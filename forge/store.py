@@ -98,18 +98,23 @@ def _recover_tail(f) -> int:
         return 0
     start = max(0, size - 65536)
     f.seek(start)
-    chunk = f.read().decode("utf-8", "replace")
+    chunk = f.read()
 
-    def scan(text: str, base: int):
+    def scan(raw: bytes, base: int):
+        """Last valid seq + byte offset of its end. Positions are computed
+        in BYTES (len of raw lines); char-space arithmetic would drift on
+        multi-byte UTF-8 (e.g. an em-dash title) and truncate a valid
+        event instead of the torn tail."""
         last_seq, valid_end = 0, None
         pos = 0
-        for ln in text.split("\n"):
-            pos += len(ln) + 1
-            if not ln.strip():
+        for raw_ln in raw.split(b"\n"):
+            pos += len(raw_ln) + 1
+            if not raw_ln.strip():
                 continue
             try:
+                ln = raw_ln.decode("utf-8")
                 seq = int(json.loads(ln)["seq"])
-            except (KeyError, ValueError, json.JSONDecodeError):
+            except (KeyError, ValueError, json.JSONDecodeError, UnicodeDecodeError):
                 continue  # torn line; keep scanning back
             last_seq = seq
             valid_end = base + pos
@@ -118,7 +123,7 @@ def _recover_tail(f) -> int:
     last_seq, valid_end = scan(chunk, start)
     if valid_end is None and size > 65536:
         f.seek(0)
-        last_seq, valid_end = scan(f.read().decode("utf-8", "replace"), 0)
+        last_seq, valid_end = scan(f.read(), 0)
     if valid_end is not None and valid_end < size:
         f.truncate(valid_end)  # discard the torn tail, keep the log valid
         f.flush()

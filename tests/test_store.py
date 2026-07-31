@@ -73,5 +73,44 @@ class StoreTest(unittest.TestCase):
         self.assertEqual(Graph.from_events(events).tasks["a"].title, "A")
 
 
+    def test_append_after_multibyte_titles_does_not_corrupt_log(self):
+        """Regression: _recover_tail computed byte offsets in character
+        space, so an em-dash title (3 bytes/char) made the next append
+        truncate a VALID last event and glue the new event onto it —
+        corrupting the log exactly like a torn write. SPEC §12.5."""
+        self.store.init()
+        self.store.append([{"op": "task_created", "id": "snake",
+                            "title": "Build a Snake game — Foundation"}])
+        out = self.store.append([{"op": "task_created", "id": "renderer",
+                                  "title": "Renderer"}])
+        self.assertEqual([e["seq"] for e in out], [2])
+        evs = self.store.read_events()
+        self.assertEqual([e["seq"] for e in evs], [1, 2])
+        self.assertEqual(evs[1]["id"], "renderer")
+        with open(self.store.path, encoding="utf-8") as f:
+            for i, ln in enumerate(f, 1):
+                if ln.strip():
+                    import json
+                    json.loads(ln)  # every line must parse
+
+    def test_recover_tail_truncates_torn_tail_after_multibyte_lines(self):
+        """Torn-tail recovery must still work when the log contains
+        multi-byte UTF-8: the torn line is discarded, seqs re-stamp."""
+        self.store.init()
+        self.store.append([{"op": "task_created", "id": "a",
+                            "title": "Alpha — Foundation"},
+                           {"op": "task_created", "id": "b", "title": "Beta"}])
+        # simulate a crash: last line truncated mid-JSON (no trailing \n)
+        with open(self.store.path, encoding="utf-8") as f:
+            raw = f.read()
+        cut = raw.rfind("\n") + 1  # keep every complete line
+        with open(self.store.path, "w", encoding="utf-8") as f:
+            f.write(raw[:cut])
+            f.write('{"op": "task_created", "id": "x", "title": "Torn')
+        out = self.store.append([{"op": "task_created", "id": "c", "title": "Gamma"}])
+        self.assertEqual([e["seq"] for e in out], [3])
+        self.assertEqual([e["id"] for e in self.store.read_events()], ["a", "b", "c"])
+
+
 if __name__ == "__main__":
     unittest.main()

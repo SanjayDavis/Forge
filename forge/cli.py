@@ -370,6 +370,54 @@ def cmd_demo(args, k: Kernel) -> int:
     return 0
 
 
+def _planner_plugin():
+    """The planner is a separate product (plugins/), not part of the
+    installed forge package. Loaded lazily so forge works without it."""
+    try:
+        from plugins.planner import ProposalError, ReferencePlanner, validate_proposal
+        return ProposalError, ReferencePlanner, validate_proposal
+    except ImportError:
+        print("error: planner plugin not found — plugins/ is not installed with "
+              "forge; run from the repository root (PYTHONPATH=repo root)",
+              file=sys.stderr)
+        return None, None, None
+
+
+def cmd_plan(args, k: Kernel) -> int:
+    ProposalError, ReferencePlanner, _ = _planner_plugin()
+    if ReferencePlanner is None:
+        return 1
+    proposal = ReferencePlanner().plan(
+        args.goal, priority=args.priority, confidence=args.confidence)
+    if args.commit:
+        result = k.import_events(proposal["events"])
+        print(f"committed {result['imported']} events from {proposal['proposal_id']} "
+              f"(confidence {proposal['confidence']}) -> project now has "
+              f"{result['tasks']} tasks")
+    else:
+        print(json.dumps(proposal, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_propose(args, k: Kernel) -> int:
+    ProposalError, _, validate_proposal = _planner_plugin()
+    if validate_proposal is None:
+        return 1
+    with open(args.file, encoding="utf-8") as f:
+        proposal = json.load(f)
+    try:
+        validate_proposal(proposal)
+    except ProposalError as e:
+        print(f"proposal rejected (protocol): {e}", file=sys.stderr)
+        return 1
+    # kernel verdict: commits whole or rejects whole (GraphError -> main)
+    result = k.import_events(proposal["events"])
+    print(f"committed {result['imported']} events from {proposal['proposal_id']} "
+          f"(confidence {proposal['confidence']}) -> project now has "
+          f"{result['tasks']} tasks")
+    return 0
+
+
 # --------------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="forge", description="Forge — a deterministic project kernel. "
@@ -469,6 +517,16 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("replay", help="reconstruct the graph from the log")
     sub.add_parser("demo", help="seed a demo project (Snake Game)")
 
+    c = sub.add_parser("plan", help="reference planner: GOAL -> proposal (SPEC §9); commit is opt-in")
+    c.add_argument("goal")
+    c.add_argument("--priority", choices=["low", "medium", "high"], default="medium")
+    c.add_argument("--confidence", type=float, default=0.9)
+    c.add_argument("--commit", action="store_true",
+                   help="commit the proposal through the kernel (atomic: whole or nothing)")
+
+    c = sub.add_parser("propose", help="commit a proposal file: protocol check, then kernel commits or rejects whole")
+    c.add_argument("file")
+
     return p
 
 
@@ -501,6 +559,8 @@ COMMANDS = {
     "undo": cmd_undo,
     "replay": cmd_replay,
     "demo": cmd_demo,
+    "plan": cmd_plan,
+    "propose": cmd_propose,
 }
 
 

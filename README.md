@@ -193,18 +193,26 @@ line is a client of the kernel, not the kernel.
   one-to-one to invariants I1–I7 — malformed proposals, fuzzed event
   streams, torn-log crash recovery, atomic proposal commits, replay
   identity across hash seeds, scheduler determinism. It found and
-  fixed three real gaps before freeze (un-stamped proposal events,
-  torn-tail line merging, torn-tail seq duplication). Every
-  implementation claiming to be Forge v1.0 must pass it. 80 tests,
+  fixed four real gaps before freeze (un-stamped proposal events,
+  torn-tail line merging, torn-tail seq duplication, byte/char drift in
+  tail recovery). Every
+  implementation claiming to be Forge v1.0 must pass it. 105 tests,
   all green.
 
 Then the clients — each a plugin, each a separate product on top of
 the kernel:
 
-- **M2B — Planner plugin (next).** The first AI client. One LLM call:
-  goal in, `{proposal_id, reason, confidence, events}` out. The kernel
-  commits it atomically or rejects it whole (`import_events`).
-- **M3 — Executor plugin.** `forge show` output in, code out, hard
+- **M2B — Planner plugin (done).** The first AI client. `plugins/planner/`
+  ships a reference planner: goal in, `{proposal_id, reason, confidence,
+  events}` out — a proposal, never a mutation. The kernel commits it
+  atomically or rejects it whole (`import_events`). The planner test
+  suite (23 tests) feeds the kernel both valid and intentionally
+  invalid proposals and asserts its verdicts. It also flushed out a
+  fourth real kernel bug — a byte/char mismatch in torn-tail recovery
+  that truncated valid events after multi-byte titles (fixed, with
+  regression tests; 105 tests, all green). An LLM planner is a drop-in
+  behind the same protocol.
+- **M3 — Executor plugin (next).** `forge show` output in, code out, hard
   evidence attached (SPEC §10).
 - **M4 — Reviewer plugin.** Acceptance judgment gates soft
   verification (SPEC §11).
