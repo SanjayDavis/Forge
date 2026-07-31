@@ -9,6 +9,16 @@
 >
 > Normative keywords: **MUST**, **MUST NOT**, **SHOULD**, **MAY**
 > (RFC 2119).
+>
+> **The philosophy — one sentence, the decision rule for every design
+> question:**
+>
+> > **The kernel owns the project state. Agents only propose changes.**
+>
+> When in doubt, ask which side of that sentence a feature belongs to.
+> If it touches state or the rules for changing it, it is kernel work —
+> frozen, tested, versioned. If it is judgment, intent, or capability,
+> it is agent work — a plugin.
 
 ## 0. Positioning
 
@@ -81,6 +91,32 @@ plays by the same rules: **it proposes; the kernel decides.**
      MUST produce the same graph, the same scheduler answers, and the
      same query results. No randomness, no wall-clock dependence in
      ordering, no hash-order iteration.
+
+1.9. **Kernel invariants.** These hold always. A feature that would
+     break one is not a feature; it is a redesign, and it requires a
+     spec change and version bump like any other (§Appendix A). Every
+     invariant has a compliance test (`tests/test_compliance.py`).
+
+     - **I1 — Deterministic fold.** Every event log folds to exactly
+       one state. Environment (locale, hash seed, dict key order) does
+       not change the result.
+     - **I2 — Replay identity.** Replaying a log reconstructs
+       byte-identical state, every time, on any machine.
+     - **I3 — Derived state is never persisted.** Nothing computable
+       from the log (`blocked`, `ready`, completion, container `done`)
+       is ever written to it.
+     - **I4 — Atomic proposals.** A proposal commits whole or not at
+       all. No partially committed batch exists, even across a crash.
+     - **I5 — Deterministic scheduler.** `ready()` / `next()` /
+       `progress()` are pure functions of the log; randomized creation
+       order cannot change their answers for the same final graph.
+     - **I6 — Verification cannot be bypassed.** No event can move a
+       task to `done` except a valid `verification_passed`; `force`
+       bypasses only the dependency gate, never status or container
+       rules.
+     - **I7 — Context never invents state.** The Context Builder
+       reports only ids, statuses, blockers, and evidence that exist
+       in the graph. It is a projection, not a generator.
 
 ## 2. Task Model
 
@@ -503,8 +539,13 @@ None of these require changing v1 events. They are new ops, stamped
 
 This specification is the contract when all three hold:
 
-1. Every claim here has a test in the reference implementation
-   (currently 68, all green).
+1. Every normative claim here has a test — either a unit test in the
+   reference implementation (currently 68) or a compliance test
+   (`tests/test_compliance.py`) that maps one-to-one to the
+   invariants I1–I7 and the adversarial cases (§3.3, §12.5):
+   malformed proposals, fuzzed event streams, torn-log recovery,
+   cross-environment replay identity, randomized scheduler
+   determinism. A claim without a test is a wish, not a contract.
 2. A fresh implementation can be built from this document alone.
 3. The kernel survives its own stress test: concurrent writers,
    100k-event replays, deep expansion, adversarial logs.

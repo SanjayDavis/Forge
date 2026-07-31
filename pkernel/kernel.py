@@ -18,7 +18,7 @@ import json
 from typing import Any, Iterable
 
 from .context import STATUS_ICON, build_context, to_json, to_markdown
-from .model import Graph, GraphError, TaskNode
+from .model import Graph, GraphError, SCHEMA_VERSION, TaskNode
 from .scheduler import blockers, is_container, next_task, progress, ready_tasks
 from .store import Store
 
@@ -194,8 +194,17 @@ class Kernel:
         overwritten. Sequence numbers are re-stamped locally."""
         if not isinstance(events, list) or not events:
             raise GraphError("nothing to import")
-        # validate + fold incoming log in isolation (bad events fail here)
-        foreign = Graph.from_events([dict(e) for e in events])
+        # validate + fold incoming log in isolation (bad events fail here).
+        # Proposals carry no seq (SPEC §9.4): the kernel assigns it, so the
+        # isolated fold pre-stamps temporary sequence numbers.
+        folded = []
+        for i, e in enumerate(events):
+            copy = dict(e)
+            copy["seq"] = i + 1
+            copy.setdefault("ts", "")
+            copy.setdefault("v", SCHEMA_VERSION)
+            folded.append(copy)
+        foreign = Graph.from_events(folded)
         overlap = set(foreign.tasks) & set(self.graph.tasks)
         if overlap:
             raise GraphError(

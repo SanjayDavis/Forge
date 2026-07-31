@@ -24,6 +24,8 @@ resolution, verification, and progress; the LLM is used only where it's
 strongest — planning, writing code, reviewing. It never owns the graph;
 it proposes, the kernel decides.
 
+> **The kernel owns the project state. Agents only propose changes.**
+
 ## The contract
 
 `docs/SPEC.md` is the Project Kernel Specification v1.0 — the normative
@@ -163,8 +165,17 @@ pk query ready()
   and 4-process concurrent writers, 5-level expansion, cycle rejection.
 - **v1.0 — Kernel frozen (done).** `docs/SPEC.md` is the contract
   (event model, state machine, scheduler, verification, context,
-  query, Planner/Executor/Reviewer protocols). No new kernel features
-  without a spec change and version bump (Appendix A).
+  query, Planner/Executor/Reviewer protocols, invariants I1–I7).
+  No new kernel features without a spec change and version bump
+  (Appendix A).
+- **Compliance — the kernel passes its own spec (done).**
+  `tests/test_compliance.py` maps one-to-one to invariants I1–I7:
+  malformed proposals, fuzzed event streams (valid + garbage),
+  torn-log crash recovery, atomic proposal commits, replay identity
+  across hash seeds, scheduler determinism under randomized creation.
+  It found and fixed three real gaps: un-stamped proposal events
+  crashed the import fold, appending after a torn tail merged lines,
+  and torn tails could duplicate seqs. 80 tests, all green.
 - **M2A — Planner Protocol (next).** The protocol is already specified
   (SPEC §9): planner receives `{goal, graph snapshot, knowledge,
   constraints}` and emits a `{proposal_id, reason, confidence, events}`

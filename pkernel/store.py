@@ -81,9 +81,17 @@ def _ts() -> str:
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
-def _tail_seq(f) -> int:
-    """Seq of the last event, read via an open handle without scanning the
-    whole file (reads only the final 64 KiB)."""
+def _recover_tail(f) -> int:
+    """Return the seq of the last valid event, truncating any torn tail
+    (partial line(s) after the last valid event) so the next append can
+    never merge into garbage. Must be called under the write lock.
+
+    A torn line is a partial write from a crash — it never made it into
+    the log, so discarding it is safe (SPEC §12.5). Garbage *followed by
+    valid events* is corruption and is not touched here; the read path
+    raises on it. The tail window covers the last 64 KiB; if it contains
+    no valid line (line longer than the window, or an all-garbage tail)
+    the whole file is scanned before giving up."""
     f.seek(0, 2)
     size = f.tell()
     if size == 0:
@@ -91,13 +99,41 @@ def _tail_seq(f) -> int:
     start = max(0, size - 65536)
     f.seek(start)
     chunk = f.read().decode("utf-8", "replace")
-    lines = [ln for ln in chunk.splitlines() if ln.strip()]
-    if not lines:
-        return 0
-    try:
-        return int(json.loads(lines[-1])["seq"])
-    except (KeyError, ValueError, json.JSONDecodeError):
-        return 0  # torn tail; next seq starts from 1
+
+    def scan(text: str, base: int):
+        last_seq, valid_end = 0, None
+        pos = 0
+        for ln in text.split("\n"):
+            pos += len(ln) + 1
+            if not ln.strip():
+                continue
+            try:
+                seq = int(json.loads(ln)["seq"])
+            except (KeyError, ValueError, json.JSONDecodeError):
+                continue  # torn line; keep scanning back
+            last_seq = seq
+            valid_end = base + pos
+        return last_seq, valid_end
+
+    last_seq, valid_end = scan(chunk, start)
+    if valid_end is None and size > 65536:
+        f.seek(0)
+        last_seq, valid_end = scan(f.read().decode("utf-8", "replace"), 0)
+    if valid_end is not None and valid_end < size:
+        f.truncate(valid_end)  # discard the torn tail, keep the log valid
+        f.flush()
+    return last_seq
+
+
+def _ensure_trailing_newline(f) -> None:
+    """A crash can leave the last line without a newline; appending to it
+    would merge two events into one line. Under the write lock, repair the
+    boundary before writing."""
+    f.seek(0, 2)
+    if f.tell() > 0:
+        f.seek(-1, 2)
+        if f.read(1) != b"\n":
+            f.write(b"\n")
 
 
 class Store:
@@ -150,7 +186,8 @@ class Store:
         with self._thread_lock:
             with _FileLock(self.lock_path):
                 with open(self.path, "a+b") as f:
-                    seq = _tail_seq(f) + 1
+                    _ensure_trailing_newline(f)
+                    seq = _recover_tail(f) + 1
                     for ev in events:
                         stamped = dict(ev)
                         stamped["seq"] = seq
@@ -169,6 +206,7 @@ class Store:
         with self._thread_lock:
             with _FileLock(self.lock_path):
                 with open(self.path, "a+b") as f:
+                    _ensure_trailing_newline(f)
                     events = self._read_all(f)
                     if not events:
                         raise GraphError("nothing to undo")
