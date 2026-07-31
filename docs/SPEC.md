@@ -1,7 +1,7 @@
-# Project Kernel Specification v1.0
+# Forge Specification v1.0
 
-> **A deterministic execution engine for autonomous software development.**
->
+> **A deterministic project kernel for autonomous software development.**
+
 > This document is the **contract**. The reference implementation
 > (`forge/`, Python) is one implementation of it. Implementations can
 > change; the spec does not. Anything not specified here is an
@@ -26,13 +26,14 @@
 >
 > The kernel owns the project state. Agents only propose changes.
 >
-> Git is the source of truth for code. Forge is the source of truth
-> for work.
+> Git is the source of truth for code. Forge is the deterministic
+> source of truth for project state.
 
-Project Kernel is **not** an AI framework. It is a deterministic
-execution engine. Intelligence — planners, executors, reviewers, humans —
-sits *above* the kernel and is interchangeable. The kernel owns project
-state and the rules for changing it; nothing else does.
+Forge is **not** an AI framework. It is a **deterministic project
+kernel**. Planners, executors, reviewers, humans, and AI agents are all
+clients of the kernel — interchangeable, fallible, replaceable. The
+kernel owns project state and the rules for changing it; nothing else
+does.
 
 ```
                  Humans   Claude Code   Codex   Gemini   Hermes

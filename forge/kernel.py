@@ -1,4 +1,4 @@
-"""The official Project Kernel API.
+"""The official Forge kernel API.
 
 This is the ONLY surface through which anything — human CLI, planner agent,
 executor, verifier, MCP server — may read or modify a project. Planners do

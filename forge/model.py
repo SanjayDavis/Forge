@@ -1,4 +1,4 @@
-"""Core domain model for the Project Kernel.
+"""Core domain model for the Forge kernel.
 
 Pure, deterministic, zero dependencies. No I/O, no AI.
 

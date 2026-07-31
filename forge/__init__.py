@@ -1,5 +1,5 @@
-"""Project Kernel — a deterministic execution engine for autonomous
-software development.
+"""Forge — a deterministic project kernel for autonomous software
+development.
 
 The kernel owns project state as an event-sourced task graph. Humans,
 planners, executors, verifiers, and MCP servers are interchangeable

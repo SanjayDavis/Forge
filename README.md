@@ -1,9 +1,18 @@
 # Forge
 
-> **Project Kernel** is the architecture and specification.
-> **Forge** is the reference implementation you install and use.
+> **Forge is a deterministic project kernel.** Planners, executors,
+> reviewers, humans, and AI agents are all clients of the kernel.
 
-**A deterministic execution engine for autonomous software development.**
+```
+Forge
+├── Forge Specification   docs/SPEC.md — the contract
+├── Forge Kernel          forge/ — the deterministic core
+├── Forge CLI             the `forge` command
+├── Forge Planner / Executor / Reviewer   plugins/ (spec §9–§11)
+└── Forge MCP / Forge UI  wire protocol and surfaces (M4, last)
+```
+
+**A deterministic project kernel for autonomous software development.**
 
 > **Everything is a proposal until the kernel accepts it.**
 
@@ -14,7 +23,7 @@ are interchangeable **plugins** of the same official API.
 
 ```
 LLM ──┐
-      ├──► Forge (Project Kernel) ──► events.log (source of truth)
+      ├──► Forge Kernel ──► events.log (source of truth)
 Human ─┘        │
                 ├── scheduler (ready/next/blockers, priority-ordered)
                 ├── verifier gates (hard: tests/lint, soft: review)
@@ -30,12 +39,12 @@ strongest — planning, writing code, reviewing. It never owns the graph;
 it proposes, the kernel decides.
 
 > **The kernel owns the project state. Agents only propose changes.**
-> Git is the source of truth for code. Forge is the source of truth
-> for work.
+> Git is the source of truth for code. Forge is the deterministic
+> source of truth for project state.
 
 ## The contract
 
-`docs/SPEC.md` is the Project Kernel Specification v1.0 — the normative
+`docs/SPEC.md` is the Forge Specification v1.0 — the normative
 contract: task model, frozen event schema, state machine, scheduler,
 verification, context builder, query language, and the Planner /
 Executor / Reviewer protocols. The kernel is **frozen at v1** (like

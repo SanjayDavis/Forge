@@ -1,4 +1,4 @@
-"""Project Kernel CLI (`forge`).
+"""Forge CLI (`forge`).
 
 A human can run an entire software project through this interface. LLM
 clients (planner/executor/verifier agents) emit exactly the same events
@@ -63,7 +63,7 @@ def _parse_child(spec: str) -> dict:
 
 # --------------------------------------------------------------------------- demo seed
 def _seed_demo(k: Kernel) -> None:
-    k.create_task("Snake Game", "A terminal snake game built via the Project Kernel.",
+    k.create_task("Snake Game", "A terminal snake game built via Forge.",
                   acceptance=["game runs", "unit tests pass"], priority="high")
     k.expand("snake-game", [
         {"title": "Window", "description": "Terminal window setup", "acceptance": ["renders a frame"]},
@@ -372,7 +372,7 @@ def cmd_demo(args, k: Kernel) -> int:
 
 # --------------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="forge", description="Project Kernel — a deterministic "
+    p = argparse.ArgumentParser(prog="forge", description="Forge — a deterministic project kernel. "
                                 "execution engine for autonomous software development. "
                                 "Version " + __version__)
     p.add_argument("-d", "--dir", default=".", help="project directory (default: .)")

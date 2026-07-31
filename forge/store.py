@@ -1,4 +1,4 @@
-"""Event-log persistence for the Project Kernel.
+"""Event-log persistence for the Forge kernel.
 
 The log is an append-only JSONL file. The graph is a projection: load =
 read all events + fold. Undo = truncate + refold. Append is the only write
