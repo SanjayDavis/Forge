@@ -24,9 +24,9 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from forge import ForgeClient, GraphError, ProposalError, slugify, validate_proposal
 from forge.kernel import Kernel
-from forge.model import GraphError, slugify
-from plugins.planner import ALLOWED_OPS, ProposalError, ReferencePlanner, validate_proposal
+from plugins.planner import ALLOWED_OPS, ReferencePlanner
 
 PLANNER_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            "..", "plugins", "planner", "planner.py")
@@ -118,15 +118,24 @@ class TestValidProposals(unittest.TestCase):
         for goal in ("Build a Snake game", "Research paper", "Game engine"):
             validate_proposal(ReferencePlanner().plan(goal))  # no raise
 
-    def test_planner_never_touches_the_kernel(self):
-        """Structural: the planner module has no handle to the graph or
-        kernel — it only returns a proposal dict (§9.1)."""
+    def test_planner_consumes_only_the_public_sdk(self):
+        """Structural: the planner imports ONLY the public SDK — never
+        kernel internals. It operates entirely through the public
+        interfaces, which is the architectural proof the boundary is
+        real. The protocol objects it re-exports ARE the SDK's — one
+        definition, no private copy."""
         with open(os.path.normpath(PLANNER_SRC), encoding="utf-8") as f:
             src = f.read()
-        for banned in ("forge.kernel", "Kernel(", "import_events", "store.",
-                       ".graph", "replay("):
+        for banned in ("forge.kernel", "forge.model", "forge.store",
+                       "forge.context", "from .", "import_events", ".graph",
+                       "replay(", "Store(", "Kernel("):
             self.assertNotIn(banned, src,
                              f"planner must not reference {banned!r} (§9.1)")
+        self.assertIn("from forge import", src, "planner must consume the SDK")
+        import plugins.planner as pp
+        self.assertIs(pp.ProposalError, ProposalError,
+                      "the planner must not duplicate the protocol")
+        self.assertIs(pp.validate_proposal, validate_proposal)
         p = ReferencePlanner().plan("Build a Snake game")
         self.assertIsInstance(p, dict)
 
@@ -267,6 +276,35 @@ class TestKernelVerdicts(unittest.TestCase):
             k.import_events(ReferencePlanner().plan("Build a Snake game")["events"])
         with self.assertRaises(GraphError):
             k.import_events(ReferencePlanner().plan("Build a Snake game")["events"])
+
+
+class TestPlannerViaSdk(unittest.TestCase):
+    """The planner's official commit path is the SDK, not the kernel:
+    ReferencePlanner(client) -> commit() -> ForgeClient.propose()."""
+
+    def test_commit_through_client(self):
+        client = ForgeClient(tempfile.mkdtemp())
+        planner = ReferencePlanner(client)
+        proposal = planner.plan("Build a Snake game")
+        result = planner.commit(proposal)
+        self.assertEqual(result["proposal_id"], proposal["proposal_id"])
+        self.assertEqual(result["committed"], 4)
+        self.assertEqual(result["tasks"], 4)
+        # the client sees the committed state; the planner never did
+        t = client.next()
+        self.assertEqual(t["id"], "build-a-snake-game-foundation")
+
+    def test_commit_without_client_raises(self):
+        with self.assertRaises(ProposalError):
+            ReferencePlanner().commit(ReferencePlanner().plan("Build a Snake game"))
+
+    def test_commit_rejects_duplicate_whole(self):
+        client = ForgeClient(tempfile.mkdtemp())
+        planner = ReferencePlanner(client)
+        planner.commit(planner.plan("Build a Snake game"))
+        with self.assertRaises(GraphError):
+            planner.commit(planner.plan("Build a Snake game"))
+        self.assertEqual(len(client.kernel.store.read_events()), 4)
 
 
 if __name__ == "__main__":

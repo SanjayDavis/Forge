@@ -24,3 +24,7 @@ from .scheduler import blockers, is_container, next_task, progress, ready_tasks 
 from .context import build_context, to_json, to_markdown  # noqa: F401
 from .query import QueryError, run_query  # noqa: F401
 from .kernel import Kernel  # noqa: F401
+from .sdk import (  # noqa: F401
+    ForgeClient, ProposalError, context_package, slugify,
+    validate_proposal,
+)

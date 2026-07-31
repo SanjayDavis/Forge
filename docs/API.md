@@ -99,3 +99,73 @@ Bare words evaluate to strings.
 This API surface is v1 and stable. The event schema is frozen in
 docs/EVENTS.md. New capabilities are additive; breaking changes bump
 the schema version with a migration.
+
+---
+
+# Forge SDK (v1) — the client surface
+
+`forge.ForgeClient` is the ONE interface every client is allowed to
+touch: humans, planner agents, executors, reviewers, MCP servers. It is
+a thin facade over the official Kernel API — no graph logic, no replay
+logic, no scheduler logic lives in it. If a client needs something the
+SDK does not offer, that is a missing SDK method (or kernel API), not a
+reason to import kernel internals.
+
+    from forge import ForgeClient, validate_proposal, slugify
+
+    forge = ForgeClient("path/to/project")
+
+| method | purpose |
+|--------|---------|
+| `next()` | next ready task as a snapshot `{id, title, description, status, priority}` or None |
+| `context(task_id)` | the standard context contract package as YAML (below) |
+| `propose(proposal)` | validate the proposal envelope (§9), then commit events atomically; returns `{proposal_id, committed, tasks}` |
+| `start(task_id)` | claim a task (todo -> in_progress; blocks dependents) |
+| `attach_evidence(task_id, kind, source, detail="")` | hard (tests/build/benchmark) or soft (review) evidence |
+| `verify(task_id)` | run the verifier gate (I6); on pass the task is done — the client never decides this |
+| `verify_fail(task_id, reason)` | reviewer verdict -> needs_revision |
+| `query(expr)` | query-language results |
+| `progress()` | `{total, done, in_progress, needs_revision, todo, percent}` |
+| `replay()` | refold from disk |
+
+The executor flow is five calls:
+
+    task = forge.next()
+    ctx  = forge.context(task["id"])     # the ~500-token contract
+    result = llm(ctx)                    # code, tests
+    forge.attach_evidence(task["id"], "hard", "unittest", detail)
+    forge.verify(task["id"])             # Forge decides "done", not the LLM
+
+The planner flow:
+
+    proposal = planner(goal)             # {proposal_id, reason, confidence, events}
+    validate_proposal(proposal)          # envelope only; the kernel enforces the rest
+    forge.propose(proposal)              # atomic commit or whole rejection
+
+## Context contract package
+
+`forge context <task>` renders exactly this shape (YAML, ~500 tokens):
+
+    Task: camera — Implement Camera
+    Description: Viewport
+    Acceptance:
+      - smooth follow
+      - zoom
+      - tests
+    Dependencies:
+      - renderer ✓ (done)
+    Knowledge:
+      - camera API exists upstream
+    Relevant Files:
+      - camera.py
+      - renderer.py
+    Evidence:
+      - [hard] unittest — renderer benchmark passed
+    Constraints:
+      - do not modify renderer API
+
+Conventions: `Knowledge` = notes; `Constraints` = notes prefixed
+`constraint:`; `Dependencies` carry a ✓ (done) / ○ (todo) status marker.
+Agents read this package, never the graph. The canonical dict is
+`forge.context_package(graph, task_id)`; `forge.slugify` is the public
+id-derivation rule (child ids must be predicted by the planner).

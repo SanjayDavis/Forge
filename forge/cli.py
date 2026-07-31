@@ -387,12 +387,14 @@ def cmd_plan(args, k: Kernel) -> int:
     ProposalError, ReferencePlanner, _ = _planner_plugin()
     if ReferencePlanner is None:
         return 1
-    proposal = ReferencePlanner().plan(
+    from .sdk import ForgeClient
+    client = ForgeClient(args.dir)  # the CLI speaks the SDK too
+    proposal = ReferencePlanner(client).plan(
         args.goal, priority=args.priority, confidence=args.confidence)
     if args.commit:
-        result = k.import_events(proposal["events"])
-        print(f"committed {result['imported']} events from {proposal['proposal_id']} "
-              f"(confidence {proposal['confidence']}) -> project now has "
+        result = client.propose(proposal)  # envelope + kernel verdict
+        print(f"committed {result['committed']} events from {result['proposal_id']} "
+              f"(confidence {result['confidence']}) -> project now has "
               f"{result['tasks']} tasks")
     else:
         print(json.dumps(proposal, ensure_ascii=False, indent=2))
@@ -400,21 +402,26 @@ def cmd_plan(args, k: Kernel) -> int:
 
 
 def cmd_propose(args, k: Kernel) -> int:
-    ProposalError, _, validate_proposal = _planner_plugin()
-    if validate_proposal is None:
-        return 1
+    from .sdk import ForgeClient, ProposalError
+    client = ForgeClient(args.dir)
     with open(args.file, encoding="utf-8") as f:
         proposal = json.load(f)
     try:
-        validate_proposal(proposal)
+        # envelope check + kernel verdict: whole or nothing
+        result = client.propose(proposal)
     except ProposalError as e:
         print(f"proposal rejected (protocol): {e}", file=sys.stderr)
         return 1
-    # kernel verdict: commits whole or rejects whole (GraphError -> main)
-    result = k.import_events(proposal["events"])
-    print(f"committed {result['imported']} events from {proposal['proposal_id']} "
-          f"(confidence {proposal['confidence']}) -> project now has "
+    print(f"committed {result['committed']} events from {result['proposal_id']} "
+          f"(confidence {result['confidence']}) -> project now has "
           f"{result['tasks']} tasks")
+    return 0
+
+
+def cmd_context(args, k: Kernel) -> int:
+    from .sdk import ForgeClient
+    client = ForgeClient(args.dir)
+    print(client.context(args.task))
     return 0
 
 
@@ -485,6 +492,10 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("task")
     c.add_argument("--json", action="store_true")
 
+    c = sub.add_parser("context", help="Context Contract package for TASK (YAML) — "
+                       "the standard ~500-token handoff to any coding agent")
+    c.add_argument("task")
+
     c = sub.add_parser("inspect", help="everything about one task: status, children, evidence, history")
     c.add_argument("task")
     c.add_argument("--json", action="store_true")
@@ -545,6 +556,7 @@ COMMANDS = {
     "note": cmd_note,
     "delete": cmd_delete,
     "show": cmd_show,
+    "context": cmd_context,
     "inspect": cmd_inspect,
     "query": cmd_query,
     "export": cmd_export,

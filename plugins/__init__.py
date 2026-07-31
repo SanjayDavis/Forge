@@ -1,11 +1,12 @@
 """Forge plugins — clients of the kernel, not part of the forge package.
 
-Each plugin is a separate product on top of the kernel (SPEC §9–§11):
-planner, executor, reviewer, and later MCP. A plugin never touches
-events.log and never mutates the graph except through the official API
-(`forge.kernel.Kernel`). The kernel stays tiny and frozen; everything
-new lives here.
+A plugin never mutates the graph directly. It talks to Forge through
+the public SDK (forge.ForgeClient) or the CLI, and nothing else.
 
-Not shipped by `pip install forge` — run from the repository root
-(PYTHONPATH=repo root) or install plugins separately.
+    planner/     goal -> Proposal                    (SPEC §9, M2B)
+    reference/   the human: next -> do -> verify     (SDK proof)
+
+Everything here must be a drop-in behind the same interfaces: an LLM
+planner replacing ReferencePlanner, a real executor replacing the
+reference client — the kernel cannot tell the difference.
 """

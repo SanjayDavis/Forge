@@ -1,9 +1,11 @@
 """ReferencePlanner — M2B, the first untrusted client of Forge.
 
 Implements the Planner Protocol (SPEC §9): goal in, proposal out.
-The planner never owns the graph. It has no handle to the kernel, the
-log, or any live state — it receives an immutable snapshot and returns
-one structured object:
+The planner never owns the graph. It consumes ONLY the public SDK
+(`forge.ForgeClient`, `forge.validate_proposal`, `forge.slugify`) —
+no kernel internals. That is the architectural proof: if a plugin can
+operate entirely through the public interfaces, the kernel boundary
+is real.
 
     {
       "proposal_id": "prop_...",
@@ -28,79 +30,24 @@ from __future__ import annotations
 
 import uuid
 
-from forge.model import slugify
+from forge import ForgeClient, ProposalError, slugify, validate_proposal
+from forge.sdk import PLANNER_OPS as ALLOWED_OPS
 
-# SPEC §9.6: the ops a planner may propose. Verification and execution
-# events are the executor's domain (§10) and are rejected here.
-ALLOWED_OPS = ("task_created", "task_expanded", "task_updated", "dependency_added")
-
-# Required fields per op (mirrors OP_SHAPES for the planner's subset).
-_ENVELOPE_REQ = ("proposal_id", "reason", "confidence", "events")
-_OP_REQ = {
-    "task_created": ("id", "title"),
-    "task_updated": ("id",),
-    "task_expanded": ("task", "children"),
-    "dependency_added": ("task", "depends_on"),
-}
+# Re-exported for compatibility: the protocol now lives in the SDK
+# (forge.validate_proposal) — one definition, no duplication.
+__all__ = ["ReferencePlanner", "ProposalError", "validate_proposal",
+           "ALLOWED_OPS"]
 
 _DEFAULT_MILESTONES = ("Foundation", "Core", "Acceptance")
 
 
-class ProposalError(Exception):
-    """A proposal violates the Planner Protocol (SPEC §9)."""
-
-
-def validate_proposal(proposal) -> None:
-    """Protocol-level validation of the proposal envelope and events.
-
-    The kernel remains the authority: this checks the *envelope* and
-    the planner's allowed surface (§9.3, §9.6). Event-level semantics
-    (cycles, unknown tasks, transitions) are enforced by the kernel on
-    commit. Raises ProposalError with a structured reason.
-    """
-    if not isinstance(proposal, dict):
-        raise ProposalError("proposal must be an object")
-    for field in _ENVELOPE_REQ:
-        if field not in proposal:
-            raise ProposalError(f"missing envelope field: {field}")
-    if not isinstance(proposal["proposal_id"], str) or not proposal["proposal_id"]:
-        raise ProposalError("proposal_id must be a non-empty string")
-    if not isinstance(proposal["reason"], str) or not proposal["reason"].strip():
-        raise ProposalError("reason must be a non-empty string")
-    conf = proposal["confidence"]
-    if isinstance(conf, bool) or not isinstance(conf, (int, float)):
-        raise ProposalError("confidence must be a number")
-    if not 0.0 <= conf <= 1.0:
-        raise ProposalError("confidence must be in [0, 1]")
-
-    events = proposal["events"]
-    if not isinstance(events, list) or not events:
-        raise ProposalError("events must be a non-empty list")
-    for i, ev in enumerate(events):
-        if not isinstance(ev, dict):
-            raise ProposalError(f"event {i}: must be an object")
-        if "seq" in ev:
-            raise ProposalError(
-                f"event {i}: proposal events carry no seq — the kernel stamps it (§9.4)")
-        op = ev.get("op")
-        if op not in ALLOWED_OPS:
-            raise ProposalError(
-                f"event {i}: op '{op}' not allowed for a planner (§9.6)")
-        for field in _OP_REQ[op]:
-            if field not in ev:
-                raise ProposalError(f"event {i}: missing '{field}' for {op}")
-        if op == "task_expanded":
-            for c in ev["children"]:
-                if not isinstance(c, dict):
-                    raise ProposalError(f"event {i}: children must be objects")
-                if not (isinstance(c.get("title"), str) and c["title"]):
-                    raise ProposalError(f"event {i}: child needs a non-empty title")
-                if not (isinstance(c.get("id"), str) and c["id"]):
-                    raise ProposalError(f"event {i}: child needs a non-empty id")
-
-
 class ReferencePlanner:
     """Deterministic, stdlib-only planner. Goal in, proposal out.
+
+    Takes an optional ForgeClient for the commit path (client.propose).
+    Planning itself needs no client — the proposal is a pure function
+    of the goal — which is why plan() works without one. commit() is
+    the only method that touches Forge, and it goes through the SDK.
 
     Decomposes a goal into a root task with three milestone children
     (Foundation -> Core -> Acceptance) joined by a dependency chain.
@@ -108,6 +55,9 @@ class ReferencePlanner:
     construction, and domain intelligence belongs to a smarter planner
     behind the same protocol.
     """
+
+    def __init__(self, client: ForgeClient | None = None) -> None:
+        self.client = client
 
     def plan(self, goal: str, children=None, priority: str = "medium",
              confidence: float = 0.9, reason: str | None = None) -> dict:
@@ -176,3 +126,10 @@ class ReferencePlanner:
         }
         validate_proposal(proposal)  # self-check before returning
         return proposal
+
+    def commit(self, proposal: dict) -> dict:
+        """Commit through the SDK — atomic, whole or nothing. The
+        planner never touches the kernel directly; ForgeClient does."""
+        if self.client is None:
+            raise ProposalError("no client: construct ReferencePlanner(client) to commit")
+        return self.client.propose(proposal)

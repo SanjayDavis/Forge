@@ -206,18 +206,40 @@ the kernel:
   ships a reference planner: goal in, `{proposal_id, reason, confidence,
   events}` out — a proposal, never a mutation. The kernel commits it
   atomically or rejects it whole (`import_events`). The planner test
-  suite (23 tests) feeds the kernel both valid and intentionally
-  invalid proposals and asserts its verdicts. It also flushed out a
-  fourth real kernel bug — a byte/char mismatch in torn-tail recovery
-  that truncated valid events after multi-byte titles (fixed, with
-  regression tests; 105 tests, all green). An LLM planner is a drop-in
-  behind the same protocol.
-- **M3 — Executor plugin (next).** `forge show` output in, code out, hard
-  evidence attached (SPEC §10).
-- **M4 — Reviewer plugin.** Acceptance judgment gates soft
-  verification (SPEC §11).
-- **M5 — MCP server.** A wire protocol exposing the kernel API — the
-  last layer, never the architecture.
+  suite feeds the kernel both valid and intentionally invalid proposals
+  and asserts its verdicts. It also flushed out a fourth real kernel
+  bug — a byte/char mismatch in torn-tail recovery that truncated valid
+  events after multi-byte titles (fixed, with regression tests). An LLM
+  planner is a drop-in behind the same protocol.
+- **Context API — the contract between Forge and every coding agent
+  (done).** `forge context <task>` (and `ForgeClient.context(task_id)`)
+  returns the standard context package: Task / Description / Acceptance /
+  Dependencies (with status) / Knowledge / Relevant Files / Evidence /
+  Constraints — roughly 500 tokens instead of a repo's worth of
+  conversation. Agents never read the graph; they read this.
+- **SDK — ForgeClient (done).** `forge/sdk.py` is the one public surface
+  every client is allowed to touch: `next()`, `context()`, `propose()`,
+  `start()`, `attach_evidence()`, `verify()`, `verify_fail()`, `query()`,
+  `progress()`, `replay()`. No graph logic, no replay logic, no
+  scheduler logic — those stay in the kernel; the SDK is a thin facade.
+  **The planner now consumes the SDK instead of kernel internals** — the
+  architectural proof that the boundary is real: a plugin operating
+  entirely through the public interfaces needs nothing else. The human
+  client (`plugins/reference/`, a tiny "next → do → evidence → verify"
+  loop) proves the SDK is comfortable for non-AIs too. The CLI itself
+  speaks the SDK for all proposal flows.
+- **M3 — Executor plugin (next).** `forge next` + `forge context` in,
+  code + hard evidence out, `forge verify` decides. The executor never
+  decides it's done — the kernel does. The SDK makes this a thin
+  milestone: the flow is five client calls.
+- **M4 — Reviewer plugin.** Deterministic checks (tests, build, lint)
+  are hard evidence; the reviewer handles only the semantic layer
+  (architecture, readability, design) and emits soft evidence or
+  `verify_fail` → NeedsRevision.
+- **M5 — MCP server.** A thin transport over the SDK — `forge_next()`,
+  `forge_context()`, `forge_propose()`, `forge_verify()`,
+  `forge_query()`, `forge_replay()`. No business logic; it should be
+  almost boring.
 - **M6 — VS Code extension.** The CLI with a panel.
 - **M7 — Web UI.** `forge ui`: project, graph, history, replay,
   evidence.
@@ -225,6 +247,12 @@ the kernel:
   source of truth.
 - **v2 — Discussion.** Hypergraph semantics (Appendix B) and anything
   else the clients teach us. Additive, spec-amended, version-bumped.
+
+Repository separation (conceptual, from M2B on): `forge/` holds the
+kernel, CLI, SDK, and specification; `forge-hermes/`, `forge-mcp/`,
+`forge-vscode/` are separate clients. If a client ever needs a private
+shortcut into the kernel, that is a signal the kernel API is missing
+something — the SDK boundary is what makes the split safe.
 
 Nobody owns the project; the kernel does. Git stores source code.
 Forge stores project state.
