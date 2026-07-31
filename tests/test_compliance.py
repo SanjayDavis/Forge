@@ -30,13 +30,13 @@ import sys
 import tempfile
 import unittest
 
-from pkernel.context import build_context, to_json
-from pkernel.kernel import Kernel
-from pkernel.model import (Graph, GraphError, SCHEMA_VERSION, STATUS_DONE,
+from forge.context import build_context, to_json
+from forge.kernel import Kernel
+from forge.model import (Graph, GraphError, SCHEMA_VERSION, STATUS_DONE,
                            STATUS_IN_PROGRESS, STATUS_NEEDS_REVISION,
                            STATUS_TODO)
-from pkernel.scheduler import next_task, progress, ready_tasks
-from pkernel.store import Store, load_project
+from forge.scheduler import next_task, progress, ready_tasks
+from forge.store import Store, load_project
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -206,8 +206,8 @@ class ComplianceInvariants(unittest.TestCase):
             code = (
                 "import json, sys\n"
                 "sys.path.insert(0, %r)\n"
-                "from pkernel.model import Graph\n"
-                "from pkernel.scheduler import ready_tasks, progress, next_task\n"
+                "from forge.model import Graph\n"
+                "from forge.scheduler import ready_tasks, progress, next_task\n"
                 "g = Graph.from_events(json.loads(%r))\n"
                 "print(json.dumps({'tasks': sorted(g.tasks), "
                 "'statuses': [g.tasks[i].status for i in sorted(g.tasks)], "

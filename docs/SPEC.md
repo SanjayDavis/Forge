@@ -3,7 +3,7 @@
 > **A deterministic execution engine for autonomous software development.**
 >
 > This document is the **contract**. The reference implementation
-> (`pkernel/`, Python) is one implementation of it. Implementations can
+> (`forge/`, Python) is one implementation of it. Implementations can
 > change; the spec does not. Anything not specified here is an
 > implementation detail and must not be relied upon.
 >
@@ -21,6 +21,13 @@
 > it is agent work — a plugin.
 
 ## 0. Positioning
+
+> **Everything is a proposal until the kernel accepts it.**
+>
+> The kernel owns the project state. Agents only propose changes.
+>
+> Git is the source of truth for code. Forge is the source of truth
+> for work.
 
 Project Kernel is **not** an AI framework. It is a deterministic
 execution engine. Intelligence — planners, executors, reviewers, humans —
@@ -514,6 +521,11 @@ proposal ──► validate envelope
 - **Plugins** (planners, executors, reviewers, MCP servers, UIs,
   context renderers) are unrestricted: they are clients of the kernel
   API and the protocols above. Everything new lives there.
+- **The user experience is NOT frozen.** CLI commands, planner prompts,
+  MCP interfaces, and visualizations may evolve freely. Only the
+  deterministic semantics — the invariants (I1–I7) and the event
+  schema — are stable. Freezing the contract is good; freezing the UX
+  is not.
 - The official API surface and event schema in `docs/API.md` and
   `docs/EVENTS.md` are normative extracts of this spec.
 

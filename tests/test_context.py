@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from pkernel.context import build_context, to_json, to_markdown
-from pkernel.model import Graph
+from forge.context import build_context, to_json, to_markdown
+from forge.model import Graph
 
 
 class ContextTest(unittest.TestCase):

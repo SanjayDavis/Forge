@@ -1,15 +1,20 @@
-# Project Kernel
+# Forge
+
+> **Project Kernel** is the architecture and specification.
+> **Forge** is the reference implementation you install and use.
 
 **A deterministic execution engine for autonomous software development.**
 
-The kernel owns software-project execution state as an event-sourced task
-graph. It is pure, deterministic Python with zero dependencies — no AI
-anywhere in the core. Humans, LLM planners, executors, verifiers, and
-MCP servers are interchangeable **plugins** of the same official API.
+> **Everything is a proposal until the kernel accepts it.**
+
+The kernel owns project state as an event-sourced task graph. It is
+pure, deterministic Python with zero dependencies — no AI anywhere in
+the core. Humans, LLM planners, executors, verifiers, and MCP servers
+are interchangeable **plugins** of the same official API.
 
 ```
 LLM ──┐
-      ├──► Project Kernel ──► events.log (source of truth)
+      ├──► Forge (Project Kernel) ──► events.log (source of truth)
 Human ─┘        │
                 ├── scheduler (ready/next/blockers, priority-ordered)
                 ├── verifier gates (hard: tests/lint, soft: review)
@@ -25,6 +30,8 @@ strongest — planning, writing code, reviewing. It never owns the graph;
 it proposes, the kernel decides.
 
 > **The kernel owns the project state. Agents only propose changes.**
+> Git is the source of truth for code. Forge is the source of truth
+> for work.
 
 ## The contract
 
@@ -41,7 +48,7 @@ the event schema don't. Anything new lives in a plugin, not the core.
   (JSONL, schema frozen in `docs/EVENTS.md`). The graph is a fold over
   the log. Undo = truncate, replay = refold, crash recovery = skip torn
   line, audit = the log itself.
-- **One official API.** `pkernel.kernel.Kernel` is the ONLY mutation
+- **One official API.** `forge.kernel.Kernel` is the ONLY mutation
   path (`docs/API.md`). Planners return *proposals*; the kernel
   validates, persists, applies. The LLM is never trusted with the graph.
 - **Derived states.** `blocked`/`ready`/completion are never stored —
@@ -53,7 +60,7 @@ the event schema don't. Anything new lives in a plugin, not the core.
 - **Hard vs soft evidence.** `hard` = tests/compile/benchmark (machine
   verifiable). `soft` = LLM/human review (asserted). Verification gates
   reject until the evidence holds.
-- **Context Builder.** `pk show TASK` produces the exact package an LLM
+- **Context Builder.** `forge show TASK` produces the exact package an LLM
   client needs. No context reconstruction, no state guessing.
 - **Concurrency by construction.** Writes are serialized by an OS file
   lock (`events.lock`); `seq` is unique across processes. N agents can
@@ -63,37 +70,37 @@ the event schema don't. Anything new lives in a plugin, not the core.
 
 ```
 python -m pip install -e .
-pk --help
+forge --help
 ```
 
-(Works without install too: `python -m pkernel.cli ...`)
+(Works without install too: `python -m forge.cli ...`)
 
 ## Quickstart
 
 ```
-pk -d myproject init
+forge -d myproject init
 cd myproject
 
-pk create "Snake Game" --desc "A terminal snake game" -a "game runs" --priority high
-pk expand snake-game \
+forge create "Snake Game" --desc "A terminal snake game" -a "game runs" --priority high
+forge expand snake-game \
     -c "Window::terminal window" \
     -c "Renderer::draws the board::renders;tests pass" \
     -c "Input::keyboard controls"
-pk graph                       # see the tree
-pk next                        # what to work on (priority order)
-pk start window
-pk evidence window --kind hard --source unittest --detail "14 passed"
-pk verify-pass window          # hard gate: deps must be done first
-pk verify-fail input --reason "edge cases missing"
-pk retry input
-pk show input                  # context package for an LLM client
-pk inspect renderer            # dossier: children, evidence, history
-pk query "status == needs_revision and priority == high"
-pk query blockers(renderer)
-pk blockers snake-game --chain # root-cause paths
-pk progress
-pk undo                        # truncate the last event
-pk replay                      # rebuild the graph from the log
+forge graph                       # see the tree
+forge next                        # what to work on (priority order)
+forge start window
+forge evidence window --kind hard --source unittest --detail "14 passed"
+forge verify-pass window          # hard gate: deps must be done first
+forge verify-fail input --reason "edge cases missing"
+forge retry input
+forge show input                  # context package for an LLM client
+forge inspect renderer            # dossier: children, evidence, history
+forge query "status == needs_revision and priority == high"
+forge query blockers(renderer)
+forge blockers snake-game --chain # root-cause paths
+forge progress
+forge undo                        # truncate the last event
+forge replay                      # rebuild the graph from the log
 ```
 
 ## States
@@ -145,14 +152,14 @@ demo          seed the Snake Game example (empty project only)
 ## Query examples
 
 ```
-pk query "status == needs_revision"
-pk query "priority > medium"                    # low < medium < high
-pk query '"snake" in title and not blocked'
-pk query "evidence_count >= 2 and status == done"
-pk query "id in children(renderer)"
-pk query blockers(renderer)
-pk query evidence(input)
-pk query ready()
+forge query "status == needs_revision"
+forge query "priority > medium"                    # low < medium < high
+forge query '"snake" in title and not blocked'
+forge query "evidence_count >= 2 and status == done"
+forge query "id in children(renderer)"
+forge query blockers(renderer)
+forge query evidence(input)
+forge query ready()
 ```
 
 ## Roadmap
@@ -184,7 +191,7 @@ pk query ready()
   protocol has a test suite.
 - **M2B — Planner (a plugin).** One LLM call: goal in, proposal out.
   A client of the kernel, like everything else.
-- **M3 — Executor + Reviewer.** Executor gets `pk show` output, writes
+- **M3 — Executor + Reviewer.** Executor gets `forge show` output, writes
   code, attaches hard evidence; reviewer protocol (SPEC §11) gates
   soft verification.
 - **M4 — Multi-agent + MCP.** Any agent works through the same kernel.

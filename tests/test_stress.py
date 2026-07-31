@@ -5,10 +5,10 @@ import threading
 import time
 import unittest
 
-from pkernel.kernel import Kernel
-from pkernel.model import Graph, GraphError, STATUS_DONE
-from pkernel.scheduler import progress
-from pkernel.store import Store, load_project
+from forge.kernel import Kernel
+from forge.model import Graph, GraphError, STATUS_DONE
+from forge.scheduler import progress
+from forge.store import Store, load_project
 
 
 def commit(g, ev, seq):

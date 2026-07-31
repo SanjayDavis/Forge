@@ -1,7 +1,7 @@
 import unittest
 
-from pkernel.model import Graph
-from pkernel.scheduler import blockers, next_task, progress, ready_tasks
+from forge.model import Graph
+from forge.scheduler import blockers, next_task, progress, ready_tasks
 
 
 class SchedulerTest(unittest.TestCase):

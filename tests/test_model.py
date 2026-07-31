@@ -1,6 +1,6 @@
 import unittest
 
-from pkernel.model import Graph, GraphError, STATUS_DONE, STATUS_IN_PROGRESS, STATUS_NEEDS_REVISION, STATUS_TODO
+from forge.model import Graph, GraphError, STATUS_DONE, STATUS_IN_PROGRESS, STATUS_NEEDS_REVISION, STATUS_TODO
 
 T = "2026-07-31T12:00:00+00:00"
 
@@ -123,7 +123,7 @@ class GraphTest(unittest.TestCase):
         self.assertEqual(set(r.depends_on), {"camera", "ui", "lighting"})
         self.assertEqual(r.status, STATUS_IN_PROGRESS)  # expansion = work started
         # children are ready immediately (no deps) and container is not a work item
-        from pkernel.scheduler import ready_tasks, is_container
+        from forge.scheduler import ready_tasks, is_container
         self.assertTrue(is_container(r))
         self.assertEqual({t.id for t in ready_tasks(g)}, {"camera", "ui", "lighting"})
 

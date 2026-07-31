@@ -1,7 +1,7 @@
 import unittest
 
-from pkernel.model import Graph
-from pkernel.query import QueryError, run_query
+from forge.model import Graph
+from forge.query import QueryError, run_query
 
 
 class QueryTest(unittest.TestCase):

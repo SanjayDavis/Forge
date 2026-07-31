@@ -2,8 +2,8 @@ import os
 import tempfile
 import unittest
 
-from pkernel.model import Graph, GraphError, STATUS_DONE
-from pkernel.store import EVENT_FILE, Store, load_project
+from forge.model import Graph, GraphError, STATUS_DONE
+from forge.store import EVENT_FILE, Store, load_project
 
 
 def commit(store, graph, ev):

@@ -1,10 +1,10 @@
-"""Project Kernel CLI (`pk`).
+"""Project Kernel CLI (`forge`).
 
 A human can run an entire software project through this interface. LLM
 clients (planner/executor/verifier agents) emit exactly the same events
 through the same Kernel API.
 
-Usage: pk <command> [args]  (run `pk --help` or `pk <command> --help`)
+Usage: forge <command> [args]  (run `forge --help` or `forge <command> --help`)
 """
 
 from __future__ import annotations
@@ -372,7 +372,7 @@ def cmd_demo(args, k: Kernel) -> int:
 
 # --------------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="pk", description="Project Kernel — a deterministic "
+    p = argparse.ArgumentParser(prog="forge", description="Project Kernel — a deterministic "
                                 "execution engine for autonomous software development. "
                                 "Version " + __version__)
     p.add_argument("-d", "--dir", default=".", help="project directory (default: .)")
@@ -516,7 +516,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {e}", file=sys.stderr)
         return 1
     except FileNotFoundError:
-        print(f"error: {args.dir} is not a project (run: pk init {args.dir})", file=sys.stderr)
+        print(f"error: {args.dir} is not a project (run: forge init {args.dir})", file=sys.stderr)
         return 1
 
 

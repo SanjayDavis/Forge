@@ -2,8 +2,8 @@ import json
 import tempfile
 import unittest
 
-from pkernel.kernel import Kernel
-from pkernel.model import GraphError, STATUS_DONE, STATUS_IN_PROGRESS, STATUS_TODO
+from forge.kernel import Kernel
+from forge.model import GraphError, STATUS_DONE, STATUS_IN_PROGRESS, STATUS_TODO
 
 
 class KernelTest(unittest.TestCase):

@@ -3,7 +3,7 @@ software development.
 
 The kernel owns project state as an event-sourced task graph. Humans,
 planners, executors, verifiers, and MCP servers are interchangeable
-clients of the same official API (pkernel.kernel.Kernel). There is no AI
+clients of the same official API (forge.kernel.Kernel). There is no AI
 in the kernel; it is pure, deterministic, and zero-dependency.
 
     LLM ──┐
