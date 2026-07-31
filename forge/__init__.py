@@ -11,7 +11,11 @@ in the kernel; it is pure, deterministic, and zero-dependency.
     Human ─┘
 """
 
-__version__ = "1.0.0"  # FROZEN — see docs/SPEC.md (Appendix A: Versioning & Freeze Policy)
+__version__ = "0.1.0a1"
+# 0.1.0-alpha: the KERNEL is stable and frozen at v1 (docs/SPEC.md,
+# Appendix A: Versioning & Freeze Policy); the ecosystem around it
+# (executor, reviewer, MCP, UIs) is under active development. The
+# kernel contract never tracks this number.
 
 from .model import (  # noqa: F401
     EVIDENCE_HARD, EVIDENCE_SOFT, SCHEMA_VERSION,

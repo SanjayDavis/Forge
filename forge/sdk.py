@@ -165,6 +165,8 @@ def to_yaml(pkg: dict) -> str:
     if desc:
         out.append("Description: |")
         out.extend(f"  {ln}" for ln in desc.splitlines() if ln.strip())
+    else:
+        out.append("Description: (none)")
     out.append("Acceptance:")
     out.extend(_yaml_items(("", a) for a in pkg["acceptance"]) or ["  (none)"])
     if pkg["dependencies"]:

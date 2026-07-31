@@ -65,9 +65,11 @@ class TestContextContract(SdkTest):
         self.client.propose(_proposal("Build a Snake game"))
         yaml = self.client.context("build-a-snake-game-foundation")
         self.assertTrue(yaml.startswith("Task: build-a-snake-game-foundation"))
-        for section in ("Acceptance:", "Dependencies:", "Knowledge:",
-                        "Relevant Files:", "Evidence:", "Constraints:"):
+        for section in ("Description:", "Acceptance:", "Dependencies:",
+                        "Knowledge:", "Relevant Files:", "Evidence:",
+                        "Constraints:"):
             self.assertIn(section, yaml, section)
+        self.assertIn("Description: (none)", yaml)  # empty values never drop headers
         self.assertIn("Dependencies: (none", yaml)
         # core depends on foundation: complete foundation first, then the
         # dependency line carries a done marker

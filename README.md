@@ -1,46 +1,93 @@
 # Forge
 
-> **Forge is a deterministic project kernel.** Planners, executors,
-> reviewers, humans, and AI agents are all clients of the kernel.
+> **A deterministic project kernel for autonomous software engineering.**
 
-```
-Forge
-├── Forge Specification   docs/SPEC.md — the contract
-├── Forge Kernel          forge/ — the deterministic core
-├── Forge CLI             the `forge` command
-├── Forge Planner / Executor / Reviewer   plugins/ (spec §9–§11)
-└── Forge MCP / Forge UI  wire protocol and surfaces (M4, last)
-```
-
-**A deterministic project kernel for autonomous software development.**
+Forge separates project state from AI. Instead of letting LLMs mutate
+projects directly, Forge requires every change to be **proposed,
+validated, and committed** through a deterministic kernel.
 
 > **Everything is a proposal until the kernel accepts it.**
+
+```
+Most AI projects:          Forge:
+Prompt                      LLM
+   │                         │
+   ▼                         ▼
+  LLM                     Proposal        {proposal_id, reason, confidence, events}
+   │                         │
+   ▼                         ▼
+ Code                      Kernel          validate → append → apply
+                             │
+                             ▼
+                        Validated State    event-sourced · deterministic · auditable
+```
 
 The kernel owns project state as an event-sourced task graph. It is
 pure, deterministic Python with zero dependencies — no AI anywhere in
 the core. Humans, LLM planners, executors, verifiers, and MCP servers
-are interchangeable **plugins** of the same official API.
+are interchangeable **clients** of the same official API. The planner
+proposes; the kernel decides. The executor never decides it's done.
+Nobody touches state directly.
+
+> **Git is the source of truth for code. Forge is the deterministic
+> source of truth for project state.**
+
+See **[WHY_FORGE.md](WHY_FORGE.md)** for the motivation: why
+conversations and markdown plans are a bad place to keep state, and why
+a frozen kernel with a proposal protocol is a better one.
+
+## Current status
+
+The **kernel is stable and frozen at v1**. The ecosystem around it is
+under active development — this release is `0.1.0-alpha`.
+
+- ✅ Kernel complete — event-sourced task graph, deterministic
+  scheduler, verifier gates, query language, inspector
+- ✅ Specification frozen — `docs/SPEC.md` v1.0 is the contract
+- ✅ Compliance suite — 12 portable tests mapping one-to-one to the
+  invariants I1–I7; pass without reading the implementation
+- ✅ Planner protocol — SPEC §9: proposals, never mutations
+- ✅ SDK — `forge.ForgeClient`, the one public surface every client uses
+- ✅ Context API — the ~500-token context contract package every coding
+  agent reads instead of the graph
+- ⬜ Executor (next milestone — see Roadmap)
+- ⬜ Reviewer
+- ⬜ MCP server
+- ⬜ VS Code / Web UI
+
+## Architecture
 
 ```
-LLM ──┐
-      ├──► Forge Kernel ──► events.log (source of truth)
-Human ─┘        │
-                ├── scheduler (ready/next/blockers, priority-ordered)
-                ├── verifier gates (hard: tests/lint, soft: review)
-                ├── context builder (focused package per task)
-                ├── inspector (task dossier + history)
-                └── query language (safe expression subset)
+                Human ─┐
+                Planner │   (proposals only — never touch the graph)
+                Executor├──► Proposal Layer ──► Kernel ──► events.log
+                Reviewer│        (validate → append → apply)
+                MCP     ─┘
+                                 │
+                                 ├── scheduler (ready/next/blockers, priority-ordered)
+                                 ├── verifier gates (status/dependency/container)
+                                 ├── context builder (the ~500-token contract package)
+                                 ├── inspector (task dossier + history)
+                                 └── query language (safe expression subset)
 ```
 
-The graph is the **shared memory and execution state**: LLM ↓ Graph ↓
-Algorithms ↓ LLM. Deterministic code handles scheduling, dependency
-resolution, verification, and progress; the LLM is used only where it's
-strongest — planning, writing code, reviewing. It never owns the graph;
-it proposes, the kernel decides.
+Above the line: intelligence. Below it: deterministic computing.
 
-> **The kernel owns the project state. Agents only propose changes.**
-> Git is the source of truth for code. Forge is the deterministic
-> source of truth for project state.
+The SDK in five calls — the whole executor flow:
+
+```python
+from forge import ForgeClient
+
+forge = ForgeClient("path/to/project")
+task = forge.next()                        # next ready task
+ctx  = forge.context(task["id"])           # the ~500-token contract
+result = llm(ctx)                          # code, tests
+forge.attach_evidence(task["id"], "hard", "unittest", detail)
+forge.verify(task["id"])                   # Forge decides "done", not the LLM
+```
+
+One implementation. Many clients: Hermes, Claude Code, Codex, a human
+with a terminal (`plugins/reference/`), an MCP server, a VS Code panel.
 
 ## The contract
 
@@ -196,7 +243,7 @@ line is a client of the kernel, not the kernel.
   fixed four real gaps before freeze (un-stamped proposal events,
   torn-tail line merging, torn-tail seq duplication, byte/char drift in
   tail recovery). Every
-  implementation claiming to be Forge v1.0 must pass it. 105 tests,
+  implementation claiming to be Forge v1.0 must pass it. 124 tests,
   all green.
 
 Then the clients — each a plugin, each a separate product on top of
