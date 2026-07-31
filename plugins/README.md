@@ -33,15 +33,30 @@ Status:
   Constraints) — the ~500-token package every coding agent reads
   instead of the graph. Tested in `tests/test_sdk.py`.
 - **SDK is DONE.** `forge.ForgeClient` is the one public surface:
-  `next()`, `context()`, `propose()`, `start()`, `attach_evidence()`,
-  `verify()`, `verify_fail()`, `query()`, `progress()`, `replay()`.
-  Thin facade — no graph logic, no replay logic, no scheduler logic.
-  The CLI itself speaks the SDK for proposal flows.
+  `next()`, `context()`, `propose()`, `start()`, `expand()`,
+  `attach_evidence()`, `verify()`, `verify_fail()`, `retry()`,
+  `query()`, `progress()`, `replay()`. Thin facade — no graph logic,
+  no replay logic, no scheduler logic. The CLI itself speaks the SDK
+  for proposal flows.
 - **Reference (human) client is DONE.** `reference/reference_client.py`
   is a tiny loop — next, do, attach hard evidence, verify — proving the
   SDK is comfortable for a non-AI. If a human can't use the API
   comfortably, an AI won't either.
-- M3 (Executor) is next — and now thin: five client calls.
+- **M3 (Executor) is DONE.** `plugins/executor/` ships a reference
+  executor (`ReferenceExecutor`): the whole executor flow in five client
+  calls — next, start, context, work, hard evidence, verify. The worker
+  (the llm slot) reads exactly the context contract package and returns
+  artifacts with byte-exact claims; the executor machine-verifies every
+  claim itself **before** attaching hard evidence, so a lying or buggy
+  worker is caught — no evidence, `verify_fail` → NeedsRevision (§10.2),
+  `retry()` back to work. Too-large tasks are re-split through the
+  SDK's new `expand()` (§10.3): the kernel derives child ids and commits
+  atomically; the container completes when its children do. Tested by
+  `tests/test_executor.py` (23 tests): the five-call flow, the
+  self-check, expansion, recovery, the SDK-only boundary — plus an
+  end-to-end run where a planner proposal is executed to done by the
+  reference client script. An LLM executor is a drop-in worker behind
+  the same protocol.
 
 The reference planner is deliberately AI-free: it proves the boundary.
 An LLM planner is a drop-in replacement behind the same protocol —

@@ -240,6 +240,14 @@ class ForgeClient:
         """Claim TASK: todo -> in_progress."""
         return self.kernel.start(task_id)
 
+    def expand(self, task_id: str, children: Iterable[dict]) -> dict:
+        """Re-split TASK into children (SPEC §10.3): the kernel derives
+        the child ids, turns TASK into a container, and commits
+        atomically — validated like every other kernel event, rejected
+        whole on any violation. The container then completes when its
+        children do."""
+        return self.kernel.expand(task_id, children)
+
     def attach_evidence(self, task_id: str, kind: str, source: str,
                         detail: str = "") -> dict:
         """Hard evidence = tests/compile/benchmark; soft = review."""
@@ -255,6 +263,11 @@ class ForgeClient:
     def verify_fail(self, task_id: str, reason: str) -> dict:
         """Reject: in_progress -> needs_revision (reviewer flow)."""
         return self.kernel.verify_fail(task_id, reason)
+
+    def retry(self, task_id: str) -> dict:
+        """needs_revision -> in_progress (SPEC §10.2: after a failed
+        pass, an executor may retry to continue)."""
+        return self.kernel.retry(task_id)
 
     # ---- inspection
     def query(self, expr: str) -> list[Any]:

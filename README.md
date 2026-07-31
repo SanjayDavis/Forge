@@ -50,7 +50,8 @@ under active development — this release is `0.1.0-alpha`.
 - ✅ SDK — `forge.ForgeClient`, the one public surface every client uses
 - ✅ Context API — the ~500-token context contract package every coding
   agent reads instead of the graph
-- ⬜ Executor (next milestone — see Roadmap)
+- ✅ Executor — `plugins/executor/` ReferenceExecutor: task package in,
+  artifacts + machine-verified hard evidence out, the kernel decides done
 - ⬜ Reviewer
 - ⬜ MCP server
 - ⬜ VS Code / Web UI
@@ -266,8 +267,8 @@ the kernel:
   conversation. Agents never read the graph; they read this.
 - **SDK — ForgeClient (done).** `forge/sdk.py` is the one public surface
   every client is allowed to touch: `next()`, `context()`, `propose()`,
-  `start()`, `attach_evidence()`, `verify()`, `verify_fail()`, `query()`,
-  `progress()`, `replay()`. No graph logic, no replay logic, no
+  `start()`, `expand()`, `attach_evidence()`, `verify()`, `verify_fail()`,
+  `retry()`, `query()`, `progress()`, `replay()`.
   scheduler logic — those stay in the kernel; the SDK is a thin facade.
   **The planner now consumes the SDK instead of kernel internals** — the
   architectural proof that the boundary is real: a plugin operating
@@ -275,10 +276,21 @@ the kernel:
   client (`plugins/reference/`, a tiny "next → do → evidence → verify"
   loop) proves the SDK is comfortable for non-AIs too. The CLI itself
   speaks the SDK for all proposal flows.
-- **M3 — Executor plugin (next).** `forge next` + `forge context` in,
-  code + hard evidence out, `forge verify` decides. The executor never
-  decides it's done — the kernel does. The SDK makes this a thin
-  milestone: the flow is five client calls.
+- **M3 — Executor plugin (done).** `plugins/executor/` ships a reference
+  executor (`ReferenceExecutor`): the whole executor flow in five client
+  calls — next, start, context, work, hard evidence, verify. The worker
+  (the llm slot) reads exactly the context contract package and returns
+  artifacts with byte-exact claims; the executor machine-verifies every
+  claim itself *before* attaching hard evidence, so a lying or buggy
+  worker is caught — no evidence, `verify_fail` → NeedsRevision (§10.2),
+  `retry()` back to work. Too-large tasks are re-split through the SDK's
+  new `expand()` (§10.3): the kernel derives child ids and commits
+  atomically; the container completes when its children do. The suite
+  (`tests/test_executor.py`, 23 tests) proves the five-call flow, the
+  self-check, expansion, recovery, and the SDK-only boundary — plus an
+  end-to-end run where a planner proposal is executed to done by the
+  reference client script. An LLM executor is a drop-in worker behind
+  the same protocol.
 - **M4 — Reviewer plugin.** Deterministic checks (tests, build, lint)
   are hard evidence; the reviewer handles only the semantic layer
   (architecture, readability, design) and emits soft evidence or
