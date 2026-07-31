@@ -1,38 +1,52 @@
 # Project Kernel
 
-An AI-agnostic, event-sourced task graph engine. Deterministic Python core
-with zero dependencies. LLMs (Claude, Codex, Gemini, Hermes — or none at
-all) are just clients that emit the same events a human emits through the
-CLI.
+**A deterministic execution engine for autonomous software development.**
 
-The graph is the **shared memory and execution state**. Deterministic code
-handles scheduling, dependency resolution, and progress tracking; the LLM
-is used only where it's strongest — planning, writing code, reviewing.
+The kernel owns software-project execution state as an event-sourced task
+graph. It is pure, deterministic Python with zero dependencies — no AI
+anywhere in the core. Humans, LLM planners, executors, verifiers, and
+MCP servers are interchangeable **plugins** of the same official API.
 
 ```
 LLM ──┐
       ├──► Project Kernel ──► events.log (source of truth)
 Human ─┘        │
-                ├── scheduler (ready/next/blockers)
+                ├── scheduler (ready/next/blockers, priority-ordered)
                 ├── verifier gates (hard: tests/lint, soft: review)
-                └── context builder (focused package per task)
+                ├── context builder (focused package per task)
+                ├── inspector (task dossier + history)
+                └── query language (safe expression subset)
 ```
+
+The graph is the **shared memory and execution state**: LLM ↓ Graph ↓
+Algorithms ↓ LLM. Deterministic code handles scheduling, dependency
+resolution, verification, and progress; the LLM is used only where it's
+strongest — planning, writing code, reviewing. It never owns the graph;
+it proposes, the kernel decides.
 
 ## Design decisions
 
 - **Event sourcing.** The only state is an append-only `events.log`
-  (JSONL). The graph is a fold over the log. Undo = truncate, replay =
-  refold, crash recovery = skip torn line, audit = the log itself.
-- **Derived states.** `blocked` is never stored — it's computed from
-  dependencies. `done` on a container task is derived from its children.
+  (JSONL, schema frozen in `docs/EVENTS.md`). The graph is a fold over
+  the log. Undo = truncate, replay = refold, crash recovery = skip torn
+  line, audit = the log itself.
+- **One official API.** `pkernel.kernel.Kernel` is the ONLY mutation
+  path (`docs/API.md`). Planners return *proposals*; the kernel
+  validates, persists, applies. The LLM is never trusted with the graph.
+- **Derived states.** `blocked`/`ready`/completion are never stored —
+  computed from dependencies. A container's `done` derives from its
+  children.
 - **Runtime expansion.** A task mid-work can be expanded into children;
-  the parent becomes a container that completes when its children do.
-  The graph evolves instead of the executor guessing.
+  the parent completes when its children do. The graph evolves instead
+  of the executor guessing.
 - **Hard vs soft evidence.** `hard` = tests/compile/benchmark (machine
-  verifiable). `soft` = LLM/human review (asserted). Both attach to tasks.
+  verifiable). `soft` = LLM/human review (asserted). Verification gates
+  reject until the evidence holds.
 - **Context Builder.** `pk show TASK` produces the exact package an LLM
-  client needs: task, acceptance criteria, dependencies + statuses,
-  blockers, evidence, project progress. No context reconstruction.
+  client needs. No context reconstruction, no state guessing.
+- **Concurrency by construction.** Writes are serialized by an OS file
+  lock (`events.lock`); `seq` is unique across processes. N agents can
+  emit events simultaneously.
 
 ## Install
 
@@ -49,19 +63,22 @@ pk --help
 pk -d myproject init
 cd myproject
 
-pk create "Snake Game" --desc "A terminal snake game" -a "game runs"
+pk create "Snake Game" --desc "A terminal snake game" -a "game runs" --priority high
 pk expand snake-game \
     -c "Window::terminal window" \
     -c "Renderer::draws the board::renders;tests pass" \
     -c "Input::keyboard controls"
 pk graph                       # see the tree
-pk next                        # what to work on
+pk next                        # what to work on (priority order)
 pk start window
 pk evidence window --kind hard --source unittest --detail "14 passed"
 pk verify-pass window          # hard gate: deps must be done first
 pk verify-fail input --reason "edge cases missing"
 pk retry input
 pk show input                  # context package for an LLM client
+pk inspect renderer            # dossier: children, evidence, history
+pk query "status == needs_revision and priority == high"
+pk query blockers(renderer)
 pk blockers snake-game --chain # root-cause paths
 pk progress
 pk undo                        # truncate the last event
@@ -85,8 +102,8 @@ be verified directly; they complete when all children complete.
 
 ```
 init          create events.log in DIR
-create        add a task (--id, --desc, -a acceptance, -f file)
-update        change title/desc/acceptance/files
+create        add a task (--id, --desc, -a acceptance, -f file, --priority)
+update        change title/desc/acceptance/files/priority
 dep           add/remove a dependency (--remove)
 expand        turn a task into a container; children become its work
 start         todo -> in_progress
@@ -98,6 +115,10 @@ evidence      attach hard/soft evidence (--kind, --source, --detail)
 note          append a note
 delete        remove a task (no dependents, no children)
 show          context package (--json for machine format)
+inspect       full dossier: status, completion, children, evidence, history
+query         expression filter / function call (--json)
+export        event log as portable JSON (FILE or stdout)
+import        merge an exported log; id collisions rejected
 graph         render the task tree (optional root TASK)
 ready         list tasks ready to work on
 next          the single next task
@@ -110,27 +131,35 @@ replay        reconstruct the graph from the log
 demo          seed the Snake Game example (empty project only)
 ```
 
-## Event log
+## Query examples
 
 ```
-{"op": "task_created", "seq": 1, "id": "snake-game", "title": "Snake Game", ...}
-{"op": "task_expanded", "seq": 2, "task": "snake-game", "children": [...]}
-{"op": "task_started", "seq": 3, "id": "window", ...}
-{"op": "verification_passed", "seq": 4, "id": "window", "force": false, ...}
+pk query "status == needs_revision"
+pk query "priority > medium"                    # low < medium < high
+pk query '"snake" in title and not blocked'
+pk query "evidence_count >= 2 and status == done"
+pk query "id in children(renderer)"
+pk query blockers(renderer)
+pk query evidence(input)
+pk query ready()
 ```
 
 ## Roadmap
 
+- **M1 — Core kernel (done).** Graph, event log, scheduler, context
+  builder, CLI, verification flow. ~1,200 lines, zero deps, no AI.
+- **M1.5 — Stress + freeze (done).** Schema v1 frozen (`docs/EVENTS.md`),
+  official Kernel API (`docs/API.md`), inspector, query language,
+  priority, cross-process locking, merge/export/import. Verified: 100k
+  events replay in <1s, 5-thread and 4-process concurrent writers, 5-level
+  expansion, cycle rejection.
 - **M2 — Planner.** One LLM call: goal in, `task_expanded` events out
   (structured JSON → same builders). Validated structurally before entry.
 - **M3 — Executor + Verifier.** Executor gets `pk show` output, writes
-  code, verifier runs hard gates then emits evidence/verify events.
-- **M4 — Multi-agent + MCP.** Expose the builders as MCP tools
-  (`graph.create_node`, `graph.ready_tasks`, `graph.get_context`...).
-  Any agent works through the same kernel. Nobody owns the project —
-  the kernel does.
-- **Concurrency.** The log is append-only; a file lock is the only thing
-  needed for true multi-process writes.
+  code; verifier runs hard gates then emits evidence/verify events.
+- **M4 — Multi-agent + MCP.** Any agent works through the same kernel.
+  MCP is the last layer — a wire protocol, not the architecture.
+  Nobody owns the project; the kernel does.
 
 ## Test
 

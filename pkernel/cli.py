@@ -1,7 +1,8 @@
 """Project Kernel CLI (`pk`).
 
 A human can run an entire software project through this interface. LLM
-clients (planner/executor/verifier agents) emit exactly the same events.
+clients (planner/executor/verifier agents) emit exactly the same events
+through the same Kernel API.
 
 Usage: pk <command> [args]  (run `pk --help` or `pk <command> --help`)
 """
@@ -13,10 +14,11 @@ import json
 import sys
 
 from . import __version__
-from .context import STATUS_ICON, build_context, to_json, to_markdown
-from .model import Graph, GraphError
-from .scheduler import blockers, is_container, next_task, progress, ready_tasks
-from .store import EVENT_FILE, Store, load_project
+from .context import STATUS_ICON
+from .kernel import Kernel
+from .model import GraphError
+from .scheduler import is_container
+from .store import EVENT_FILE, Store
 
 
 # --------------------------------------------------------------------------- helpers
@@ -25,11 +27,6 @@ def _setup_stdout() -> None:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-
-
-def _commit(store: Store, graph: Graph, event: dict) -> None:
-    stamped = store.append([event])[0]
-    graph.apply(stamped)
 
 
 def _node_label(g: Graph, tid: str) -> str:
@@ -65,38 +62,35 @@ def _parse_child(spec: str) -> dict:
 
 
 # --------------------------------------------------------------------------- demo seed
-def _seed_demo(store: Store, graph: Graph) -> None:
-    def c(ev) -> None:
-        _commit(store, graph, ev)
-
-    c(graph.create_task("Snake Game", "A terminal snake game built via the Project Kernel.",
-                        acceptance=["game runs", "unit tests pass"]))
-    c(graph.expand("snake-game", [
+def _seed_demo(k: Kernel) -> None:
+    k.create_task("Snake Game", "A terminal snake game built via the Project Kernel.",
+                  acceptance=["game runs", "unit tests pass"], priority="high")
+    k.expand("snake-game", [
         {"title": "Window", "description": "Terminal window setup", "acceptance": ["renders a frame"]},
         {"title": "Renderer", "description": "Draws the board state", "acceptance": ["renders snakes, food, score"]},
         {"title": "Input", "description": "Keyboard controls", "acceptance": ["arrow keys move the snake"]},
         {"title": "Snake Logic", "description": "Movement and growth", "acceptance": ["grows on food"]},
         {"title": "Food", "description": "Spawning and eating", "acceptance": ["spawns on empty cell"]},
         {"title": "Collision", "description": "Wall and self collision", "acceptance": ["game over on hit"]},
-    ]))
-    c(graph.expand("renderer", [
+    ])
+    k.expand("renderer", [
         {"title": "Camera", "description": "Viewport", "acceptance": ["follows the snake"]},
         {"title": "UI", "description": "Score and status bar", "acceptance": ["score updates"]},
         {"title": "Lighting", "description": "ASCII shading", "acceptance": ["depth shading"]},
         {"title": "Particle System", "description": "Death explosion", "acceptance": ["particles on game over"]},
-    ]))
-    c(graph.start("window"))
-    c(graph.add_evidence("window", "hard", "unittest", "test_window passes (14 assertions)"))
-    c(graph.verify_pass("window"))
-    c(graph.start("input"))
-    c(graph.verify_fail("input", "movement handler misses edge cases (diagonal input races)"))
-    c(graph.add_evidence("input", "soft", "peer review", "logic otherwise sound; fix races then re-verify"))
-    c(graph.retry("input"))
-    c(graph.verify_pass("input"))
-    c(graph.start("camera"))
-    c(graph.add_evidence("camera", "hard", "unittest", "test_camera passes (9 assertions)"))
-    c(graph.verify_pass("camera"))
-    c(graph.start("ui"))
+    ])
+    k.start("window")
+    k.add_evidence("window", "hard", "unittest", "test_window passes (14 assertions)")
+    k.verify_pass("window")
+    k.start("input")
+    k.verify_fail("input", "movement handler misses edge cases (diagonal input races)")
+    k.add_evidence("input", "soft", "peer review", "logic otherwise sound; fix races then re-verify")
+    k.retry("input")
+    k.verify_pass("input")
+    k.start("camera")
+    k.add_evidence("camera", "hard", "unittest", "test_camera passes (9 assertions)")
+    k.verify_pass("camera")
+    k.start("ui")
 
 
 # --------------------------------------------------------------------------- commands
@@ -106,136 +100,207 @@ def cmd_init(args) -> int:
     return 0
 
 
-def cmd_create(args, store, graph) -> int:
-    ev = graph.create_task(args.title, args.desc, args.acceptance, args.file, id=args.id)
-    _commit(store, graph, ev)
+def cmd_create(args, k: Kernel) -> int:
+    ev = k.create_task(args.title, args.desc, args.acceptance, args.file, id=args.id,
+                       priority=args.priority)
     print(ev["id"])
     return 0
 
 
-def cmd_update(args, store, graph) -> int:
+def cmd_update(args, k: Kernel) -> int:
     changes = {}
     if args.title is not None: changes["title"] = args.title
     if args.desc is not None: changes["description"] = args.desc
     if args.acceptance is not None: changes["acceptance"] = args.acceptance
     if args.file is not None: changes["files"] = args.file
-    ev = graph.update_task(args.task, **changes)
-    _commit(store, graph, ev)
+    if args.priority is not None: changes["priority"] = args.priority
+    k.update_task(args.task, **changes)
     print(f"updated {args.task}")
     return 0
 
 
-def cmd_dep(args, store, graph) -> int:
-    ev = (graph.remove_dependency if args.remove else graph.add_dependency)(args.task, args.depends_on)
-    _commit(store, graph, ev)
+def cmd_dep(args, k: Kernel) -> int:
+    if args.remove:
+        k.remove_dependency(args.task, args.depends_on)
+    else:
+        k.add_dependency(args.task, args.depends_on)
     print(f"{'removed' if args.remove else 'added'} dependency: {args.task} -> {args.depends_on}")
     return 0
 
 
-def cmd_expand(args, store, graph) -> int:
+def cmd_expand(args, k: Kernel) -> int:
     children = [_parse_child(s) for s in args.child]
-    ev = graph.expand(args.task, children)
-    _commit(store, graph, ev)
+    ev = k.expand(args.task, children)
     print(f"expanded {args.task} into: {', '.join(c['id'] for c in ev['children'])}")
     return 0
 
 
-def cmd_start(args, store, graph) -> int:
-    _commit(store, graph, graph.start(args.task))
+def cmd_start(args, k: Kernel) -> int:
+    k.start(args.task)
     print(f"{args.task} -> in_progress")
     return 0
 
 
-def cmd_verify_pass(args, store, graph) -> int:
-    _commit(store, graph, graph.verify_pass(args.task, force=args.force))
+def cmd_verify_pass(args, k: Kernel) -> int:
+    k.verify_pass(args.task, force=args.force)
     print(f"{args.task} -> done")
     return 0
 
 
-def cmd_verify_fail(args, store, graph) -> int:
-    _commit(store, graph, graph.verify_fail(args.task, args.reason))
+def cmd_verify_fail(args, k: Kernel) -> int:
+    k.verify_fail(args.task, args.reason)
     print(f"{args.task} -> needs_revision")
     return 0
 
 
-def cmd_retry(args, store, graph) -> int:
-    _commit(store, graph, graph.retry(args.task))
+def cmd_retry(args, k: Kernel) -> int:
+    k.retry(args.task)
     print(f"{args.task} -> in_progress")
     return 0
 
 
-def cmd_reopen(args, store, graph) -> int:
-    _commit(store, graph, graph.reopen(args.task))
+def cmd_reopen(args, k: Kernel) -> int:
+    k.reopen(args.task)
     print(f"{args.task} -> in_progress")
     return 0
 
 
-def cmd_evidence(args, store, graph) -> int:
-    _commit(store, graph, graph.add_evidence(args.task, args.kind, args.source, args.detail))
+def cmd_evidence(args, k: Kernel) -> int:
+    k.add_evidence(args.task, args.kind, args.source, args.detail)
     print(f"{args.task}: evidence [{args.kind}] {args.source}")
     return 0
 
 
-def cmd_note(args, store, graph) -> int:
-    _commit(store, graph, graph.add_note(args.task, args.text))
+def cmd_note(args, k: Kernel) -> int:
+    k.add_note(args.task, args.text)
     print(f"{args.task}: note added")
     return 0
 
 
-def cmd_delete(args, store, graph) -> int:
-    _commit(store, graph, graph.delete(args.task))
+def cmd_delete(args, k: Kernel) -> int:
+    k.delete(args.task)
     print(f"deleted {args.task}")
     return 0
 
 
-def cmd_show(args, store, graph) -> int:
-    if args.task not in graph.tasks:
-        print(f"no such task: {args.task}", file=sys.stderr)
-        return 1
-    ctx = build_context(graph, args.task)
-    print(to_json(ctx) if args.json else to_markdown(ctx))
+def cmd_show(args, k: Kernel) -> int:
+    print(k.context(args.task, "json" if args.json else "markdown"))
     return 0
 
 
-def cmd_graph(args, store, graph) -> int:
-    if not graph.tasks:
+def cmd_inspect(args, k: Kernel) -> int:
+    info = k.inspect(args.task)
+    if args.json:
+        print(json.dumps(info, ensure_ascii=False, indent=2))
+        return 0
+    g = k.graph
+    print(f"{info['id']} — {info['title']}")
+    print("-" * max(len(info["id"]) + len(info["title"]) + 3, 24))
+    print(f"Status:     {STATUS_ICON[info['status']]} {info['status']}"
+          + (" (container: completes when children do)" if info["container"] else ""))
+    print(f"Priority:   {info['priority']}")
+    print(f"Completion: {info['completion']}% ({info['completion_text']})")
+    if info["children"]:
+        print("Children:")
+        for c in info["children"]:
+            print(f"  {c['icon']} {c['id']} — {c['title']} ({c['status']})")
+    if info["depends_on"]:
+        print(f"Depends on: {', '.join(info['depends_on'])}")
+    if info["blocks"]:
+        print(f"Blocks:     {', '.join(info['blocks'])}")
+    if info["acceptance"]:
+        print("Acceptance:")
+        for a in info["acceptance"]:
+            print(f"  - {a}")
+    if info["files"] or info["produces"]:
+        print(f"Files:      {', '.join(info['files']) or '(none)'}")
+        print(f"Produces:   {', '.join(info['produces']) or '(none)'}")
+    if info["evidence"]:
+        print("Evidence:")
+        for e in info["evidence"]:
+            print(f"  [{e['kind']}] {e['source']} — {e['detail']}")
+    if info["notes"]:
+        print("Notes:")
+        for n in info["notes"]:
+            print(f"  - {n}")
+    print("History:")
+    for h in info["history"]:
+        extra = f" ({h['summary']})" if h["summary"] else ""
+        print(f"  #{h['seq']:>4} {h['op']}{extra}")
+    return 0
+
+
+def cmd_query(args, k: Kernel) -> int:
+    result = k.query(args.expr)
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if isinstance(result, list) and result and isinstance(result[0], str):
+        for item in result:
+            print(item)
+    elif isinstance(result, list) and not result:
+        print("(no matches)")
+    else:
+        for item in result:
+            print(item)
+    return 0
+
+
+def cmd_export(args, k: Kernel) -> int:
+    payload = k.to_export_json()
+    if args.file:
+        with open(args.file, "w", encoding="utf-8") as f:
+            f.write(payload + "\n")
+        print(f"exported {len(k.export_events())} events to {args.file}")
+    else:
+        print(payload)
+    return 0
+
+
+def cmd_import(args, k: Kernel) -> int:
+    with open(args.file, encoding="utf-8") as f:
+        events = json.load(f)
+    result = k.import_events(events)
+    print(f"imported {result['imported']} events -> project now has {result['tasks']} tasks")
+    return 0
+
+
+def cmd_graph(args, k: Kernel) -> int:
+    g = k.graph
+    if not g.tasks:
         print("(empty graph)")
         return 0
     if args.task is not None:
-        if args.task not in graph.tasks:
+        if args.task not in g.tasks:
             print(f"no such task: {args.task}", file=sys.stderr)
             return 1
-        _print_tree(graph, args.task, "", True, set())
+        _print_tree(g, args.task, "", True, set())
         return 0
-    roots = graph.roots()
+    roots = g.roots()
     if not roots:
-        # disconnected cycle-free graph shouldn't happen, but be safe
-        roots = sorted(graph.tasks.values(), key=lambda t: t.created_seq)[:1]
+        roots = sorted(g.tasks.values(), key=lambda t: t.created_seq)[:1]
     for i, r in enumerate(roots):
-        _print_tree(graph, r.id, "", i == len(roots) - 1, set())
+        _print_tree(g, r.id, "", i == len(roots) - 1, set())
     return 0
 
 
-def cmd_ready(args, store, graph) -> int:
-    for t in ready_tasks(graph):
-        print(t.id)
+def cmd_ready(args, k: Kernel) -> int:
+    for tid in k.ready():
+        print(tid)
     return 0
 
 
-def cmd_next(args, store, graph) -> int:
-    t = next_task(graph)
-    if t is None:
+def cmd_next(args, k: Kernel) -> int:
+    tid = k.next()
+    if tid is None:
         print("nothing ready")
         return 1
-    print(t.id)
+    print(tid)
     return 0
 
 
-def cmd_blockers(args, store, graph) -> int:
-    if args.task not in graph.tasks:
-        print(f"no such task: {args.task}", file=sys.stderr)
-        return 1
-    result = blockers(graph, args.task, chain=args.chain)
+def cmd_blockers(args, k: Kernel) -> int:
+    result = k.blockers(args.task, chain=args.chain)
     if not result:
         print("none")
         return 0
@@ -248,26 +313,26 @@ def cmd_blockers(args, store, graph) -> int:
     return 0
 
 
-def cmd_progress(args, store, graph) -> int:
-    p = progress(graph)
+def cmd_progress(args, k: Kernel) -> int:
+    p = k.progress()
     print(f"done {p['done']}/{p['total']} ({p['percent']}%)")
     print(f"todo {p['todo']} | in_progress {p['in_progress']} | "
           f"needs_revision {p['needs_revision']} | done {p['done']}")
     return 0
 
 
-def cmd_validate(args, store, graph) -> int:
-    problems = graph.problems()
+def cmd_validate(args, k: Kernel) -> int:
+    problems = k.graph.problems()
     if not problems:
-        print(f"graph OK: {len(graph.tasks)} tasks, {graph.seq} events")
+        print(f"graph OK: {len(k.graph.tasks)} tasks, {k.graph.seq} events")
         return 0
     for p in problems:
         print(p, file=sys.stderr)
     return 1
 
 
-def cmd_log(args, store, graph) -> int:
-    events = store.read_events()
+def cmd_log(args, k: Kernel) -> int:
+    events = k.store.read_events()
     tail = events[-args.tail:] if args.tail else events
     for ev in tail:
         op = ev["op"]
@@ -276,41 +341,40 @@ def cmd_log(args, store, graph) -> int:
     return 0
 
 
-def cmd_undo(args, store, graph) -> int:
-    removed = store.undo(args.count)
-    fresh = Graph.from_events(store.read_events())
+def cmd_undo(args, k: Kernel) -> int:
+    removed = k.undo(args.count)
     for ev in removed:
         op = ev["op"]
         target = ev.get("id") or ev.get("task") or ev.get("depends_on", "")
         print(f"undid #{ev['seq']} {op} ({target})")
-    if fresh.tasks:
-        print(f"project now: {len(fresh.tasks)} tasks")
+    if k.graph.tasks:
+        print(f"project now: {len(k.graph.tasks)} tasks")
     else:
         print("project now: empty")
     return 0
 
 
-def cmd_replay(args, store, graph) -> int:
-    events = store.read_events()
-    g = Graph.from_events(events)
-    print(f"replayed {len(events)} events -> {len(g.tasks)} tasks, "
-          f"{progress(g)['done']} done")
+def cmd_replay(args, k: Kernel) -> int:
+    stats = k.replay()
+    print(f"replayed {stats['events']} events -> {stats['tasks']} tasks, "
+          f"{stats['done']} done")
     return 0
 
 
-def cmd_demo(args, store, graph) -> int:
-    if graph.tasks:
+def cmd_demo(args, k: Kernel) -> int:
+    if k.graph.tasks:
         print("project is not empty; demo needs a fresh project", file=sys.stderr)
         return 1
-    _seed_demo(store, graph)
+    _seed_demo(k)
     print("seeded demo project (Snake Game)")
     return 0
 
 
 # --------------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="pk", description="Project Kernel — AI-agnostic, "
-                                "event-sourced task graph engine. Version " + __version__)
+    p = argparse.ArgumentParser(prog="pk", description="Project Kernel — a deterministic "
+                                "execution engine for autonomous software development. "
+                                "Version " + __version__)
     p.add_argument("-d", "--dir", default=".", help="project directory (default: .)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -322,6 +386,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--desc", default="")
     c.add_argument("-a", "--acceptance", action="append", default=[], help="repeatable")
     c.add_argument("-f", "--file", action="append", default=[], help="repeatable")
+    c.add_argument("--priority", choices=["low", "medium", "high"], default="medium")
 
     c = sub.add_parser("update", help="update task fields")
     c.add_argument("task")
@@ -329,6 +394,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--desc")
     c.add_argument("-a", "--acceptance", action="append", help="replaces the list")
     c.add_argument("-f", "--file", action="append", help="replaces the list")
+    c.add_argument("--priority", choices=["low", "medium", "high"])
 
     c = sub.add_parser("dep", help="add a dependency: TASK cannot finish until DEPENDS_ON is done")
     c.add_argument("task")
@@ -371,11 +437,25 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("task")
     c.add_argument("--json", action="store_true")
 
+    c = sub.add_parser("inspect", help="everything about one task: status, children, evidence, history")
+    c.add_argument("task")
+    c.add_argument("--json", action="store_true")
+
+    c = sub.add_parser("query", help="query the graph: 'status == needs_revision and priority == high'")
+    c.add_argument("expr", help="e.g. 'status == done', '\"snake\" in title', 'blockers(renderer)'")
+    c.add_argument("--json", action="store_true")
+
+    c = sub.add_parser("export", help="write the event log as portable JSON")
+    c.add_argument("file", nargs="?", help="output file (default: stdout)")
+
+    c = sub.add_parser("import", help="merge an exported event log into this project")
+    c.add_argument("file")
+
     c = sub.add_parser("graph", help="render the task tree")
     c.add_argument("task", nargs="?", help="render subtree rooted at TASK")
 
     sub.add_parser("ready", help="list tasks ready to work on")
-    sub.add_parser("next", help="print the single next task")
+    sub.add_parser("next", help="print the single next task (priority, then creation order)")
     c = sub.add_parser("blockers", help="incomplete dependencies of TASK")
     c.add_argument("task")
     c.add_argument("--chain", action="store_true", help="show full root-cause paths")
@@ -407,6 +487,10 @@ COMMANDS = {
     "note": cmd_note,
     "delete": cmd_delete,
     "show": cmd_show,
+    "inspect": cmd_inspect,
+    "query": cmd_query,
+    "export": cmd_export,
+    "import": cmd_import,
     "graph": cmd_graph,
     "ready": cmd_ready,
     "next": cmd_next,
@@ -426,8 +510,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.cmd == "init":
             return cmd_init(args)
-        store, graph = load_project(args.dir)
-        return COMMANDS[args.cmd](args, store, graph)
+        k = Kernel(args.dir)
+        return COMMANDS[args.cmd](args, k)
     except GraphError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

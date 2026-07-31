@@ -23,6 +23,33 @@ EVIDENCE_HARD = "hard"
 EVIDENCE_SOFT = "soft"
 VALID_EVIDENCE_KINDS = (EVIDENCE_HARD, EVIDENCE_SOFT)
 
+# --- schema freeze (v1) ---------------------------------------------------
+# Event schema is versioned like Git's object model: once frozen, ops and
+# field semantics do not change. New fields/ops require a schema version
+# bump and a migration, never a silent edit.
+SCHEMA_VERSION = 1
+
+PRIORITIES = ("low", "medium", "high")
+PRIORITY_WEIGHT = {"low": 0, "medium": 1, "high": 2}
+
+# Required fields + types per op. Enforced on every event, including replay,
+# so a corrupt or foreign event fails loudly with its seq number.
+OP_SHAPES: dict[str, dict[str, type]] = {
+    "task_created":        {"id": str, "title": str},
+    "task_updated":        {"id": str},
+    "dependency_added":    {"task": str, "depends_on": str},
+    "dependency_removed":  {"task": str, "depends_on": str},
+    "task_expanded":       {"task": str, "children": list},
+    "task_started":        {"id": str},
+    "verification_failed": {"id": str, "reason": str},
+    "task_retried":        {"id": str},
+    "verification_passed": {"id": str},
+    "task_reopened":       {"id": str},
+    "evidence_added":      {"id": str, "kind": str, "source": str},
+    "note_added":          {"id": str, "text": str},
+    "task_deleted":        {"id": str},
+}
+
 
 class GraphError(Exception):
     """Raised for invalid events or illegal transitions. Message is user-facing."""
@@ -42,6 +69,7 @@ class TaskNode:
     title: str
     description: str = ""
     status: str = STATUS_TODO
+    priority: str = "medium"
     acceptance: list[str] = field(default_factory=list)
     files: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
@@ -76,9 +104,10 @@ class Graph:
 
     # ------------------------------------------------------------------ construction
     @classmethod
-    def from_events(cls, events: Iterable[dict[str, Any]]) -> "Graph":
+    def from_events(cls, events: Iterable[dict]) -> "Graph":
         g = cls()
         for ev in events:
+            g.validate(ev)   # foreign/corrupt input must fail loudly, not KeyError
             g.apply(ev)
         return g
 
@@ -94,10 +123,12 @@ class Graph:
 
     # ------------------------------------------------------------------ event builders (validate -> return event)
     def create_task(self, title: str, description: str = "", acceptance: Iterable[str] = (),
-                    files: Iterable[str] = (), notes: Iterable[str] = (), id: str | None = None) -> dict:
+                    files: Iterable[str] = (), notes: Iterable[str] = (), id: str | None = None,
+                    priority: str = "medium") -> dict:
         tid = id or self.next_id(title)
         ev = {"op": "task_created", "id": tid, "title": title, "description": description,
-              "acceptance": list(acceptance), "files": list(files), "notes": list(notes)}
+              "acceptance": list(acceptance), "files": list(files), "notes": list(notes),
+              "priority": priority}
         self.validate(ev)
         return ev
 
@@ -117,7 +148,8 @@ class Graph:
             ev_children.append({"id": cid, "title": c["title"],
                                 "description": c.get("description", ""),
                                 "acceptance": list(c.get("acceptance", [])),
-                                "files": list(c.get("files", []))})
+                                "files": list(c.get("files", [])),
+                                "priority": c.get("priority", "medium")})
         ev = {"op": "task_expanded", "task": task_id, "children": ev_children}
         self.validate(ev)
         return ev
@@ -174,9 +206,16 @@ class Graph:
 
     # ------------------------------------------------------------------ validation (no mutation)
     def validate(self, ev: dict) -> None:
-        fn = getattr(self, f"_validate_{ev.get('op')}", None)
-        if fn is None:
-            raise GraphError(f"unknown event op: {ev.get('op')!r}")
+        op = ev.get("op")
+        shape = OP_SHAPES.get(op)
+        if shape is None:
+            raise GraphError(f"unknown event op: {op!r}")
+        for key, typ in shape.items():
+            if key not in ev:
+                raise GraphError(f"event {op!r} is missing required field {key!r}")
+            if not isinstance(ev[key], typ):
+                raise GraphError(f"event {op!r}: field {key!r} must be {typ.__name__}, got {type(ev[key]).__name__}")
+        fn = getattr(self, f"_validate_{op}")
         fn(ev)
 
     def _require(self, task_id: str) -> TaskNode:
@@ -208,11 +247,15 @@ class Graph:
             raise GraphError(f"task already exists: {tid}")
         if not title or not title.strip():
             raise GraphError("task title must be non-empty")
+        if ev.get("priority", "medium") not in PRIORITIES:
+            raise GraphError(f"priority must be one of {', '.join(PRIORITIES)}, got {ev.get('priority')!r}")
 
     def _validate_task_updated(self, ev):
         self._require(ev["id"])
-        if not any(k in ev for k in ("title", "description", "acceptance", "files")):
+        if not any(k in ev for k in ("title", "description", "acceptance", "files", "priority")):
             raise GraphError("task_updated needs at least one field to change")
+        if "priority" in ev and ev["priority"] not in PRIORITIES:
+            raise GraphError(f"priority must be one of {', '.join(PRIORITIES)}, got {ev['priority']!r}")
 
     def _validate_task_expanded(self, ev):
         t = self._require(ev["task"])
@@ -229,6 +272,9 @@ class Graph:
                 raise GraphError(f"child id already exists: {c['id']}")
             if not c["title"].strip():
                 raise GraphError("child title must be non-empty")
+            if c.get("priority", "medium") not in PRIORITIES:
+                raise GraphError(f"child priority must be one of {', '.join(PRIORITIES)}, "
+                                 f"got {c.get('priority')!r}")
 
     def _validate_dependency_added(self, ev):
         task_id, dep_id = ev["task"], ev["depends_on"]
@@ -313,7 +359,8 @@ class Graph:
         self.tasks[ev["id"]] = TaskNode(
             id=ev["id"], title=ev["title"], description=ev.get("description", ""),
             acceptance=list(ev.get("acceptance", [])), files=list(ev.get("files", [])),
-            notes=list(ev.get("notes", [])), created_seq=ev["seq"])
+            notes=list(ev.get("notes", [])), priority=ev.get("priority", "medium"),
+            created_seq=ev["seq"])
 
     def _apply_task_updated(self, ev):
         t = self.tasks[ev["id"]]
@@ -321,6 +368,7 @@ class Graph:
         if "description" in ev: t.description = ev["description"]
         if "acceptance" in ev: t.acceptance = list(ev["acceptance"])
         if "files" in ev: t.files = list(ev["files"])
+        if "priority" in ev: t.priority = ev["priority"]
 
     def _apply_task_expanded(self, ev):
         parent = self.tasks[ev["task"]]
@@ -331,6 +379,7 @@ class Graph:
             self.tasks[c["id"]] = TaskNode(
                 id=c["id"], title=c["title"], description=c.get("description", ""),
                 acceptance=list(c.get("acceptance", [])), files=list(c.get("files", [])),
+                priority=c.get("priority", "medium"),
                 created_seq=ev["seq"])
             parent.depends_on.append(c["id"])
 
