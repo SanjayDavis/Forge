@@ -1,5 +1,8 @@
 # Event Schema v1 (FROZEN)
 
+> Normative extract of `docs/SPEC.md` §3 (Event Model). The spec is the
+> contract; this file is the quick reference.
+
 The event log is the single source of truth. The graph is a projection:
 fold the log, oldest to newest. This document freezes the schema — like
 Git's object model, it should not change in breaking ways. Any new event

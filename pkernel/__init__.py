@@ -11,7 +11,7 @@ in the kernel; it is pure, deterministic, and zero-dependency.
     Human ─┘
 """
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"  # FROZEN — see docs/SPEC.md (Appendix A: Versioning & Freeze Policy)
 
 from .model import (  # noqa: F401
     EVIDENCE_HARD, EVIDENCE_SOFT, SCHEMA_VERSION,

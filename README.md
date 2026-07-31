@@ -24,6 +24,15 @@ resolution, verification, and progress; the LLM is used only where it's
 strongest — planning, writing code, reviewing. It never owns the graph;
 it proposes, the kernel decides.
 
+## The contract
+
+`docs/SPEC.md` is the Project Kernel Specification v1.0 — the normative
+contract: task model, frozen event schema, state machine, scheduler,
+verification, context builder, query language, and the Planner /
+Executor / Reviewer protocols. The kernel is **frozen at v1** (like
+Git's object model): implementations and plugins change; the spec and
+the event schema don't. Anything new lives in a plugin, not the core.
+
 ## Design decisions
 
 - **Event sourcing.** The only state is an append-only `events.log`
@@ -148,15 +157,25 @@ pk query ready()
 
 - **M1 — Core kernel (done).** Graph, event log, scheduler, context
   builder, CLI, verification flow. ~1,200 lines, zero deps, no AI.
-- **M1.5 — Stress + freeze (done).** Schema v1 frozen (`docs/EVENTS.md`),
-  official Kernel API (`docs/API.md`), inspector, query language,
-  priority, cross-process locking, merge/export/import. Verified: 100k
-  events replay in <1s, 5-thread and 4-process concurrent writers, 5-level
-  expansion, cycle rejection.
-- **M2 — Planner.** One LLM call: goal in, `task_expanded` events out
-  (structured JSON → same builders). Validated structurally before entry.
-- **M3 — Executor + Verifier.** Executor gets `pk show` output, writes
-  code; verifier runs hard gates then emits evidence/verify events.
+- **M1.5 — Stress + freeze (done).** Schema v1 frozen, official Kernel
+  API, inspector, query language, priority, cross-process locking,
+  merge/export/import. Verified: 100k events replay in <1s, 5-thread
+  and 4-process concurrent writers, 5-level expansion, cycle rejection.
+- **v1.0 — Kernel frozen (done).** `docs/SPEC.md` is the contract
+  (event model, state machine, scheduler, verification, context,
+  query, Planner/Executor/Reviewer protocols). No new kernel features
+  without a spec change and version bump (Appendix A).
+- **M2A — Planner Protocol (next).** The protocol is already specified
+  (SPEC §9): planner receives `{goal, graph snapshot, knowledge,
+  constraints}` and emits a `{proposal_id, reason, confidence, events}`
+  proposal. The kernel commits it atomically or rejects it whole —
+  the existing `import_events` path. No planner code until the
+  protocol has a test suite.
+- **M2B — Planner (a plugin).** One LLM call: goal in, proposal out.
+  A client of the kernel, like everything else.
+- **M3 — Executor + Reviewer.** Executor gets `pk show` output, writes
+  code, attaches hard evidence; reviewer protocol (SPEC §11) gates
+  soft verification.
 - **M4 — Multi-agent + MCP.** Any agent works through the same kernel.
   MCP is the last layer — a wire protocol, not the architecture.
   Nobody owns the project; the kernel does.

@@ -1,5 +1,9 @@
 # Official Kernel API (v1)
 
+> Normative extract of `docs/SPEC.md` (Task Model, State Machine,
+> Persistence). The spec is the contract; this file is the quick
+> reference.
+
 `pkernel.kernel.Kernel` is the ONLY way anything may read or modify a
 project. Planners, executors, verifiers, humans, and MCP servers are all
 clients of this same surface. There is no back door: agents propose
