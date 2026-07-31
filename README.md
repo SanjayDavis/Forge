@@ -173,39 +173,53 @@ forge query ready()
 
 ## Roadmap
 
+The kernel is **complete at v1.0 and frozen**. Everything after this
+line is a client of the kernel, not the kernel.
+
 - **M1 — Core kernel (done).** Graph, event log, scheduler, context
-  builder, CLI, verification flow. ~1,200 lines, zero deps, no AI.
+  builder, CLI, verification flow. Zero deps, no AI.
 - **M1.5 — Stress + freeze (done).** Schema v1 frozen, official Kernel
   API, inspector, query language, priority, cross-process locking,
   merge/export/import. Verified: 100k events replay in <1s, 5-thread
   and 4-process concurrent writers, 5-level expansion, cycle rejection.
-- **v1.0 — Kernel frozen (done).** `docs/SPEC.md` is the contract
-  (event model, state machine, scheduler, verification, context,
-  query, Planner/Executor/Reviewer protocols, invariants I1–I7).
-  No new kernel features without a spec change and version bump
-  (Appendix A).
+- **v1.0 — Kernel complete (done).** `docs/SPEC.md` is the contract:
+  task model, event schema, state machine, scheduler, verification,
+  context builder, query language, Planner/Executor/Reviewer protocols
+  (M2A included — SPEC §9), invariants I1–I7, freeze policy
+  (Appendix A). No new kernel features without a spec change and
+  version bump.
 - **Compliance — the kernel passes its own spec (done).**
-  `tests/test_compliance.py` maps one-to-one to invariants I1–I7:
-  malformed proposals, fuzzed event streams (valid + garbage),
-  torn-log crash recovery, atomic proposal commits, replay identity
-  across hash seeds, scheduler determinism under randomized creation.
-  It found and fixed three real gaps: un-stamped proposal events
-  crashed the import fold, appending after a torn tail merged lines,
-  and torn tails could duplicate seqs. 80 tests, all green.
-- **M2A — Planner Protocol (next).** The protocol is already specified
-  (SPEC §9): planner receives `{goal, graph snapshot, knowledge,
-  constraints}` and emits a `{proposal_id, reason, confidence, events}`
-  proposal. The kernel commits it atomically or rejects it whole —
-  the existing `import_events` path. No planner code until the
-  protocol has a test suite.
-- **M2B — Planner (a plugin).** One LLM call: goal in, proposal out.
-  A client of the kernel, like everything else.
-- **M3 — Executor + Reviewer.** Executor gets `forge show` output, writes
-  code, attaches hard evidence; reviewer protocol (SPEC §11) gates
-  soft verification.
-- **M4 — Multi-agent + MCP.** Any agent works through the same kernel.
-  MCP is the last layer — a wire protocol, not the architecture.
-  Nobody owns the project; the kernel does.
+  `tests/compliance/` is the Specification Compliance Suite: it maps
+  one-to-one to invariants I1–I7 — malformed proposals, fuzzed event
+  streams, torn-log crash recovery, atomic proposal commits, replay
+  identity across hash seeds, scheduler determinism. It found and
+  fixed three real gaps before freeze (un-stamped proposal events,
+  torn-tail line merging, torn-tail seq duplication). Every
+  implementation claiming to be Forge v1.0 must pass it. 80 tests,
+  all green.
+
+Then the clients — each a plugin, each a separate product on top of
+the kernel:
+
+- **M2B — Planner plugin (next).** The first AI client. One LLM call:
+  goal in, `{proposal_id, reason, confidence, events}` out. The kernel
+  commits it atomically or rejects it whole (`import_events`).
+- **M3 — Executor plugin.** `forge show` output in, code out, hard
+  evidence attached (SPEC §10).
+- **M4 — Reviewer plugin.** Acceptance judgment gates soft
+  verification (SPEC §11).
+- **M5 — MCP server.** A wire protocol exposing the kernel API — the
+  last layer, never the architecture.
+- **M6 — VS Code extension.** The CLI with a panel.
+- **M7 — Web UI.** `forge ui`: project, graph, history, replay,
+  evidence.
+- **M8 — Multi-agent orchestrator.** Many agents, one kernel, one
+  source of truth.
+- **v2 — Discussion.** Hypergraph semantics (Appendix B) and anything
+  else the clients teach us. Additive, spec-amended, version-bumped.
+
+Nobody owns the project; the kernel does. Git stores source code.
+Forge stores project state.
 
 ## Test
 

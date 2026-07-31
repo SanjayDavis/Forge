@@ -103,7 +103,7 @@ plays by the same rules: **it proposes; the kernel decides.**
 1.9. **Kernel invariants.** These hold always. A feature that would
      break one is not a feature; it is a redesign, and it requires a
      spec change and version bump like any other (§Appendix A). Every
-     invariant has a compliance test (`tests/test_compliance.py`).
+     invariant has a compliance test (`tests/compliance/`).
 
      - **I1 — Deterministic fold.** Every event log folds to exactly
        one state. Environment (locale, hash seed, dict key order) does
@@ -553,8 +553,8 @@ None of these require changing v1 events. They are new ops, stamped
 This specification is the contract when all three hold:
 
 1. Every normative claim here has a test — either a unit test in the
-   reference implementation (currently 68) or a compliance test
-   (`tests/test_compliance.py`) that maps one-to-one to the
+   reference implementation or a compliance test in
+   `tests/compliance/` that maps one-to-one to the
    invariants I1–I7 and the adversarial cases (§3.3, §12.5):
    malformed proposals, fuzzed event streams, torn-log recovery,
    cross-environment replay identity, randomized scheduler

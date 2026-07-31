@@ -12,8 +12,8 @@ and never mutates the graph except through the kernel.
 | `planner/`  | goal -> Proposal; emits events only          | §9 (Planner Protocol) |
 | `executor/` | task package -> artifacts + hard evidence    | §10 (Executor Protocol) |
 | `reviewer/` | acceptance judgment -> soft evidence         | §11 (Reviewer Protocol) |
-| `mcp/`      | wire protocol exposing the kernel API        | (M4, last) |
+| `mcp/`      | wire protocol exposing the kernel API        | (M5, last) |
 
-Not yet implemented — M2A (Planner Protocol) must have a test suite
-before any planner code lands. Until then, this directory is the
-contract for where that code will live.
+Status: M2A (Planner Protocol) is specified (SPEC §9) and enforced by
+the compliance suite (`tests/compliance/`). The first plugin to land
+here is M2B, the planner — the first AI client of the kernel.
