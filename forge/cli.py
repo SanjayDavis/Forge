@@ -41,6 +41,9 @@ def _node_label(g: Graph, tid: str) -> str:
 
 
 def _print_tree(g: Graph, tid: str, prefix: str, is_last: bool, seen: set[str]) -> None:
+    # seen holds the current ancestry path only. A repeat along the path is
+    # a true cycle; a node re-printed under a different branch (a DAG with
+    # multiple parents) is legitimate and must not be flagged.
     if tid in seen:
         print(prefix + ("└── " if is_last else "├── ") + f"{tid} (cycle!)")
         return
@@ -48,8 +51,9 @@ def _print_tree(g: Graph, tid: str, prefix: str, is_last: bool, seen: set[str]) 
     print(prefix + ("└── " if is_last else "├── ") + _node_label(g, tid))
     kids = sorted((g.tasks[d] for d in g.tasks[tid].depends_on), key=lambda t: t.created_seq)
     child_prefix = prefix + ("    " if is_last else "│   ")
-    for i, k in enumerate(kids):
-        _print_tree(g, k.id, child_prefix, i == len(kids) - 1, seen)
+    for i, kid in enumerate(kids):
+        _print_tree(g, kid.id, child_prefix, i == len(kids) - 1, seen)
+    seen.remove(tid)
 
 
 def _parse_child(spec: str) -> dict:
