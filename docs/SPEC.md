@@ -230,9 +230,13 @@ plays by the same rules: **it proposes; the kernel decides.**
 
 ```
 todo ──start──────────► in_progress ──verify-fail──► needs_revision
-                          │  ▲                          │
-                          │  └────────retry─────────────┘
-                          └───────verify-pass──────► done ──reopen──► in_progress
+                          │  ▲                          │  ▲
+                          │  └────────retry─────────────┘  │
+                          │                                │
+                          └───────verify-pass──────────────┘
+                                   │
+                                   ▼
+                                 done ──reopen──► in_progress
 ```
 
 4.2. Transitions are atomic, validated events (§3.3). An illegal

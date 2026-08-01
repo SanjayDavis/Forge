@@ -130,7 +130,7 @@ Done:
 - Kernel — event-sourced task graph, scheduler, verifier gates, query
   language, inspector
 - Specification — `docs/SPEC.md` v1.0
-- Compliance suite — 12 portable tests mapped to invariants I1–I7
+- Compliance suite — 13 portable tests mapped to invariants I1–I7
 - SDK — `forge.ForgeClient`, the single public surface
 - Context API — the ~500-token contract package for coding agents
 - Planner, Executor, Reviewer plugins — reference clients, each an LLM

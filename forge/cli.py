@@ -408,8 +408,15 @@ def cmd_plan(args, k: Kernel) -> int:
 def cmd_propose(args, k: Kernel) -> int:
     from .sdk import ForgeClient, ProposalError
     client = ForgeClient(args.dir)
-    with open(args.file, encoding="utf-8") as f:
-        proposal = json.load(f)
+    try:
+        with open(args.file, encoding="utf-8") as f:
+            proposal = json.load(f)
+    except FileNotFoundError:
+        print(f"error: proposal file not found: {args.file}", file=sys.stderr)
+        return 1
+    except json.JSONDecodeError as e:
+        print(f"error: proposal file is not valid JSON: {e}", file=sys.stderr)
+        return 1
     try:
         # envelope check + kernel verdict: whole or nothing
         result = client.propose(proposal)
@@ -593,6 +600,12 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     except FileNotFoundError:
         print(f"error: {args.dir} is not a project (run: forge init {args.dir})", file=sys.stderr)
+        return 1
+    except OSError as e:
+        # e.g. -d pointing at a file (FileExistsError from store.init) or a
+        # project whose events.log is a directory (PermissionError on open).
+        # Clean error, never a traceback.
+        print(f"error: {e}", file=sys.stderr)
         return 1
 
 

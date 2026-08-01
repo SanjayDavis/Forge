@@ -341,6 +341,29 @@ class ComplianceInvariants(unittest.TestCase):
         # only a genuine verification_passed moves a task to done
         self.assertEqual(g.tasks["a"].status, STATUS_TODO)
 
+    # ------------------------------------------------------- §4.1 pinned
+    def test_needs_revision_can_pass_verification_directly(self):
+        # SPEC §4.1 event table (and the kernel) make verification_passed
+        # legal from BOTH in_progress and needs_revision. The reviewer flow
+        # happens to use retry before re-verifying, but the state machine
+        # does not force it. Pin the current contract so any future change
+        # is a deliberate spec amendment, not silent drift.
+        g = Graph()
+        seq = 0
+
+        def commit(ev):
+            nonlocal seq
+            seq += 1
+            g.apply(stamped(ev, seq))
+
+        commit(g.create_task("A", id="a"))
+        commit(g.start("a"))
+        commit(g.verify_fail("a", "needs rework"))
+        self.assertEqual(g.tasks["a"].status, STATUS_NEEDS_REVISION)
+        # direct verify-pass from needs_revision: legal, task reaches done
+        commit(g.verify_pass("a"))
+        self.assertEqual(g.tasks["a"].status, STATUS_DONE)
+
     # ------------------------------------------------------------- I7
     def test_context_reports_only_real_state(self):
         d = tempfile.mkdtemp()

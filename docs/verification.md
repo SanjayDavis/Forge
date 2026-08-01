@@ -20,7 +20,7 @@ Breakdown:
 | `tests/test_sdk.py` | — | SDK surface |
 | `tests/test_reference.py` | — | human client loop |
 | `tests/test_security.py` | 16 | task-id charset, event typing, symlink-safe store, context injection, query recursion |
-| `tests/compliance/test_compliance.py` | 12 | SPEC invariants I1–I7, one-to-one |
+| `tests/compliance/test_compliance.py` | 13 | SPEC invariants I1–I7, one-to-one |
 
 ## Specification Compliance Suite
 
