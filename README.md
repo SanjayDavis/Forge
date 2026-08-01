@@ -1,56 +1,55 @@
 # Forge
 
-A deterministic project kernel for autonomous software engineering.
-
-Forge separates project state from AI. Every change to a project must be
-proposed, validated, and committed through a deterministic kernel.
-LLMs never mutate project state directly.
-
-```
-Most AI projects:          Forge:
-Prompt                      LLM
-   │                         │
-   ▼                         ▼
-  LLM                     Proposal        {proposal_id, reason, confidence, events}
-   │                         │
-   ▼                         ▼
- Code                      Kernel          validate → append → apply
-                            │
-                            ▼
-                       Validated State    event-sourced · deterministic · auditable
-```
-
 **Project state is deterministic. Intelligence is replaceable.**
 
-The kernel owns project state as an event-sourced task graph. It is pure,
-deterministic Python with zero dependencies. Humans, LLM planners,
-executors, verifiers, and MCP servers are interchangeable clients of one
-official API. The planner proposes; the kernel decides. The executor
-never decides it is done. Nobody touches state directly.
+Forge is a deterministic project kernel for autonomous software
+engineering. Every change to a project — by an LLM, an agent, or a
+human — must be proposed, validated, and committed through the kernel.
+No client ever mutates project state directly.
 
-Forge is infrastructure, not another agent framework. It does not
-replace coding agents; it gives them a shared, auditable source of
-truth — the same role Git plays for code. See
-[WHY_FORGE.md](WHY_FORGE.md) for the full motivation.
+The planner proposes. The kernel decides.
 
-## Status
+## Why does it exist?
 
-The kernel is stable and frozen at v1. The ecosystem around it is under
-active development; this release is `0.1.0-alpha`.
+Conversations and markdown plans are a bad place to keep state. They
+are lossy, unreplayable, and unauditable. Forge replaces them with an
+event-sourced task graph: append-only, deterministic, replayable.
 
-| Component | Status |
+| Traditional agent | Forge |
 | --- | --- |
-| Kernel — event-sourced task graph, scheduler, verifier gates, query language, inspector | Complete |
-| Specification — `docs/SPEC.md` v1.0 | Frozen |
-| Compliance suite — 12 portable tests mapped to invariants I1–I7 | Complete |
-| Planner protocol — SPEC §9, proposals only | Complete |
-| SDK — `forge.ForgeClient`, the single public surface | Complete |
-| Context API — the ~500-token contract package for coding agents | Complete |
-| Executor — `plugins/executor/` ReferenceExecutor | Complete |
-| Reviewer — `plugins/reviewer/` ReferenceReviewer | Complete |
-| MCP server — `plugins/mcp/` ForgeMCPServer | Complete |
-| VS Code extension | Planned |
-| Web UI | Planned |
+| Conversation is state | Event log is state |
+| AI edits directly | AI proposes |
+| Memory in prompts | Deterministic graph |
+| Hard to replay | Replay built in |
+| Hard to audit | Fully auditable |
+
+See [WHY_FORGE.md](WHY_FORGE.md) for the full argument.
+
+## Forge in 60 seconds
+
+```
+forge -d chip8 init
+cd chip8
+
+forge create "Chip-8 Emulator" \
+  --desc "A CHIP-8 interpreter with display, input, and ROM loader" \
+  -a "ROM loads and runs" --priority high
+forge expand chip-8-emulator \
+  -c "CPU::executes opcodes" \
+  -c "Memory::4KB RAM + registers" \
+  -c "Display::64x32 framebuffer" \
+  -c "Input::hex keypad"
+
+forge graph        # the task tree
+forge next         # cpu — what to work on first
+forge show cpu     # the context contract: task, acceptance, deps, evidence
+forge progress     # done 0/5
+```
+
+What happened: a goal became a graph. The kernel computed what is
+ready, handed the client a focused context package instead of the whole
+project, and recorded every step in an append-only log. The planner
+proposes; the kernel decides. Nothing was mutated directly.
 
 ## Architecture
 
@@ -84,40 +83,7 @@ forge.verify(task["id"])                   # Forge decides "done", not the LLM
 ```
 
 One implementation. Many clients: Hermes, Claude Code, Codex, a human
-with a terminal (`plugins/reference/`), an MCP server, a VS Code panel.
-
-## The contract
-
-`docs/SPEC.md` is the Forge Specification v1.0 — the normative
-contract: task model, frozen event schema, state machine, scheduler,
-verification, context builder, query language, and the Planner /
-Executor / Reviewer protocols. The kernel is frozen at v1 (like Git's
-object model): implementations and plugins change; the spec and the
-event schema do not. Anything new lives in a plugin, not the core.
-
-## Design decisions
-
-- **Event sourcing.** The only state is an append-only `events.log`
-  (JSONL, schema frozen in `docs/EVENTS.md`). The graph is a fold over
-  the log. Undo = truncate, replay = refold, crash recovery = skip torn
-  line, audit = the log itself.
-- **One official API.** `forge.kernel.Kernel` is the ONLY mutation
-  path (`docs/API.md`). Planners return *proposals*; the kernel
-  validates, persists, applies. The LLM is never trusted with the graph.
-- **Derived states.** `blocked`/`ready`/completion are never stored —
-  computed from dependencies. A container's `done` derives from its
-  children.
-- **Runtime expansion.** A task mid-work can be expanded into children;
-  the parent completes when its children do. The graph evolves instead
-  of the executor guessing.
-- **Hard vs soft evidence.** `hard` = tests/compile/benchmark (machine
-  verifiable). `soft` = LLM/human review (asserted). Verification gates
-  reject until the evidence holds.
-- **Context Builder.** `forge show TASK` produces the exact package an
-  LLM client needs. No context reconstruction, no state guessing.
-- **Concurrency by construction.** Writes are serialized by an OS file
-  lock (`events.lock`); `seq` is unique across processes. N agents can
-  emit events simultaneously.
+with a terminal, an MCP server, a VS Code panel.
 
 ## Install
 
@@ -144,196 +110,83 @@ forge next                        # what to work on (priority order)
 forge start window
 forge evidence window --kind hard --source unittest --detail "14 passed"
 forge verify-pass window          # hard gate: deps must be done first
+forge start input
 forge verify-fail input --reason "edge cases missing"
 forge retry input
 forge show input                  # context package for an LLM client
 forge inspect renderer            # dossier: children, evidence, history
-forge query "status == needs_revision and priority == high"
-forge query blockers(renderer)
-forge blockers snake-game --chain # root-cause paths
 forge progress
-forge undo                        # truncate the last event
 forge replay                      # rebuild the graph from the log
 ```
 
-## States
+Full command reference: [docs/CLI.md](docs/CLI.md).
 
-```
-todo ──start──► in_progress ──verify-fail──► needs_revision
-                  │  ▲                            │
-                  │  └─────────retry──────────────┘
-                  └──────verify-pass──────► done ──reopen──► in_progress
-```
+## Status
 
-`verify-pass` is rejected while dependencies are incomplete (`--force`
-overrides — humans can break rules, machines shouldn't). Containers
-cannot be verified directly; they complete when all children complete.
+The kernel is frozen at v1. This release is `0.1.0-alpha`.
 
-## Commands
+Done:
 
-```
-init          create events.log in DIR
-create        add a task (--id, --desc, -a acceptance, -f file, --priority)
-update        change title/desc/acceptance/files/priority
-dep           add/remove a dependency (--remove)
-expand        turn a task into a container; children become its work
-start         todo -> in_progress
-verify-pass   in_progress -> done (requires deps done; --force bypasses)
-verify-fail   in_progress -> needs_revision (--reason required)
-retry         needs_revision -> in_progress
-reopen        done -> in_progress
-evidence      attach hard/soft evidence (--kind, --source, --detail)
-note          append a note
-delete        remove a task (no dependents, no children)
-show          context package (--json for machine format)
-inspect       full dossier: status, completion, children, evidence, history
-query         expression filter / function call (--json)
-export        event log as portable JSON (FILE or stdout)
-import        merge an exported log; id collisions rejected
-graph         render the task tree (optional root TASK)
-ready         list tasks ready to work on
-next          the single next task
-blockers      incomplete deps (--chain for root-cause paths)
-progress      done/total + per-status counts
-validate      consistency check (cycles, dangling refs)
-log           view events (--tail N)
-undo [N]      truncate the last N events
-replay        reconstruct the graph from the log
-demo          seed the Snake Game example (empty project only)
-```
+- Kernel — event-sourced task graph, scheduler, verifier gates, query
+  language, inspector
+- Specification — `docs/SPEC.md` v1.0
+- Compliance suite — 12 portable tests mapped to invariants I1–I7
+- SDK — `forge.ForgeClient`, the single public surface
+- Context API — the ~500-token contract package for coding agents
+- Planner, Executor, Reviewer plugins — reference clients, each an LLM
+  drop-in behind the same protocol
+- MCP server — the SDK as six JSON-RPC 2.0 tools over stdio
 
-## Query examples
+Next:
 
-```
-forge query "status == needs_revision"
-forge query "priority > medium"                    # low < medium < high
-forge query '"snake" in title and not blocked'
-forge query "evidence_count >= 2 and status == done"
-forge query "id in children(renderer)"
-forge query blockers(renderer)
-forge query evidence(input)
-forge query ready()
-```
+- VS Code extension
+- Web UI
+- Multi-agent orchestrator
 
-## Roadmap
+Full history: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-The kernel is complete at v1.0 and frozen. Everything after this line
-is a client of the kernel, not the kernel.
+## Who is Forge for?
 
-- **M1 — Core kernel (done).** Graph, event log, scheduler, context
-  builder, CLI, verification flow. Zero deps, no AI.
-- **M1.5 — Stress + freeze (done).** Schema v1 frozen, official Kernel
-  API, inspector, query language, priority, cross-process locking,
-  merge/export/import. Verified: 100k events replay in <1s, 5-thread
-  and 4-process concurrent writers, 5-level expansion, cycle rejection.
-- **v1.0 — Kernel complete (done).** `docs/SPEC.md` is the contract:
-  task model, event schema, state machine, scheduler, verification,
-  context builder, query language, Planner/Executor/Reviewer protocols
-  (M2A included — SPEC §9), invariants I1–I7, freeze policy
-  (Appendix A). No new kernel features without a spec change and
-  version bump.
-- **Compliance — the kernel passes its own spec (done).**
-  `tests/compliance/` is the Specification Compliance Suite: it maps
-  one-to-one to invariants I1–I7 — malformed proposals, fuzzed event
-  streams, torn-log crash recovery, atomic proposal commits, replay
-  identity across hash seeds, scheduler determinism. It found and
-  fixed four real gaps before freeze (un-stamped proposal events,
-  torn-tail line merging, torn-tail seq duplication, byte/char drift in
-  tail recovery). Every implementation claiming to be Forge v1.0 must
-  pass it. 124 tests, all green.
+Forge is useful if you are building:
 
-Then the clients — each a plugin, each a separate product on top of
-the kernel:
+- AI coding agents
+- Autonomous software systems
+- Multi-agent workflows
+- Coding research
+- Reproducible AI pipelines
 
-- **M2B — Planner plugin (done).** The first AI client.
-  `plugins/planner/` ships a reference planner: goal in,
-  `{proposal_id, reason, confidence, events}` out — a proposal, never a
-  mutation. The kernel commits it atomically or rejects it whole
-  (`import_events`). The planner test suite feeds the kernel both valid
-  and intentionally invalid proposals and asserts its verdicts. It also
-  flushed out a fourth real kernel bug — a byte/char mismatch in
-  torn-tail recovery that truncated valid events after multi-byte
-  titles (fixed, with regression tests). An LLM planner is a drop-in
-  behind the same protocol.
-- **Context API — the contract between Forge and every coding agent
-  (done).** `forge context <task>` (and `ForgeClient.context(task_id)`)
-  returns the standard context package: Task / Description / Acceptance /
-  Dependencies (with status) / Knowledge / Relevant Files / Evidence /
-  Constraints — roughly 500 tokens instead of a repo's worth of
-  conversation. Agents never read the graph; they read this. The SDK
-  also ships the reader: `forge.parse_context()` parses a package back
-  into the same sections (the canonical reader every client uses).
-- **SDK — ForgeClient (done).** `forge/sdk.py` is the one public
-  surface every client is allowed to touch: `next()`, `context()`,
-  `propose()`, `start()`, `expand()`, `attach_evidence()`, `verify()`,
-  `verify_fail()`, `retry()`, `query()`, `progress()`, `replay()`.
-  Scheduler logic stays in the kernel; the SDK is a thin facade.
-  The planner now consumes the SDK instead of kernel internals — the
-  architectural proof that the boundary is real: a plugin operating
-  entirely through the public interfaces needs nothing else. The human
-  client (`plugins/reference/`, a tiny "next → do → evidence → verify"
-  loop) proves the SDK is comfortable for non-AIs too. The CLI itself
-  speaks the SDK for all proposal flows.
-- **M3 — Executor plugin (done).** `plugins/executor/` ships a
-  reference executor (`ReferenceExecutor`): the whole executor flow in
-  five client calls — next, start, context, work, hard evidence,
-  verify. The worker (the llm slot) reads exactly the context contract
-  package and returns artifacts with byte-exact claims; the executor
-  machine-verifies every claim itself *before* attaching hard evidence,
-  so a lying or buggy worker is caught — no evidence, `verify_fail` →
-  NeedsRevision (§10.2), `retry()` back to work. Too-large tasks are
-  re-split through the SDK's new `expand()` (§10.3): the kernel derives
-  child ids and commits atomically; the container completes when its
-  children do. The suite (`tests/test_executor.py`, 23 tests) proves
-  the five-call flow, the self-check, expansion, recovery, and the
-  SDK-only boundary — plus an end-to-end run where a planner proposal
-  is executed to done by the reference client script. An LLM executor
-  is a drop-in worker behind the same protocol.
-- **M4 — Reviewer plugin (done).** Deterministic checks (tests, build,
-  lint) are the executor's hard evidence; the reviewer handles only the
-  semantic layer (architecture, readability, design) and emits **soft
-  evidence** or `verify_fail` → NeedsRevision. `plugins/reviewer/`
-  ships a reference reviewer (`ReferenceReviewer`): three client calls
-  per task — context, judge, then approve (soft evidence + verify) or
-  reject (soft evidence + verify_fail). The judge is the llm slot
-  (`judge(ctx_yaml)`); the reference judge is deterministic and
-  stdlib-only — every acceptance criterion must be covered by the
-  evidence or relevant files on record, an uncovered criterion is a
-  gap. A machine reviewer never overrides the dependency gate: if the
-  kernel's structural gate refuses (dependencies not done), it reports
-  `blocked` and leaves the task untouched — and the SDK's `verify()`
-  does not even expose a bypass. The Context Contract reader
-  (`parse_context`) moved into the SDK so the reviewer consumes the
-  same canonical package every client reads. The suite
-  (`tests/test_reviewer.py`, 17 tests) proves the three-call flow, the
-  judge slot, the blocked path, and the SDK-only boundary (soft
-  evidence only, no file writes, no gate overrides) — plus an
-  end-to-end run where a planner proposal is worked (executor slot) and
-  judged (reviewer slot) to done by the reference client script. An
-  LLM reviewer is a drop-in judge behind the same protocol.
-- **M5 — MCP server (done).** A thin transport over the SDK —
-  `forge_next()`, `forge_context()`, `forge_propose()`,
-  `forge_verify()`, `forge_query()`, `forge_replay()`. No business
-  logic. `plugins/mcp/` ships `ForgeMCPServer` (JSON-RPC 2.0 over
-  stdio, stdlib-only, six tools, one SDK call each) plus a reference
-  MCP client. The test suite drives it both with a minimal wire client
-  and with the official `mcp` Python SDK client (skipped when not
-  installed — the canonical suite stays dependency-free).
-- **M6 — VS Code extension.** The CLI with a panel.
-- **M7 — Web UI.** `forge ui`: project, graph, history, replay,
-  evidence.
-- **M8 — Multi-agent orchestrator.** Many agents, one kernel, one
-  source of truth.
-- **v2 — Discussion.** Hypergraph semantics (Appendix B) and anything
-  else the clients teach us. Additive, spec-amended, version-bumped.
+If you are an individual developer who wants an agent to write your
+project, Forge is not the tool — yet. It is the foundation those tools
+will be built on.
 
-Repository separation (conceptual, from M2B on): `forge/` holds the
-kernel, CLI, SDK, and specification; `forge-hermes/`, `forge-mcp/`,
-`forge-vscode/` are separate clients. If a client ever needs a private
-shortcut into the kernel, that is a signal the kernel API is missing
-something — the SDK boundary is what makes the split safe.
+## Why not X?
 
-Git stores source code. Forge stores project state.
+Forge does not compete with coding agents; it sits underneath them.
+
+- **Claude Code / Codex / OpenHands** are agents that write code. Forge
+  is the state layer an agent works against. Run any of them on a Forge
+  project: the agent proposes, the kernel decides.
+- **LangGraph / CrewAI** orchestrate agent workflows. Forge does not
+  orchestrate; it stores and validates the state those workflows
+  produce. Your orchestrator of choice is a client.
+- **Git** stores source code. Forge stores project state — the task
+  graph, the evidence, the decisions. The two are complementary.
+
+Nothing stops you from using all of them together: LangGraph to
+orchestrate, Claude Code to write, Forge to hold the truth.
+
+## Documentation
+
+- [docs/SPEC.md](docs/SPEC.md) — the Forge Specification v1.0, the
+  normative contract
+- [docs/DESIGN.md](docs/DESIGN.md) — design decisions
+- [docs/API.md](docs/API.md) — the kernel API
+- [docs/EVENTS.md](docs/EVENTS.md) — the event schema
+- [docs/CLI.md](docs/CLI.md) — command reference
+- [docs/ROADMAP.md](docs/ROADMAP.md) — milestone history and plan
+- [docs/verification.md](docs/verification.md) — test suite and stress
+  results
+- [WHY_FORGE.md](WHY_FORGE.md) — the motivation
 
 ## Test
 

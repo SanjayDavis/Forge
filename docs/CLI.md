@@ -1,0 +1,51 @@
+# Forge CLI Reference
+
+`forge` is the human client: a thin shell over the SDK.
+
+```
+init          create events.log in DIR
+create        add a task (--id, --desc, -a acceptance, -f file, --priority)
+update        change title/desc/acceptance/files/priority
+dep           add/remove a dependency (--remove)
+expand        turn a task into a container; children become its work
+start         todo -> in_progress
+verify-pass   in_progress -> done (requires deps done; --force bypasses)
+verify-fail   in_progress -> needs_revision (--reason required)
+retry         needs_revision -> in_progress
+reopen        done -> in_progress
+evidence      attach hard/soft evidence (--kind, --source, --detail)
+note          append a note
+delete        remove a task (no dependents, no children)
+show          context package (--json for machine format)
+inspect       full dossier: status, completion, children, evidence, history
+query         expression filter / function call (--json)
+export        event log as portable JSON (FILE or stdout)
+import        merge an exported log; id collisions rejected
+graph         render the task tree (optional root TASK)
+ready         list tasks ready to work on
+next          the single next task
+blockers      incomplete deps (--chain for root-cause paths)
+progress      done/total + per-status counts
+validate      consistency check (cycles, dangling refs)
+log           view events (--tail N)
+undo [N]      truncate the last N events
+replay        reconstruct the graph from the log
+demo          seed the Snake Game example (empty project only)
+```
+
+## Query language
+
+```
+forge query "status == needs_revision"
+forge query "priority > medium"                    # low < medium < high
+forge query '"snake" in title and not blocked'
+forge query "evidence_count >= 2 and status == done"
+forge query "id in children(renderer)"
+forge query blockers(renderer)
+forge query evidence(input)
+forge query ready()
+```
+
+Safe expression subset: status, priority, evidence_count, files,
+depends_on, and/or/not, comparison operators, plus function calls
+(`children()`, `blockers()`, `evidence()`, `ready()`).
