@@ -57,6 +57,23 @@ Status:
   end-to-end run where a planner proposal is executed to done by the
   reference client script. An LLM executor is a drop-in worker behind
   the same protocol.
+- **M4 (Reviewer) is DONE.** `plugins/reviewer/` ships a reference
+  reviewer (`ReferenceReviewer`): the whole review flow in three client
+  calls — context, judge, then approve (soft evidence + verify) or
+  reject (soft evidence + verify_fail). The judge is the llm slot;
+  the deterministic reference judge checks that every acceptance
+  criterion is covered by the evidence or relevant files on record.
+  The reviewer attaches **only soft evidence**, never writes files,
+  and never overrides the dependency gate — if the kernel refuses
+  (dependencies not done), it reports `blocked` and leaves the task
+  untouched. `parse_context` (the Context Contract reader) now lives
+  in the SDK, so every client parses the same canonical package.
+  Tested by `tests/test_reviewer.py` (17 tests): the three-call flow,
+  the judge slot (reference + drop-in), the blocked path, the SDK-only
+  boundary — plus an end-to-end run where a planner proposal is worked
+  (executor slot) and judged (reviewer slot) to done by the reference
+  client script. An LLM reviewer is a drop-in judge behind the same
+  protocol.
 
 The reference planner is deliberately AI-free: it proves the boundary.
 An LLM planner is a drop-in replacement behind the same protocol —

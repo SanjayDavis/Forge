@@ -52,7 +52,8 @@ under active development — this release is `0.1.0-alpha`.
   agent reads instead of the graph
 - ✅ Executor — `plugins/executor/` ReferenceExecutor: task package in,
   artifacts + machine-verified hard evidence out, the kernel decides done
-- ⬜ Reviewer
+- ✅ Reviewer — `plugins/reviewer/` ReferenceReviewer: acceptance
+  judgment as soft evidence, the kernel decides done
 - ⬜ MCP server
 - ⬜ VS Code / Web UI
 
@@ -264,7 +265,9 @@ the kernel:
   returns the standard context package: Task / Description / Acceptance /
   Dependencies (with status) / Knowledge / Relevant Files / Evidence /
   Constraints — roughly 500 tokens instead of a repo's worth of
-  conversation. Agents never read the graph; they read this.
+  conversation. Agents never read the graph; they read this. The SDK
+  also ships the reader: `forge.parse_context()` parses a package back
+  into the same sections (the canonical reader every client uses).
 - **SDK — ForgeClient (done).** `forge/sdk.py` is the one public surface
   every client is allowed to touch: `next()`, `context()`, `propose()`,
   `start()`, `expand()`, `attach_evidence()`, `verify()`, `verify_fail()`,
@@ -291,10 +294,28 @@ the kernel:
   end-to-end run where a planner proposal is executed to done by the
   reference client script. An LLM executor is a drop-in worker behind
   the same protocol.
-- **M4 — Reviewer plugin.** Deterministic checks (tests, build, lint)
-  are hard evidence; the reviewer handles only the semantic layer
-  (architecture, readability, design) and emits soft evidence or
-  `verify_fail` → NeedsRevision.
+- **M4 — Reviewer plugin (done).** Deterministic checks (tests, build,
+  lint) are the executor's hard evidence; the reviewer handles only the
+  semantic layer (architecture, readability, design) and emits **soft
+  evidence** or `verify_fail` → NeedsRevision. `plugins/reviewer/` ships
+  a reference reviewer (`ReferenceReviewer`): three client calls per
+  task — context, judge, then approve (soft evidence + verify) or
+  reject (soft evidence + verify_fail). The judge is the llm slot
+  (`judge(ctx_yaml)`); the reference judge is deterministic and
+  stdlib-only — every acceptance criterion must be covered by the
+  evidence or relevant files on record, an uncovered criterion is a
+  gap. A machine reviewer never overrides the dependency gate: if the
+  kernel's structural gate refuses (dependencies not done), it reports
+  `blocked` and leaves the task untouched — and the SDK's `verify()`
+  doesn't even expose a bypass. The Context Contract reader
+  (`parse_context`) moved into the SDK so the reviewer consumes the
+  same canonical package every client reads. The suite
+  (`tests/test_reviewer.py`, 17 tests) proves the three-call flow, the
+  judge slot, the blocked path, and the SDK-only boundary (soft
+  evidence only, no file writes, no gate overrides) — plus an
+  end-to-end run where a planner proposal is worked (executor slot) and
+  judged (reviewer slot) to done by the reference client script. An LLM
+  reviewer is a drop-in judge behind the same protocol.
 - **M5 — MCP server.** A thin transport over the SDK — `forge_next()`,
   `forge_context()`, `forge_propose()`, `forge_verify()`,
   `forge_query()`, `forge_replay()`. No business logic; it should be

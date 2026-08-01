@@ -197,6 +197,71 @@ def to_json(pkg: dict) -> str:
     return json.dumps(pkg, indent=2, ensure_ascii=False)
 
 
+class ContextError(ValueError):
+    """The Context Contract package is malformed (SPEC Appendix C). The
+    kernel never sees it; this is client-side tooling."""
+
+
+def _unquote(s: str) -> str:
+    s = s.strip()
+    if len(s) >= 2 and s.startswith("'") and s.endswith("'"):
+        return s[1:-1].replace("''", "'")
+    return s
+
+
+def parse_context(text: str) -> dict:
+    """Parse the frozen Context Contract YAML subset emitted by
+    `to_yaml` / `ForgeClient.context()`. Strictly bound to the
+    contract's fixed shape (section order, indented items, single-quoted
+    scalars) — not a general YAML parser. This is the canonical reader
+    for the Context Contract; every client (executor, reviewer, MCP
+    server) consumes the same package natively."""
+    lines = text.splitlines()
+    if not lines or not lines[0].startswith("Task: "):
+        raise ContextError(
+            "context package must open with 'Task: <id> — <title>'")
+    rest = lines[0][len("Task: "):]
+    if " — " not in rest:
+        raise ContextError("context header must be 'Task: <id> — <title>'")
+    task_id, title = rest.split(" — ", 1)  # id is first; title may contain ' — ' itself
+    pkg: dict = {
+        "task": _unquote(task_id),
+        "title": _unquote(title),
+        "description": "",
+        "acceptance": [],
+        "dependencies": [],
+        "knowledge": [],
+        "relevant_files": [],
+        "evidence": [],
+        "constraints": [],
+    }
+    section: str | None = None
+    for line in lines[1:]:
+        if line and not line.startswith(" "):
+            head = line.rstrip()
+            if "(" in head:
+                section = None            # "(none)" placeholders
+            elif head.startswith("Description"):
+                section = "description"
+            else:
+                key = head.rstrip(":").strip().lower().replace(" ", "_")
+                section = key if key in pkg else None
+            continue
+        if section is None:
+            continue
+        item = line.strip()
+        if not item:
+            continue
+        if section == "description":
+            pkg["description"] += ("\n" + item) if pkg["description"] else item
+            continue
+        if item.startswith("(none"):
+            continue
+        if item.startswith("- "):
+            pkg[section].append(_unquote(item[2:].strip()))
+    return pkg
+
+
 # --------------------------------------------------------------------------- the client
 class ForgeClient:
     """The public SDK. One implementation; every client — Hermes, Claude
