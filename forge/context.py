@@ -14,8 +14,10 @@ import json
 from .model import Graph, STATUS_DONE
 from .scheduler import blockers, is_container, progress
 
-STATUS_ICON = {"todo": "\u26aa", "in_progress": "\U0001f535",
-               "needs_revision": "\U0001f534", "done": "\u2705"}
+# Plain-ASCII status markers (terminal-safe, no glyphs): [ ] todo,
+# [~] in_progress, [!] needs_revision, [x] done.
+STATUS_ICON = {"todo": "[ ]", "in_progress": "[~]",
+               "needs_revision": "[!]", "done": "[x]"}
 
 
 def build_context(g: Graph, task_id: str) -> dict:
@@ -52,7 +54,7 @@ def build_context(g: Graph, task_id: str) -> dict:
 
 
 def _icon(status: str) -> str:
-    return STATUS_ICON.get(status, "\u2753")
+    return STATUS_ICON.get(status, "[?]")
 
 
 def to_markdown(ctx: dict) -> str:

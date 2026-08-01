@@ -153,7 +153,7 @@ The planner flow:
       - zoom
       - tests
     Dependencies:
-      - renderer ✓ (done)
+      - renderer [x] (done)
     Knowledge:
       - camera API exists upstream
     Relevant Files:
@@ -165,7 +165,7 @@ The planner flow:
       - do not modify renderer API
 
 Conventions: `Knowledge` = notes; `Constraints` = notes prefixed
-`constraint:`; `Dependencies` carry a ✓ (done) / ○ (todo) status marker.
+`constraint:`; `Dependencies` carry a [x] (done) / [ ] (todo) status marker.
 Agents read this package, never the graph. The canonical dict is
 `forge.context_package(graph, task_id)`; `forge.slugify` is the public
 id-derivation rule (child ids must be predicted by the planner).
