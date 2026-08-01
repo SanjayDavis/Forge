@@ -15,7 +15,7 @@ that is a missing kernel API, not a plugin bug.**
 | `reference/` | the human: next -> do -> evidence -> verify  | SDK usage |
 | `executor/`  | task package -> artifacts + hard evidence    | §10 (Executor Protocol) |
 | `reviewer/`  | acceptance judgment -> soft evidence         | §11 (Reviewer Protocol) |
-| `mcp/`       | wire protocol exposing the SDK               | (M5, last) |
+| `mcp/`       | wire protocol exposing the SDK               | M5 (done) |
 
 Status:
 - M2A (Planner Protocol) is specified (SPEC §9) and enforced by the
@@ -74,6 +74,23 @@ Status:
   (executor slot) and judged (reviewer slot) to done by the reference
   client script. An LLM reviewer is a drop-in judge behind the same
   protocol.
+- **M5 (MCP server) is DONE.** `plugins/mcp/` ships `ForgeMCPServer`,
+  the SDK as a wire protocol: JSON-RPC 2.0 over stdio, stdlib-only,
+  exactly the six roadmap tools (`forge_next`, `forge_context`,
+  `forge_propose`, `forge_verify`, `forge_query`, `forge_replay`),
+  one SDK call each, zero business logic. The reference server
+  implements the MCP framing itself (initialize handshake,
+  notifications, `tools/list`, `tools/call`, JSON-RPC faults — parse
+  `-32700`, method-not-found `-32601`, invalid-params `-32602`; tool
+  failures surface as `isError` results, never as crashes). The
+  reference MCP client (`mcp_client.py`) spawns the server and walks
+  the six tools over stdio, like any MCP client would. Tested by
+  `tests/test_mcp.py` (26 tests): the wire layer, each tool against a
+  live project, the SDK-only / no-business-logic boundary, an
+  end-to-end client run — and interop where the **official `mcp`
+  Python SDK client** connects and drives all six tools (skipped when
+  the SDK isn't installed, so the canonical suite stays
+  dependency-free).
 
 The reference planner is deliberately AI-free: it proves the boundary.
 An LLM planner is a drop-in replacement behind the same protocol —

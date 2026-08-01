@@ -54,7 +54,9 @@ under active development — this release is `0.1.0-alpha`.
   artifacts + machine-verified hard evidence out, the kernel decides done
 - ✅ Reviewer — `plugins/reviewer/` ReferenceReviewer: acceptance
   judgment as soft evidence, the kernel decides done
-- ⬜ MCP server
+- ✅ MCP server — `plugins/mcp/` ForgeMCPServer: the SDK as six
+  JSON-RPC 2.0 tools over stdio, zero business logic, interop-tested
+  against the official `mcp` SDK client
 - ⬜ VS Code / Web UI
 
 ## Architecture
@@ -316,10 +318,15 @@ the kernel:
   end-to-end run where a planner proposal is worked (executor slot) and
   judged (reviewer slot) to done by the reference client script. An LLM
   reviewer is a drop-in judge behind the same protocol.
-- **M5 — MCP server.** A thin transport over the SDK — `forge_next()`,
-  `forge_context()`, `forge_propose()`, `forge_verify()`,
-  `forge_query()`, `forge_replay()`. No business logic; it should be
-  almost boring.
+- **M5 — MCP server (done).** A thin transport over the SDK —
+  `forge_next()`, `forge_context()`, `forge_propose()`,
+  `forge_verify()`, `forge_query()`, `forge_replay()`. No business
+  logic; it should be almost boring. `plugins/mcp/` ships
+  `ForgeMCPServer` (JSON-RPC 2.0 over stdio, stdlib-only, six tools,
+  one SDK call each) plus a reference MCP client. The test suite
+  drives it both with a minimal wire client and with the official
+  `mcp` Python SDK client (skipped when not installed — the canonical
+  suite stays dependency-free).
 - **M6 — VS Code extension.** The CLI with a panel.
 - **M7 — Web UI.** `forge ui`: project, graph, history, replay,
   evidence.
