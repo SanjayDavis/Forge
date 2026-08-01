@@ -143,6 +143,11 @@ def context_package(g: Graph, task_id: str) -> dict:
 
 
 def _yaml_scalar(v: str) -> str:
+    # Line-based contract: an embedded newline would split the value across
+    # lines and let it be misread as a section header / extra items (context
+    # injection). Escape line breaks so the value always renders as one line.
+    if "\n" in v or "\r" in v:
+        v = v.replace("\r", "\\r").replace("\n", "\\n")
     if (v == "" or v != v.strip()
             or any(ch in v for ch in ":#{}[],&*!|>'\"%@`")
             or v[0] in "-? "):
@@ -184,7 +189,7 @@ def to_yaml(pkg: dict) -> str:
         out.append("Evidence:")
         for e in pkg["evidence"]:
             tag = "hard" if e["kind"] == "hard" else "soft"
-            detail = f" \u2014 {e['detail']}" if e["detail"] else ""
+            detail = f" — {_yaml_scalar(e['detail'])}" if e["detail"] else ""
             out.append(f"  - [{tag}] {_yaml_scalar(e['source'])}{detail}")
     else:
         out.append("Evidence: (none)")

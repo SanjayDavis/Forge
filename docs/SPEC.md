@@ -199,7 +199,14 @@ plays by the same rules: **it proposes; the kernel decides.**
      and at load time — MUST pass shape validation and guard
      validation. A log that fails to fold **MUST** fail loudly
      (never silently skipped except the torn-tail case, §12.5).
-     Unknown `op` values are errors.
+     Unknown `op` values are errors, as are unknown fields on a known
+     op, wrong-typed fields (including optional fields), and task ids
+     outside the slug charset `[a-zA-Z0-9][a-zA-Z0-9._-]*` (this keeps
+     ids safe as filesystem path components and blocks path traversal
+     through plugin artifact writes). Single-line contract fields
+     (title, notes, acceptance items, files, evidence source/detail)
+     MUST NOT contain line breaks, so the line-based context package
+     (§7) can never be injected with fake sections.
 
 3.4. **Flexibility (hypergraph readiness).** v1 is a DAG, but the
      envelope is deliberately open:

@@ -158,17 +158,31 @@ class Store:
     def init(self) -> None:
         os.makedirs(self.dir, exist_ok=True)
         for fname in (EVENT_FILE, LOCK_FILE):
-            if not os.path.exists(os.path.join(self.dir, fname)):
-                with open(os.path.join(self.dir, fname), "w", encoding="utf-8") as f:
+            path = os.path.join(self.dir, fname)
+            if os.path.islink(path):
+                raise GraphError(f"refusing symlinked {fname}: {path}")
+            if not os.path.exists(path):
+                with open(path, "w", encoding="utf-8") as f:
                     f.write("")
 
     def exists(self) -> bool:
         return os.path.exists(self.path)
 
+    def _guard_no_symlink(self) -> None:
+        """Refuse to operate on a project whose event/lock files are symlinks.
+        A symlinked events.log would redirect every append/truncate to the
+        symlink target (arbitrary file append/corruption via a crafted project
+        directory), so the store fails loudly instead of writing through it."""
+        for fname in (EVENT_FILE, LOCK_FILE):
+            path = os.path.join(self.dir, fname)
+            if os.path.islink(path):
+                raise GraphError(f"refusing symlinked {fname}: {path}")
+
     # ---------------------------------------------------------------- I/O
     def read_events(self) -> list[dict[str, Any]]:
         if not self.exists():
             return []
+        self._guard_no_symlink()
         events: list[dict[str, Any]] = []
         with open(self.path, encoding="utf-8") as f:
             lines = [ln for ln in f if ln.strip()]
@@ -187,6 +201,7 @@ class Store:
 
     def append(self, events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Assign seq/ts/schema-version, append lines, return stamped events."""
+        self._guard_no_symlink()
         out: list[dict[str, Any]] = []
         with self._thread_lock:
             with _FileLock(self.lock_path):
@@ -208,6 +223,7 @@ class Store:
         """Truncate the last n events and return them."""
         if n < 1:
             raise GraphError("undo count must be >= 1")
+        self._guard_no_symlink()
         with self._thread_lock:
             with _FileLock(self.lock_path):
                 with open(self.path, "a+b") as f:

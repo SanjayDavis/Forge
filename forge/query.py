@@ -154,8 +154,8 @@ def run_query(g: Graph, expr: str):
     _register_functions(g)
     try:
         tree = ast.parse(expr, mode="eval")
-    except SyntaxError as e:
-        raise QueryError(f"bad query: {e.msg}") from e
+    except (SyntaxError, RecursionError, MemoryError) as e:
+        raise QueryError(f"bad query: {e}") from e
     _check_tree(tree)
     body = tree.body
 
@@ -164,7 +164,10 @@ def run_query(g: Graph, expr: str):
         name = body.func.id if isinstance(body.func, ast.Name) else None
         if name not in FUNCTIONS:
             raise QueryError(f"unknown function {name!r}")
-        args = [_eval(a, {}) for a in body.args]
+        try:
+            args = [_eval(a, {}) for a in body.args]
+        except RecursionError as e:
+            raise QueryError("query expression too deeply nested") from e
         return FUNCTIONS[name](*args)
 
     # filter form: evaluate the expression against every task

@@ -34,21 +34,64 @@ PRIORITY_WEIGHT = {"low": 0, "medium": 1, "high": 2}
 
 # Required fields + types per op. Enforced on every event, including replay,
 # so a corrupt or foreign event fails loudly with its seq number.
+# The map covers ALL known fields (required + optional); OP_REQUIRED lists the
+# required subset. Unknown fields are rejected (system keys seq/ts/v excepted)
+# so foreign events and type-confused optional fields fail loudly instead of
+# silently corrupting the graph or crashing later renders.
 OP_SHAPES: dict[str, dict[str, type]] = {
-    "task_created":        {"id": str, "title": str},
-    "task_updated":        {"id": str},
+    "task_created":        {"id": str, "title": str, "description": str, "acceptance": list,
+                            "files": list, "notes": list, "priority": str},
+    "task_updated":        {"id": str, "title": str, "description": str, "acceptance": list,
+                            "files": list, "priority": str},
     "dependency_added":    {"task": str, "depends_on": str},
     "dependency_removed":  {"task": str, "depends_on": str},
     "task_expanded":       {"task": str, "children": list},
     "task_started":        {"id": str},
     "verification_failed": {"id": str, "reason": str},
     "task_retried":        {"id": str},
-    "verification_passed": {"id": str},
+    "verification_passed": {"id": str, "force": bool},
     "task_reopened":       {"id": str},
-    "evidence_added":      {"id": str, "kind": str, "source": str},
+    "evidence_added":      {"id": str, "kind": str, "source": str, "detail": str},
     "note_added":          {"id": str, "text": str},
     "task_deleted":        {"id": str},
 }
+
+OP_REQUIRED: dict[str, tuple[str, ...]] = {
+    "task_created":        ("id", "title"),
+    "task_updated":        ("id",),
+    "dependency_added":    ("task", "depends_on"),
+    "dependency_removed":  ("task", "depends_on"),
+    "task_expanded":       ("task", "children"),
+    "task_started":        ("id",),
+    "verification_failed": ("id", "reason"),
+    "task_retried":        ("id",),
+    "verification_passed": ("id",),
+    "task_reopened":       ("id",),
+    "evidence_added":      ("id", "kind", "source"),
+    "note_added":          ("id", "text"),
+    "task_deleted":        ("id",),
+}
+
+# Keys the store stamps after validation; validate() must tolerate them on
+# replay/import because from_events() folds already-stamped events.
+_SYSTEM_KEYS = ("seq", "ts", "v")
+
+# Task ids become filesystem path components (artifact filenames) in
+# executor/plugin land, so they are restricted to a safe slug-like charset:
+# alphanumeric first char, then alnum / dot / underscore / hyphen. This blocks
+# path traversal ("../x", "a/b", "..\x"), leading-dot hidden files, and
+# Windows-reserved device names (CON, NUL, COM1 ...).
+_TASK_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
+_WIN_RESERVED = {"con", "prn", "aux", "nul"} | {f"com{i}" for i in range(1, 10)} \
+    | {f"lpt{i}" for i in range(1, 10)}
+
+# Single-line contract fields must not contain line breaks: the Context
+# Contract renders them as one line each and parse_context is line-based, so an
+# embedded newline would smuggle fake sections into the package an LLM reads.
+# Description is the one multi-line field (rendered as a block scalar).
+def _reject_ctrl(value: Any, field: str, what: str = "field") -> None:
+    if isinstance(value, str) and ("\n" in value or "\r" in value):
+        raise GraphError(f"{what} {field!r} must not contain line breaks")
 
 
 class GraphError(Exception):
@@ -210,11 +253,20 @@ class Graph:
         shape = OP_SHAPES.get(op)
         if shape is None:
             raise GraphError(f"unknown event op: {op!r}")
-        for key, typ in shape.items():
+        for key in OP_REQUIRED[op]:
             if key not in ev:
                 raise GraphError(f"event {op!r} is missing required field {key!r}")
-            if not isinstance(ev[key], typ):
-                raise GraphError(f"event {op!r}: field {key!r} must be {typ.__name__}, got {type(ev[key]).__name__}")
+        # every present field must be a known field of the right type —
+        # including optional fields, so type confusion can never be persisted
+        # (a bad optional field used to be accepted and then crash later
+        # renders; now it fails loudly at the event boundary)
+        for key, val in ev.items():
+            if key in _SYSTEM_KEYS or key == "op":
+                continue
+            if key not in shape:
+                raise GraphError(f"event {op!r} has unknown field {key!r}")
+            if not isinstance(val, shape[key]):
+                raise GraphError(f"event {op!r}: field {key!r} must be {shape[key].__name__}, got {type(val).__name__}")
         fn = getattr(self, f"_validate_{op}")
         fn(ev)
 
@@ -241,14 +293,22 @@ class Graph:
         tid, title = ev["id"], ev["title"]
         if not isinstance(tid, str) or not tid.strip():
             raise GraphError("task id must be a non-empty string")
-        if re.search(r"\s", tid):
-            raise GraphError(f"task id must not contain whitespace: {tid!r}")
+        if not _TASK_ID_RE.fullmatch(tid) or tid.lower() in _WIN_RESERVED:
+            raise GraphError(
+                f"task id must be a safe slug ([a-zA-Z0-9][a-zA-Z0-9._-]*), got {tid!r}")
         if tid in self.tasks:
             raise GraphError(f"task already exists: {tid}")
         if not title or not title.strip():
             raise GraphError("task title must be non-empty")
+        _reject_ctrl(title, "title")
         if ev.get("priority", "medium") not in PRIORITIES:
             raise GraphError(f"priority must be one of {', '.join(PRIORITIES)}, got {ev.get('priority')!r}")
+        for lst, what in (("acceptance", "acceptance item"), ("files", "file"),
+                          ("notes", "note")):
+            for item in ev.get(lst, []):
+                if not isinstance(item, str):
+                    raise GraphError(f"{what} must be a string, got {type(item).__name__}")
+                _reject_ctrl(item, lst, what)
 
     def _validate_task_updated(self, ev):
         self._require(ev["id"])
@@ -256,6 +316,15 @@ class Graph:
             raise GraphError("task_updated needs at least one field to change")
         if "priority" in ev and ev["priority"] not in PRIORITIES:
             raise GraphError(f"priority must be one of {', '.join(PRIORITIES)}, got {ev['priority']!r}")
+        if "title" in ev:
+            if not ev["title"].strip():
+                raise GraphError("task title must be non-empty")
+            _reject_ctrl(ev["title"], "title")
+        for lst, what in (("acceptance", "acceptance item"), ("files", "file")):
+            for item in ev.get(lst, []):
+                if not isinstance(item, str):
+                    raise GraphError(f"{what} must be a string, got {type(item).__name__}")
+                _reject_ctrl(item, lst, what)
 
     def _validate_task_expanded(self, ev):
         t = self._require(ev["task"])
@@ -264,14 +333,24 @@ class Graph:
         kids = ev["children"]
         if not kids:
             raise GraphError("expand needs at least one child")
-        ids = [c["id"] for c in kids]
+        ids = []
+        for c in kids:
+            if not isinstance(c, dict):
+                raise GraphError(f"child must be an object with id/title, got {type(c).__name__}")
+            if "id" not in c or not isinstance(c["id"], str) or not c["id"].strip():
+                raise GraphError("child id must be a non-empty string")
+            if not _TASK_ID_RE.fullmatch(c["id"]) or c["id"].lower() in _WIN_RESERVED:
+                raise GraphError(
+                    f"child id must be a safe slug ([a-zA-Z0-9][a-zA-Z0-9._-]*), got {c['id']!r}")
+            if "title" not in c or not isinstance(c["title"], str) or not c["title"].strip():
+                raise GraphError("child title must be a non-empty string")
+            _reject_ctrl(c["title"], "title", "child")
+            ids.append(c["id"])
         if len(set(ids)) != len(ids):
             raise GraphError("duplicate child ids in expand")
         for c in kids:
             if c["id"] in self.tasks:
                 raise GraphError(f"child id already exists: {c['id']}")
-            if not c["title"].strip():
-                raise GraphError("child title must be non-empty")
             if c.get("priority", "medium") not in PRIORITIES:
                 raise GraphError(f"child priority must be one of {', '.join(PRIORITIES)}, "
                                  f"got {c.get('priority')!r}")
@@ -305,6 +384,7 @@ class Graph:
             raise GraphError(f"only in-progress tasks can fail verification; {ev['id']} is '{t.status}'")
         if not (ev.get("reason") or "").strip():
             raise GraphError("verification_failed needs a reason")
+        _reject_ctrl(ev.get("reason", ""), "reason")
 
     def _validate_task_retried(self, ev):
         t = self._require(ev["id"])
@@ -335,11 +415,14 @@ class Graph:
             raise GraphError(f"evidence kind must be 'hard' or 'soft', got {ev['kind']!r}")
         if not (ev.get("source") or "").strip():
             raise GraphError("evidence needs a source (e.g. 'unittest', 'peer review')")
+        _reject_ctrl(ev.get("source", ""), "source", "evidence")
+        _reject_ctrl(ev.get("detail", ""), "detail", "evidence")
 
     def _validate_note_added(self, ev):
         self._require(ev["id"])
         if not (ev.get("text") or "").strip():
             raise GraphError("note text must be non-empty")
+        _reject_ctrl(ev.get("text", ""), "text", "note")
 
     def _validate_task_deleted(self, ev):
         t = self._require(ev["id"])
