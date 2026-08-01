@@ -43,6 +43,12 @@ _ALLOWED_NODES = (
     ast.In, ast.NotIn,
 )
 
+# F5: pathological nesting must fail as QueryError on every platform.
+# The C parser's RecursionError depth is platform-dependent (Windows vs
+# Linux differ), and with an empty graph the filter loop never evaluates
+# — so a depth check here is the only deterministic guard.
+_MAX_QUERY_DEPTH = 100
+
 
 class QueryError(GraphError):
     pass
@@ -142,6 +148,23 @@ def _check_tree(tree: ast.AST) -> None:
             raise QueryError(f"unsupported expression element: {type(node).__name__}")
 
 
+def _check_depth(tree: ast.AST) -> None:
+    """Iterative max-depth check. Never recurses — recursion here would
+    defeat the guard (pathological nesting must not overflow Python's
+    stack either). Raises QueryError when the expression nests deeper
+    than _MAX_QUERY_DEPTH."""
+    max_depth = 0
+    stack = [(tree, 1)]
+    while stack:
+        node, depth = stack.pop()
+        if depth > max_depth:
+            max_depth = depth
+            if max_depth > _MAX_QUERY_DEPTH:
+                raise QueryError("query expression too deeply nested")
+        for child in ast.iter_child_nodes(node):
+            stack.append((child, depth + 1))
+
+
 FUNCTIONS: dict[str, callable] = {}
 
 
@@ -157,6 +180,7 @@ def run_query(g: Graph, expr: str):
     except (SyntaxError, RecursionError, MemoryError) as e:
         raise QueryError(f"bad query: {e}") from e
     _check_tree(tree)
+    _check_depth(tree)
     body = tree.body
 
     # call form: a top-level function call (blockers(x), evidence(x), ready()...)
