@@ -96,6 +96,11 @@ class _Wire:
         assert self.p.stdin is not None
         self.p.stdin.close()
         self.p.wait(timeout=10)
+        # close the read pipes too, or the wrappers leak (ResourceWarning)
+        if self.p.stdout is not None:
+            self.p.stdout.close()
+        if self.p.stderr is not None:
+            self.p.stderr.close()
 
 
 def _handshake(w: _Wire) -> dict:

@@ -242,7 +242,8 @@ class ComplianceInvariants(unittest.TestCase):
         k = Kernel(d)
         for ev in scenario():
             k._commit(dict(ev))
-        raw = open(os.path.join(d, "events.log"), encoding="utf-8").read()
+        with open(os.path.join(d, "events.log"), encoding="utf-8") as f:
+            raw = f.read()
         for banned in ("\"blocked\"", "\"ready\"", "\"completion\"",
                        "\"effective_status\"", "project.graph.json"):
             self.assertNotIn(banned, raw, f"derived state leaked into the log: {banned}")
