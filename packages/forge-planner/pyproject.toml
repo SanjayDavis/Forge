@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-planner"
+version = "0.1.0a1"
+description = "Forge reference planner: goal in, proposal out (SPEC §9). The first untrusted SDK client, published as its own package."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Sanjay Davis", email = "psanjuknl@gmail.com" }]
+keywords = ["forge", "planner", "sdk", "autonomous-software"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = ["forge"]
+
+[project.entry-points."forge.commands"]
+plan = "forge_planner.cli:register"
+
+[tool.setuptools]
+packages = ["forge_planner"]

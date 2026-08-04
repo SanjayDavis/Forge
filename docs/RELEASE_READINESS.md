@@ -14,7 +14,7 @@ project state directly.
 | client | imports | verdict |
 |--------|---------|---------|
 | `plugins/reference/` (human) | `from forge import ForgeClient` | clean |
-| `plugins/planner/` | `from forge import ForgeClient, PLANNER_OPS, ProposalError, slugify, validate_proposal` | clean (fixed in M2D: was `forge.sdk.PLANNER_OPS`) |
+| `forge-planner` (packages/forge-planner) | `from forge import ForgeClient, PLANNER_OPS, ProposalError, slugify, validate_proposal` | clean (fixed in M2D: was `forge.sdk.PLANNER_OPS`; graduated to its own distribution in v0.1) |
 | `plugins/executor/` | `from forge import ForgeClient, GraphError` | clean |
 | `plugins/reviewer/` | `from forge import ForgeClient, GraphError, parse_context` | clean |
 | `plugins/mcp/server.py` | `from forge import ForgeClient, GraphError, ProposalError` | clean |

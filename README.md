@@ -88,23 +88,31 @@ with a terminal, an MCP server, a VS Code panel.
 ## Install
 
 ```bash
-pip install forge          # from PyPI (once published)
+pip install forge forge-planner   # from PyPI (once published)
 forge --help
 ```
+
+`forge` is the kernel + CLI + public SDK. `forge-planner` is the
+reference planner (a separate distribution) and registers the `forge
+plan` command at runtime through a `forge.commands` entry point. Every
+other client (executor, reviewer, MCP server, a future VS Code panel)
+is the same shape: an installable package that consumes only the SDK.
 
 For development, install from the repository root:
 
 ```bash
 python -m pip install -e .
+python -m pip install -e packages/forge-planner
 forge --help
 ```
 
 (Works without install too: `python -m forge.cli ...`)
 
-The install is zero-dependency: stdlib only, Python 3.10+. Plugins
-(planner, executor, reviewer, MCP server) are separate products that
-consume the SDK — they are not part of the `forge` package
-(`docs/ROADMAP.md`: Repository separation).
+The install is zero-dependency: stdlib only, Python 3.10+. Plugins are
+separate products that consume the SDK — they are not part of the
+`forge` package (`docs/ROADMAP.md`: Repository separation). If a known
+plugin command's package is missing, the CLI says exactly what to
+install instead of failing with an opaque argparse error.
 
 ## Quickstart
 
@@ -112,23 +120,15 @@ consume the SDK — they are not part of the `forge` package
 forge -d myproject init
 cd myproject
 
-forge create "Snake Game" --desc "A terminal snake game" -a "game runs" --priority high
-forge expand snake-game \
-    -c "Window::terminal window" \
-    -c "Renderer::draws the board::renders;tests pass" \
-    -c "Input::keyboard controls"
-forge graph                       # see the tree
-forge next                        # what to work on (priority order)
-forge start window
-forge evidence window --kind hard --source unittest --detail "14 passed"
-forge verify-pass window          # hard gate: deps must be done first
-forge start input
-forge verify-fail input --reason "edge cases missing"
-forge retry input
-forge show input                  # context package for an LLM client
-forge inspect renderer            # dossier: children, evidence, history
+forge plan "Build a Snake game" --commit   # reference planner proposes; kernel decides
+forge graph                    # root + Foundation/Core/Acceptance milestones
+forge next                     # what to work on (priority order)
+forge start build-a-snake-game-foundation
+forge evidence build-a-snake-game-foundation --kind hard --source unittest --detail "14 passed"
+forge verify-pass build-a-snake-game-foundation
+forge show build-a-snake-game-foundation   # context package for an LLM client
 forge progress
-forge replay                      # rebuild the graph from the log
+forge replay                   # rebuild the graph from the log
 ```
 
 Full command reference: [docs/CLI.md](docs/CLI.md).

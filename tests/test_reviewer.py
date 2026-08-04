@@ -27,12 +27,14 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _REPO)
+sys.path.insert(0, os.path.join(_REPO, "packages", "forge-planner"))
 
 from forge import ForgeClient, GraphError
 from forge.kernel import Kernel
+from forge_planner import ReferencePlanner
 from plugins.executor import default_worker
-from plugins.planner import ReferencePlanner
 from plugins.reviewer import (REVIEW_SOURCE, ReferenceReviewer, default_judge)
 
 REVIEWER_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)),

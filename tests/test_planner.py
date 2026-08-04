@@ -22,14 +22,17 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _REPO)
+sys.path.insert(0, os.path.join(_REPO, "packages", "forge-planner"))
 
 from forge import ForgeClient, GraphError, ProposalError, slugify, validate_proposal
 from forge.kernel import Kernel
-from plugins.planner import ALLOWED_OPS, ReferencePlanner
+from forge_planner import ALLOWED_OPS, ReferencePlanner
 
 PLANNER_SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           "..", "plugins", "planner", "planner.py")
+                           "..", "packages", "forge-planner",
+                           "forge_planner", "planner.py")
 
 
 def _fresh_kernel() -> Kernel:
@@ -132,10 +135,10 @@ class TestValidProposals(unittest.TestCase):
             self.assertNotIn(banned, src,
                              f"planner must not reference {banned!r} (§9.1)")
         self.assertIn("from forge import", src, "planner must consume the SDK")
-        import plugins.planner as pp
-        self.assertIs(pp.ProposalError, ProposalError,
+        import forge_planner as fp
+        self.assertIs(fp.ProposalError, ProposalError,
                       "the planner must not duplicate the protocol")
-        self.assertIs(pp.validate_proposal, validate_proposal)
+        self.assertIs(fp.validate_proposal, validate_proposal)
         p = ReferencePlanner().plan("Build a Snake game")
         self.assertIsInstance(p, dict)
 

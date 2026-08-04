@@ -30,8 +30,9 @@ is a client of the kernel, not the kernel.
 
 Each plugin is a separate product on top of the kernel.
 
-- **M2B — Planner plugin (done).** The first AI client.
-  `plugins/planner/` ships a reference planner: goal in,
+- **M2B — Planner plugin (done).** The first AI client. The reference
+  planner is a separate distribution, `forge-planner`
+  (`packages/forge-planner/`): goal in,
   `{proposal_id, reason, confidence, events}` out — a proposal, never a
   mutation. The kernel commits it atomically or rejects it whole
   (`import_events`). The planner test suite feeds the kernel both valid

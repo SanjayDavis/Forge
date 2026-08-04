@@ -374,37 +374,6 @@ def cmd_demo(args, k: Kernel) -> int:
     return 0
 
 
-def _planner_plugin():
-    """The planner is a separate product (plugins/), not part of the
-    installed forge package. Loaded lazily so forge works without it."""
-    try:
-        from plugins.planner import ProposalError, ReferencePlanner, validate_proposal
-        return ProposalError, ReferencePlanner, validate_proposal
-    except ImportError:
-        print("error: planner plugin not found — plugins/ is not installed with "
-              "forge; run from the repository root (PYTHONPATH=repo root)",
-              file=sys.stderr)
-        return None, None, None
-
-
-def cmd_plan(args, k: Kernel) -> int:
-    ProposalError, ReferencePlanner, _ = _planner_plugin()
-    if ReferencePlanner is None:
-        return 1
-    from .sdk import ForgeClient
-    client = ForgeClient(args.dir)  # the CLI speaks the SDK too
-    proposal = ReferencePlanner(client).plan(
-        args.goal, priority=args.priority, confidence=args.confidence)
-    if args.commit:
-        result = client.propose(proposal)  # envelope + kernel verdict
-        print(f"committed {result['committed']} events from {result['proposal_id']} "
-              f"(confidence {result['confidence']}) -> project now has "
-              f"{result['tasks']} tasks")
-    else:
-        print(json.dumps(proposal, ensure_ascii=False, indent=2))
-    return 0
-
-
 def cmd_propose(args, k: Kernel) -> int:
     from .sdk import ForgeClient, ProposalError
     client = ForgeClient(args.dir)
@@ -539,15 +508,17 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("replay", help="reconstruct the graph from the log")
     sub.add_parser("demo", help="seed a demo project (Snake Game)")
 
-    c = sub.add_parser("plan", help="reference planner: GOAL -> proposal (SPEC §9); commit is opt-in")
-    c.add_argument("goal")
-    c.add_argument("--priority", choices=["low", "medium", "high"], default="medium")
-    c.add_argument("--confidence", type=float, default=0.9)
-    c.add_argument("--commit", action="store_true",
-                   help="commit the proposal through the kernel (atomic: whole or nothing)")
-
     c = sub.add_parser("propose", help="commit a proposal file: protocol check, then kernel commits or rejects whole")
     c.add_argument("file")
+
+    # Ecosystem plugins contribute their own subparsers via the
+    # forge.commands entry-point group (see forge/plugins.py). A known
+    # command whose package is not installed gets a stub subparser with an
+    # install hint instead of argparse's bare "invalid choice".
+    from .plugins import discover, stub_for_ecosystem
+    plugin_commands = discover(sub)
+    plugin_commands.update(stub_for_ecosystem(sub, plugin_commands))
+    p._forge_plugin_commands = plugin_commands
 
     return p
 
@@ -582,19 +553,21 @@ COMMANDS = {
     "undo": cmd_undo,
     "replay": cmd_replay,
     "demo": cmd_demo,
-    "plan": cmd_plan,
     "propose": cmd_propose,
 }
 
 
 def main(argv: list[str] | None = None) -> int:
     _setup_stdout()
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    commands = dict(COMMANDS)
+    commands.update(getattr(parser, "_forge_plugin_commands", {}))
     try:
         if args.cmd == "init":
             return cmd_init(args)
         k = Kernel(args.dir)
-        return COMMANDS[args.cmd](args, k)
+        return commands[args.cmd](args, k)
     except GraphError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

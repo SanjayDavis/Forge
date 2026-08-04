@@ -26,10 +26,11 @@ import unittest
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
+sys.path.insert(0, os.path.join(REPO, "packages", "forge-planner"))
 
 from forge import ForgeClient  # noqa: E402
+from forge_planner import ReferencePlanner  # noqa: E402
 from plugins.mcp import TOOLS, ForgeMCPServer  # noqa: E402
-from plugins.planner import ReferencePlanner  # noqa: E402
 
 SERVER = os.path.join(REPO, "plugins", "mcp", "server.py")
 MCP_CLIENT = os.path.join(REPO, "plugins", "mcp", "mcp_client.py")

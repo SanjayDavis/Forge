@@ -11,6 +11,18 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
 
 ### Added
 
+- **Plugin command registry.** `forge/plugins.py` — the CLI discovers
+  commands through the `forge.commands` entry-point group, so any
+  installable package can contribute a subcommand without touching the
+  kernel. Known ecosystem commands whose package is missing get an
+  install-hint stub (`pip install forge-planner`) instead of an opaque
+  argparse error.
+- **`forge-planner` distribution.** The reference planner graduated
+  from `plugins/planner/` to its own installable package
+  (`packages/forge-planner/`, import name `forge_planner`), with its
+  own pyproject/LICENSE/README and a `plan` entry point. The `forge
+  plan` command now lives in that package — a real client of the SDK,
+  installed separately, proving the boundary end to end.
 - **SDK surface completed (M2D).** `PLANNER_OPS` is now exported from the
   top-level `forge` namespace, so every client (planner included) imports
   only `forge.*` — no submodule reaches, no kernel internals.
@@ -26,6 +38,10 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
   the compliance suite with `-W error` (all warnings are errors), and a
   new packaging job verifies `pip install` + `forge --help` + the full
   smoke surface on the built wheel/sdist.
+- **CI (v0.1):** the test job installs both `forge` and `forge-planner`
+  editable; the packaging job builds and installs both wheels and
+  verifies `forge plan` works against the installed package (and that a
+  bare `forge` install prints the install hint for `plan`).
 
 ### Fixed
 
