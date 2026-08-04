@@ -5,12 +5,46 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "forge"
 version = "0.1.0a1"
-description = "Forge - a deterministic project kernel for autonomous software development"
+description = "Forge — a deterministic project kernel for autonomous software development. Project state is deterministic; intelligence is replaceable."
+readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Sanjay Davis", email = "psanjuknl@gmail.com" },
+]
+keywords = [
+    "agents", "autonomous-software", "event-sourcing", "kernel",
+    "project-management", "task-graph",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+# The kernel is intentionally zero-dependency: stdlib only, no runtime
+# requirements, no optional extras. Do not add dependencies without a
+# spec amendment (docs/SPEC.md Appendix A: Freeze Policy).
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/SanjayDavis/Forge"
+Repository = "https://github.com/SanjayDavis/Forge"
+Documentation = "https://github.com/SanjayDavis/Forge/tree/master/docs"
 
 [project.scripts]
 forge = "forge.cli:main"
 
 [tool.setuptools]
+# Only the kernel package ships on PyPI. Plugins (plugins/) are separate
+# products that consume the SDK; they are not part of the installed
+# package (docs/ROADMAP.md: Repository separation).
 packages = ["forge"]

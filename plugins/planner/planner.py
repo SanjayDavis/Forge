@@ -30,8 +30,11 @@ from __future__ import annotations
 
 import uuid
 
-from forge import ForgeClient, ProposalError, slugify, validate_proposal
-from forge.sdk import PLANNER_OPS as ALLOWED_OPS
+from forge import ForgeClient, PLANNER_OPS, ProposalError, slugify, validate_proposal
+
+# Backward-compatible alias (pre-M2D name): the ops allowlist is the SDK's
+# PLANNER_OPS, one definition, no duplication.
+ALLOWED_OPS = PLANNER_OPS
 
 # Re-exported for compatibility: the protocol now lives in the SDK
 # (forge.validate_proposal) — one definition, no duplication.

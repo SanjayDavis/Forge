@@ -1,6 +1,9 @@
 # Forge CLI Reference
 
-`forge` is the human client: a thin shell over the SDK.
+`forge` is the human client. It ships with the kernel package and speaks
+the official Kernel API directly (it is the kernel's own first-party
+interface, not an external SDK client); proposal flows (`plan`,
+`propose`) go through the SDK exactly like any other client would.
 
 ```
 init          create events.log in DIR

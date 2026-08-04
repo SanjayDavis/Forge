@@ -87,12 +87,24 @@ with a terminal, an MCP server, a VS Code panel.
 
 ## Install
 
+```bash
+pip install forge          # from PyPI (once published)
+forge --help
 ```
+
+For development, install from the repository root:
+
+```bash
 python -m pip install -e .
 forge --help
 ```
 
 (Works without install too: `python -m forge.cli ...`)
+
+The install is zero-dependency: stdlib only, Python 3.10+. Plugins
+(planner, executor, reviewer, MCP server) are separate products that
+consume the SDK — they are not part of the `forge` package
+(`docs/ROADMAP.md`: Repository separation).
 
 ## Quickstart
 
@@ -180,12 +192,15 @@ orchestrate, Claude Code to write, Forge to hold the truth.
 - [docs/SPEC.md](docs/SPEC.md) — the Forge Specification v1.0, the
   normative contract
 - [docs/DESIGN.md](docs/DESIGN.md) — design decisions
-- [docs/API.md](docs/API.md) — the kernel API
+- [docs/API.md](docs/API.md) — the kernel API and the SDK
 - [docs/EVENTS.md](docs/EVENTS.md) — the event schema
 - [docs/CLI.md](docs/CLI.md) — command reference
 - [docs/ROADMAP.md](docs/ROADMAP.md) — milestone history and plan
 - [docs/verification.md](docs/verification.md) — test suite and stress
   results
+- [docs/RELEASE_READINESS.md](docs/RELEASE_READINESS.md) — SDK audit,
+  public API review, and packaging decisions (M2D)
+- [CHANGELOG.md](CHANGELOG.md) — release history
 - [WHY_FORGE.md](WHY_FORGE.md) — the motivation
 
 ## Test

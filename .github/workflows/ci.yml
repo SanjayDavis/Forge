@@ -21,11 +21,11 @@ jobs:
       - name: Install
         run: python -m pip install -e .
 
-      - name: Test suite
-        run: python -W error::ResourceWarning -m unittest discover -s tests
+      - name: Test suite (warnings are errors)
+        run: python -W error -m unittest discover -s tests
 
-      - name: Compliance suite
-        run: python -m unittest tests.compliance.test_compliance
+      - name: Compliance suite (warnings are errors)
+        run: python -W error -m unittest tests.compliance.test_compliance
 
       - name: CLI smoke test
         run: |
@@ -34,3 +34,53 @@ jobs:
           forge create "CI Demo" --desc "smoke" -a "passes" --priority high
           forge next
           forge progress
+
+  package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+
+      - name: Install the wheel into a clean venv
+        run: |
+          python -m venv /tmp/forge-venv
+          /tmp/forge-venv/bin/pip install dist/*.whl
+
+      - name: forge --help works from the installed wheel
+        run: |
+          cd /tmp
+          /tmp/forge-venv/bin/forge --help >/dev/null
+          /tmp/forge-venv/bin/python -c "import forge; print(forge.__version__)"
+          /tmp/forge-venv/bin/python -c "from forge import ForgeClient, PLANNER_OPS, validate_proposal; print('SDK ok')"
+
+      - name: SDK + CLI smoke against the installed package
+        run: |
+          mkdir -p /tmp/pkg-demo && cd /tmp/pkg-demo
+          /tmp/forge-venv/bin/forge init
+          /tmp/forge-venv/bin/forge create "Packaged Demo" --desc "via wheel" -a "passes" --priority high
+          /tmp/forge-venv/bin/forge next
+          /tmp/forge-venv/bin/python - <<'EOF'
+          from forge import ForgeClient
+          c = ForgeClient(".")
+          t = c.next()
+          assert t is not None and t["id"] == "packaged-demo"
+          assert "Constraints:" in c.context(t["id"])
+          print("installed-package SDK smoke: ok")
+          EOF
+
+      - name: sdist installs too
+        run: |
+          python -m venv /tmp/forge-sdist-venv
+          /tmp/forge-sdist-venv/bin/pip install dist/*.tar.gz
+          /tmp/forge-sdist-venv/bin/forge --help >/dev/null

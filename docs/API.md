@@ -121,9 +121,11 @@ reason to import kernel internals.
 | `context(task_id)` | the standard context contract package as YAML (below) |
 | `propose(proposal)` | validate the proposal envelope (§9), then commit events atomically; returns `{proposal_id, committed, tasks}` |
 | `start(task_id)` | claim a task (todo -> in_progress; blocks dependents) |
+| `expand(task_id, children)` | re-split a task into children (§10.3); the kernel derives child ids and commits atomically |
 | `attach_evidence(task_id, kind, source, detail="")` | hard (tests/build/benchmark) or soft (review) evidence |
 | `verify(task_id)` | run the verifier gate (I6); on pass the task is done — the client never decides this |
 | `verify_fail(task_id, reason)` | reviewer verdict -> needs_revision |
+| `retry(task_id)` | needs_revision -> in_progress (§10.2) |
 | `query(expr)` | query-language results |
 | `progress()` | `{total, done, in_progress, needs_revision, todo, percent}` |
 | `replay()` | refold from disk |
