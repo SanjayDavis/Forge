@@ -7,6 +7,12 @@
   "verification_passes": 10,
   "verification_failures": 0,
   "retries": 0,
+  "max_ready_queue": 8,
+  "max_ready_queue_at": {
+    "seq": 138,
+    "event": "verification_passed",
+    "id": "project-skeleton"
+  },
   "duration_minutes": 17,
   "llm": "not recorded",
   "forge_version": "0.2.0",

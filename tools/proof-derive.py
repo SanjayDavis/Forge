@@ -3,10 +3,12 @@
 
 Reproduces graph.json and metrics.json solely from events.log, per the
 Forge Proof Standard derivation rule (§5). Also emits _replay_facts.md,
-numbered milestones a human turns into replay.md.
+numbered milestones a human turns into replay.md. metrics.json includes
+max_ready_queue (widest simultaneously-executable frontier — a graph
+parallelism property, independent of the executor).
 
 Usage:
-    python tools/proof-derive.py examples/<name>
+    python tools/proof-derive.py examples/<name> [--forge-version X] [--snapshot NAME]
 """
 import json
 from collections import Counter
@@ -56,6 +58,44 @@ def replay(events):
             milestones.append((seq, "task_retried", e["id"], ""))
         elif op == "dependency_added":
             edges.append((e["depends_on"], e["task"]))
+    # --- max ready queue: the widest simultaneously-executable frontier ---
+    # A property of the project's dependency structure (graph parallelism),
+    # not of the executor: at the busiest point, how many tasks were ready.
+    # Pass 1: full DAG (the plan fixes all edges before execution starts).
+    deps = {}
+    for e in events:
+        if e["op"] == "dependency_added":
+            deps.setdefault(e["task"], set()).add(e["depends_on"])
+    # Pass 2: simulate the frontier over the event stream.
+    frontier = {}  # tid -> 'pending' | 'running' | 'done' | 'cancelled'
+    peak, peak_seq, peak_ev = 0, None, ("", "")
+
+    def ready_count():
+        return sum(1 for t, s in frontier.items()
+                   if s == "pending" and all(frontier.get(d) == "done"
+                                             for d in deps.get(t, ())))
+
+    for e in events:
+        op, seq = e["op"], e["seq"]
+        if op == "task_created":
+            frontier[e["id"]] = "pending"
+        elif op == "task_started":
+            frontier[e["id"]] = "running"
+        elif op == "verification_passed":
+            frontier[e["id"]] = "done"
+        elif op == "verification_failed":
+            frontier[e["id"]] = "pending"   # executable again (retry)
+        elif op == "task_reopened":
+            frontier[e["id"]] = "pending"
+        elif op == "task_retried":
+            frontier[e["id"]] = "running"
+        elif op == "task_cancelled":
+            frontier[e["id"]] = "cancelled"
+        rc = ready_count()
+        if rc > peak:
+            peak, peak_seq, peak_ev = rc, seq, (op, e.get("id", ""))
+    meta["max_ready_queue"] = peak
+    meta["max_ready_queue_at"] = {"seq": peak_seq, "event": peak_ev[0], "id": peak_ev[1]}
     return {
         "tasks": {tid: {"id": tid, "title": title[tid], "status": status[tid],
                         "priority": priority[tid]}
@@ -65,7 +105,7 @@ def replay(events):
     }
 
 
-def main(example_dir, forge_version="unknown"):
+def main(example_dir, forge_version="unknown", snapshot=None):
     root = Path(example_dir)
     events = [json.loads(l) for l in
               (root / "events.log").read_text(encoding="utf-8").splitlines() if l.strip()]
@@ -104,6 +144,8 @@ def main(example_dir, forge_version="unknown"):
         "verification_passes": passes,
         "verification_failures": failures,
         "retries": counts.get("task_retried", 0),
+        "max_ready_queue": r["meta"]["max_ready_queue"],
+        "max_ready_queue_at": r["meta"]["max_ready_queue_at"],
         "duration_minutes": minutes,
         "llm": "not recorded",
         "forge_version": forge_version,
@@ -114,6 +156,12 @@ def main(example_dir, forge_version="unknown"):
 
     (root / "graph.json").write_text(json.dumps(graph, indent=2) + "\n", encoding="utf-8")
     (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
+
+    if snapshot:  # keep an evolving-demo snapshot of the graph per subsystem milestone
+        snap_dir = root / "demo" / "snapshots"
+        snap_dir.mkdir(parents=True, exist_ok=True)
+        (snap_dir / f"{snapshot}.graph.json").write_text(
+            json.dumps(graph, indent=2) + "\n", encoding="utf-8")
 
     # replay facts: ordered milestones (human turns this narrative)
     by_task = {}
@@ -130,7 +178,8 @@ def main(example_dir, forge_version="unknown"):
     (root / "demo" / "_replay_facts.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(f"derived {root.name}: {len(tasks)} tasks, {len(events)} events, "
-          f"{passes} passes, {failures} failures, {minutes} min")
+          f"{passes} passes, {failures} failures, {minutes} min, "
+          f"max_ready_queue={r['meta']['max_ready_queue']}")
     print(f"  -> {root/'graph.json'}, {root/'metrics.json'}, "
           f"{root/'demo'/'_replay_facts.md'}")
 
@@ -140,5 +189,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("example_dir")
     ap.add_argument("--forge-version", default="unknown")
+    ap.add_argument("--snapshot", default=None,
+                    help="copy graph.json to demo/snapshots/<name>.graph.json "
+                         "(per-subsystem evidence for an evolving demo)")
     a = ap.parse_args()
-    main(a.example_dir, a.forge_version)
+    main(a.example_dir, a.forge_version, a.snapshot)

@@ -10,10 +10,10 @@ VF / (VPass + VF).
 
 ## Comparison table
 
-| # | Proof | Language | Status | Tasks | Events | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
-|---|-------|----------|--------|-------|--------|-------|----|---------|---------|----------------|-----|--------|-------|
-| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
-| 2 | subsystem-dense (CHIP-8) *(executing)* | Python | in progress | 9/42 | 165 | 10 | 0 | — | — | 17 | Hermes agent | C1, C2, C7 | — |
+| # | Proof | Language | Status | Tasks | Events | MaxQ | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
+|---|-------|----------|--------|-------|--------|------|-------|----|---------|---------|----------------|-----|--------|-------|
+| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 1 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
+| 2 | subsystem-dense (CHIP-8) *(executing)* | Python | in progress | 9/42 | 165 | 8 | 10 | 0 | — | — | 17 | Hermes agent | C1, C2, C7 | — |
 | 3 | expression-parser *(planned)* | C++ | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
@@ -80,6 +80,13 @@ fetch-decode-execute dispatch core, 22 opcode units, 7 test groups, CLI, README.
 Verified acyclic DAG, max depth 6. Execution is live (foundation done: core
 subsystems + tests-core, 22/22 tests, events.log seq 1..165, executor = Hermes
 agent); remaining: dispatch, opcode units, integration tests, CLI, README.
+
+`MaxQ` = max ready queue: the widest simultaneously-executable frontier derived
+from events.log. It measures the graph's inherent parallelism, independent of
+the executor — flask-todo's serial chain exposes MaxQ 1, while CHIP-8's parallel
+subsystems already expose MaxQ 8 (the 8 core subsystems) and will grow as the
+opcode units unlock. The graph is snapshotted to `demo/snapshots/<N>-<name>.
+graph.json` after each major subsystem so the demo can show it evolving.
 
 Why: the proof isn't about emulation — it's about dependency structure. CHIP-8 stresses
 Forge structurally: CPU, memory, timers, display, input, ROM loading, and tests are

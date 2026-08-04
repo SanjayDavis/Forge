@@ -7,6 +7,12 @@
   "verification_passes": 9,
   "verification_failures": 1,
   "retries": 1,
+  "max_ready_queue": 1,
+  "max_ready_queue_at": {
+    "seq": 1,
+    "event": "task_created",
+    "id": "app-factory"
+  },
   "duration_minutes": 5,
   "llm": "not recorded",
   "forge_version": "0.1.0a1",
