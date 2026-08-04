@@ -1,7 +1,8 @@
 {
   "proof": "chip8",
   "forge_version": "0.2.0",
-  "generated_at": "2026-08-04T16:23:57.852932Z",
+  "derived_from": "events.log",
+  "log_tail_ts": "2026-08-04T18:52:00+00:00",
   "tasks": [
     {
       "id": "project-skeleton",

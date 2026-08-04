@@ -82,7 +82,9 @@ def main(example_dir, forge_version="unknown"):
     graph = {
         "proof": root.name,
         "forge_version": forge_version,
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "derived_from": "events.log",
+        "log_tail_ts": r["meta"]["last_ts"],  # pure function of the log: artifacts must
+        # regenerate byte-identically; a wall-clock timestamp would break that
         "tasks": tasks,
         "dependencies": [{"task": t, "depends_on": d} for d, t in r["edges"]],
     }

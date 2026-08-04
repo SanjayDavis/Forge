@@ -1,63 +1,64 @@
 {
   "proof": "flask-todo",
   "forge_version": "0.1.0a1",
-  "generated_at": "2026-08-04T12:49:02.555187Z",
+  "derived_from": "events.log",
+  "log_tail_ts": "2026-08-01T15:17:26+00:00",
   "tasks": [
     {
       "id": "app-factory",
       "title": "Flask app factory and config",
       "status": "done",
       "priority": "high",
-      "subsystem": "core"
+      "subsystem": null
     },
     {
       "id": "db-schema",
       "title": "SQLite schema and init",
       "status": "done",
       "priority": "high",
-      "subsystem": "core"
+      "subsystem": null
     },
     {
       "id": "models",
       "title": "Task data-access layer",
       "status": "done",
       "priority": "high",
-      "subsystem": "core"
+      "subsystem": null
     },
     {
       "id": "routes",
       "title": "HTTP routes",
       "status": "done",
       "priority": "high",
-      "subsystem": "web"
+      "subsystem": null
     },
     {
       "id": "templates",
       "title": "Templates",
       "status": "done",
       "priority": "medium",
-      "subsystem": "web"
+      "subsystem": null
     },
     {
       "id": "static-css",
       "title": "Minimal stylesheet",
       "status": "done",
       "priority": "low",
-      "subsystem": "web"
+      "subsystem": null
     },
     {
       "id": "tests",
       "title": "Test suite",
       "status": "done",
       "priority": "high",
-      "subsystem": "qa"
+      "subsystem": null
     },
     {
       "id": "readme",
       "title": "README",
       "status": "done",
       "priority": "low",
-      "subsystem": "docs"
+      "subsystem": null
     }
   ],
   "dependencies": [
