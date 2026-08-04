@@ -17,7 +17,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-dependencies = ["forge"]
+# Depends on the forge-kernel distribution (PyPI name; the import name
+# is "forge"). NEVER depend on plain "forge" — that name is owned by an
+# unrelated Django project on PyPI.
+dependencies = ["forge-kernel"]
 
 [project.entry-points."forge.commands"]
 plan = "forge_planner.cli:register"

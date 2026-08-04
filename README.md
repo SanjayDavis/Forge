@@ -88,7 +88,7 @@ with a terminal, an MCP server, a VS Code panel.
 ## Install
 
 ```bash
-pip install forge forge-planner   # from PyPI (once published)
+pip install forge-kernel forge-planner   # from PyPI (once published)
 forge --help
 ```
 

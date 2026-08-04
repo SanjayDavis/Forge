@@ -23,6 +23,12 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
   own pyproject/LICENSE/README and a `plan` entry point. The `forge
   plan` command now lives in that package — a real client of the SDK,
   installed separately, proving the boundary end to end.
+- **PyPI distribution naming.** The core distribution is published as
+  `forge-kernel` (import name and CLI command stay `forge`), because
+  the name `forge` is already taken on PyPI by an unrelated Django
+  project. `forge-planner` depends on `forge-kernel`, never on plain
+  `forge` — so `pip install forge-planner` resolves to this SDK, not a
+  foreign package.
 - **SDK surface completed (M2D).** `PLANNER_OPS` is now exported from the
   top-level `forge` namespace, so every client (planner included) imports
   only `forge.*` — no submodule reaches, no kernel internals.

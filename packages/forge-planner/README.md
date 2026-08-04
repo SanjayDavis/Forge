@@ -11,7 +11,7 @@ This package is the architectural proof behind the SDK boundary: it is a
 ## Install
 
 ```sh
-pip install forge forge-planner
+pip install forge-kernel forge-planner
 ```
 
 ## Use
