@@ -1,6 +1,6 @@
 # Replay facts (derived from events.log)
 
-- tasks: 8 · events: 46 · passes: 9 · failures: 1 · retries: 1 · duration: 5 min
+- tasks: 8 · events: 47 · passes: 9 · failures: 1 · retries: 1 · duration: 5 min
 
 - seq 1  task_created           app-factory — planned
 - seq 2  task_created           db-schema — planned

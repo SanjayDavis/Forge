@@ -1,56 +1,56 @@
 # Replay facts (derived from events.log)
 
-- tasks: 42 · events: 164 · passes: 10 · failures: 0 · retries: 0 · duration: 17 min
+- tasks: 42 · events: 165 · passes: 10 · failures: 0 · retries: 0 · duration: 17 min
 
-- seq 2  task_created           project-skeleton — planned
-- seq 3  task_created           memory — planned
-- seq 4  task_created           fontset — planned
-- seq 5  task_created           registers — planned
-- seq 6  task_created           stack — planned
-- seq 7  task_created           timers — planned
-- seq 8  task_created           rng — planned
-- seq 9  task_created           framebuffer — planned
-- seq 10  task_created           keypad — planned
-- seq 11  task_created           rom-loader — planned
-- seq 12  task_created           cpu-fde — planned
-- seq 13  task_created           op-cls — planned
-- seq 14  task_created           op-ret — planned
-- seq 15  task_created           op-jmp — planned
-- seq 16  task_created           op-call — planned
-- seq 17  task_created           op-skip-eq — planned
-- seq 18  task_created           op-skip-reg — planned
-- seq 19  task_created           op-ld-imm — planned
-- seq 20  task_created           op-add-imm — planned
-- seq 21  task_created           op-alu — planned
-- seq 22  task_created           op-ld-i — planned
-- seq 23  task_created           op-jmp-v0 — planned
-- seq 24  task_created           op-rand — planned
-- seq 25  task_created           op-draw — planned
-- seq 26  task_created           op-key-skip — planned
-- seq 27  task_created           op-key-wait — planned
-- seq 28  task_created           op-timer-read — planned
-- seq 29  task_created           op-timer-write — planned
-- seq 30  task_created           op-add-i — planned
-- seq 31  task_created           op-font — planned
-- seq 32  task_created           op-bcd — planned
-- seq 33  task_created           op-store-mem — planned
-- seq 34  task_created           op-load-mem — planned
-- seq 35  task_created           tests-core — planned
-- seq 36  task_created           tests-alu — planned
-- seq 37  task_created           tests-flow — planned
-- seq 38  task_created           tests-display — planned
-- seq 39  task_created           tests-input — planned
-- seq 40  task_created           tests-mem — planned
-- seq 41  task_created           tests-rom — planned
-- seq 42  task_created           cli-run — planned
-- seq 43  task_created           readme — planned
-- seq 137  verification_passed    project-skeleton
-- seq 140  verification_passed    memory
-- seq 143  verification_passed    registers
-- seq 146  verification_passed    stack
-- seq 149  verification_passed    timers
-- seq 152  verification_passed    rng
-- seq 155  verification_passed    framebuffer
-- seq 158  verification_passed    keypad
-- seq 161  verification_passed    fontset
-- seq 164  verification_passed    tests-core
+- seq 3  task_created           project-skeleton — planned
+- seq 4  task_created           memory — planned
+- seq 5  task_created           fontset — planned
+- seq 6  task_created           registers — planned
+- seq 7  task_created           stack — planned
+- seq 8  task_created           timers — planned
+- seq 9  task_created           rng — planned
+- seq 10  task_created           framebuffer — planned
+- seq 11  task_created           keypad — planned
+- seq 12  task_created           rom-loader — planned
+- seq 13  task_created           cpu-fde — planned
+- seq 14  task_created           op-cls — planned
+- seq 15  task_created           op-ret — planned
+- seq 16  task_created           op-jmp — planned
+- seq 17  task_created           op-call — planned
+- seq 18  task_created           op-skip-eq — planned
+- seq 19  task_created           op-skip-reg — planned
+- seq 20  task_created           op-ld-imm — planned
+- seq 21  task_created           op-add-imm — planned
+- seq 22  task_created           op-alu — planned
+- seq 23  task_created           op-ld-i — planned
+- seq 24  task_created           op-jmp-v0 — planned
+- seq 25  task_created           op-rand — planned
+- seq 26  task_created           op-draw — planned
+- seq 27  task_created           op-key-skip — planned
+- seq 28  task_created           op-key-wait — planned
+- seq 29  task_created           op-timer-read — planned
+- seq 30  task_created           op-timer-write — planned
+- seq 31  task_created           op-add-i — planned
+- seq 32  task_created           op-font — planned
+- seq 33  task_created           op-bcd — planned
+- seq 34  task_created           op-store-mem — planned
+- seq 35  task_created           op-load-mem — planned
+- seq 36  task_created           tests-core — planned
+- seq 37  task_created           tests-alu — planned
+- seq 38  task_created           tests-flow — planned
+- seq 39  task_created           tests-display — planned
+- seq 40  task_created           tests-input — planned
+- seq 41  task_created           tests-mem — planned
+- seq 42  task_created           tests-rom — planned
+- seq 43  task_created           cli-run — planned
+- seq 44  task_created           readme — planned
+- seq 138  verification_passed    project-skeleton
+- seq 141  verification_passed    memory
+- seq 144  verification_passed    registers
+- seq 147  verification_passed    stack
+- seq 150  verification_passed    timers
+- seq 153  verification_passed    rng
+- seq 156  verification_passed    framebuffer
+- seq 159  verification_passed    keypad
+- seq 162  verification_passed    fontset
+- seq 165  verification_passed    tests-core

@@ -3,7 +3,7 @@
   "status": "partial",
   "language": "python",
   "tasks": 42,
-  "events": 164,
+  "events": 165,
   "verification_passes": 10,
   "verification_failures": 0,
   "retries": 0,
@@ -11,5 +11,9 @@
   "llm": "not recorded",
   "forge_version": "0.2.0",
   "conforms_to": "proof-spec-0.1",
-  "claims": []
+  "claims": [
+    "C1",
+    "C2",
+    "C7"
+  ]
 }

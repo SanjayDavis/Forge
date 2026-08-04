@@ -108,7 +108,8 @@ def main(example_dir, forge_version="unknown"):
         "llm": "not recorded",
         "forge_version": forge_version,
         "conforms_to": FIELD_DEFAULTS["conforms_to"],
-        "claims": [],  # filled by the human author in README
+        "claims": [c for e in events if e["op"] == "claims_claimed"
+                   for c in e.get("claims", [])],
     }
 
     (root / "graph.json").write_text(json.dumps(graph, indent=2) + "\n", encoding="utf-8")

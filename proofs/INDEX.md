@@ -12,8 +12,8 @@ VF / (VPass + VF).
 
 | # | Proof | Language | Status | Tasks | Events | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
 |---|-------|----------|--------|-------|--------|-------|----|---------|---------|----------------|-----|--------|-------|
-| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 46 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
-| 2 | subsystem-dense (CHIP-8) *(planned)* | Python | — | — | — | — | — | — | — | — | — | C1, C2, C7 | — |
+| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
+| 2 | subsystem-dense (CHIP-8) *(executing)* | Python | in progress | 9/42 | 165 | 10 | 0 | — | — | 17 | Hermes agent | C1, C2, C7 | — |
 | 3 | expression-parser *(planned)* | C++ | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
@@ -77,8 +77,9 @@ of the backfill (see Behavior notes in the proof README).
 91-edge decomposition (proposal id `prop_chip8_001`): 8 core subsystems
 (memory, registers, stack, timers, RNG, framebuffer, keypad, fontset), the
 fetch-decode-execute dispatch core, 22 opcode units, 7 test groups, CLI, README.
-Verified acyclic DAG, max depth 6. Execution of tasks into a live `events.log` begins
-after Proof #1's backfill is reviewed.
+Verified acyclic DAG, max depth 6. Execution is live (foundation done: core
+subsystems + tests-core, 22/22 tests, events.log seq 1..165, executor = Hermes
+agent); remaining: dispatch, opcode units, integration tests, CLI, README.
 
 Why: the proof isn't about emulation — it's about dependency structure. CHIP-8 stresses
 Forge structurally: CPU, memory, timers, display, input, ROM loading, and tests are
