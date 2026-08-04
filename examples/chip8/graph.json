@@ -1,0 +1,667 @@
+{
+  "proof": "chip8",
+  "forge_version": "0.2.0",
+  "generated_at": "2026-08-04T16:23:57.852932Z",
+  "tasks": [
+    {
+      "id": "project-skeleton",
+      "title": "Project skeleton and entrypoint",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "memory",
+      "title": "4KB RAM bus",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "fontset",
+      "title": "Hex fontset sprites",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "registers",
+      "title": "Register file",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "stack",
+      "title": "Call stack",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "timers",
+      "title": "Delay and sound timers",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "rng",
+      "title": "Seeded RNG",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "framebuffer",
+      "title": "64x32 display framebuffer",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "keypad",
+      "title": "16-key hex keypad",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "rom-loader",
+      "title": "ROM loader",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "cpu-fde",
+      "title": "Fetch-decode-execute core",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-cls",
+      "title": "00E0 CLS",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-ret",
+      "title": "00EE RET",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-jmp",
+      "title": "1NNN JP addr",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-call",
+      "title": "2NNN CALL addr",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-skip-eq",
+      "title": "3XNN/4XNN skip on imm",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-skip-reg",
+      "title": "5XY0/9XY0 skip on reg",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-ld-imm",
+      "title": "6XNN LD Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-add-imm",
+      "title": "7XNN ADD Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-alu",
+      "title": "8XY0-8XYE ALU group",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-ld-i",
+      "title": "ANNN LD I",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-jmp-v0",
+      "title": "BNNN JP V0",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-rand",
+      "title": "CXNN RND Vx",
+      "status": "todo",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "op-draw",
+      "title": "DXYN DRW",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-key-skip",
+      "title": "EX9E/EXA1 skip on key",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-key-wait",
+      "title": "FX0A LD Vx, K",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-timer-read",
+      "title": "FX07 LD Vx, DT",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-timer-write",
+      "title": "FX15/FX18 set timers",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-add-i",
+      "title": "FX1E ADD I, Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-font",
+      "title": "FX29 LD F, Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-bcd",
+      "title": "FX33 LD B, Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-store-mem",
+      "title": "FX55 LD [I], V0..Vx",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "op-load-mem",
+      "title": "FX65 LD V0..Vx, [I]",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-core",
+      "title": "Core subsystem tests",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-alu",
+      "title": "ALU / arithmetic tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-flow",
+      "title": "Flow / control tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-display",
+      "title": "Display tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-input",
+      "title": "Input tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-mem",
+      "title": "Memory / I/O tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "tests-rom",
+      "title": "Integration ROM tests",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "cli-run",
+      "title": "CLI run/step",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "readme",
+      "title": "README",
+      "status": "todo",
+      "priority": "high",
+      "subsystem": null
+    }
+  ],
+  "dependencies": [
+    {
+      "task": "memory",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "fontset",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "registers",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "stack",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "timers",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "rng",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "framebuffer",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "keypad",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "rom-loader",
+      "depends_on": "memory"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "memory"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "registers"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "stack"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "timers"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "framebuffer"
+    },
+    {
+      "task": "cpu-fde",
+      "depends_on": "keypad"
+    },
+    {
+      "task": "op-cls",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-ret",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-jmp",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-call",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-skip-eq",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-skip-reg",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-jmp-v0",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-ld-imm",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-add-imm",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-alu",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-rand",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-draw",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-key-skip",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-key-wait",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-timer-read",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-timer-write",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-ld-i",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-add-i",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-font",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-bcd",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-store-mem",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-load-mem",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "op-rand",
+      "depends_on": "rng"
+    },
+    {
+      "task": "op-draw",
+      "depends_on": "framebuffer"
+    },
+    {
+      "task": "op-font",
+      "depends_on": "fontset"
+    },
+    {
+      "task": "op-key-skip",
+      "depends_on": "keypad"
+    },
+    {
+      "task": "op-key-wait",
+      "depends_on": "keypad"
+    },
+    {
+      "task": "op-timer-read",
+      "depends_on": "timers"
+    },
+    {
+      "task": "op-timer-write",
+      "depends_on": "timers"
+    },
+    {
+      "task": "op-ld-i",
+      "depends_on": "memory"
+    },
+    {
+      "task": "op-add-i",
+      "depends_on": "memory"
+    },
+    {
+      "task": "op-bcd",
+      "depends_on": "memory"
+    },
+    {
+      "task": "op-store-mem",
+      "depends_on": "memory"
+    },
+    {
+      "task": "op-load-mem",
+      "depends_on": "memory"
+    },
+    {
+      "task": "cli-run",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "task": "cli-run",
+      "depends_on": "rom-loader"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "memory"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "registers"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "stack"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "timers"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "keypad"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "fontset"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "rng"
+    },
+    {
+      "task": "tests-core",
+      "depends_on": "rom-loader"
+    },
+    {
+      "task": "tests-alu",
+      "depends_on": "op-alu"
+    },
+    {
+      "task": "tests-alu",
+      "depends_on": "op-ld-imm"
+    },
+    {
+      "task": "tests-alu",
+      "depends_on": "op-add-imm"
+    },
+    {
+      "task": "tests-alu",
+      "depends_on": "op-rand"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-ret"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-jmp"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-call"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-skip-eq"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-skip-reg"
+    },
+    {
+      "task": "tests-flow",
+      "depends_on": "op-jmp-v0"
+    },
+    {
+      "task": "tests-display",
+      "depends_on": "op-cls"
+    },
+    {
+      "task": "tests-display",
+      "depends_on": "op-draw"
+    },
+    {
+      "task": "tests-input",
+      "depends_on": "op-key-skip"
+    },
+    {
+      "task": "tests-input",
+      "depends_on": "op-key-wait"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-ld-i"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-add-i"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-font"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-bcd"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-store-mem"
+    },
+    {
+      "task": "tests-mem",
+      "depends_on": "op-load-mem"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-alu"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-ret"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-jmp"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-call"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-skip-eq"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-skip-reg"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-cls"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "op-draw"
+    },
+    {
+      "task": "tests-rom",
+      "depends_on": "rom-loader"
+    },
+    {
+      "task": "readme",
+      "depends_on": "cli-run"
+    },
+    {
+      "task": "readme",
+      "depends_on": "tests-rom"
+    }
+  ]
+}
