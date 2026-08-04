@@ -1,0 +1,40 @@
+$ flask --app app init-db   # fresh schema (idempotent)
+Initialized the database.
+
+$ python run.py &   # start the server
+[server pid 375 on http://127.0.0.1:5000]
+
+$ curl -s http://127.0.0.1:5000/health
+{
+  "status": "ok"
+}
+
+
+$ curl -s -X POST -d 'title=Buy milk' http://127.0.0.1:5000/add -w 'HTTP %{http_code}' -o /dev/null
+HTTP 302 (redirect to /)
+
+$ curl -s -X POST -d 'title=Write Forge tests' http://127.0.0.1:5000/add -w 'HTTP %{http_code}' -o /dev/null
+HTTP 302 (redirect to /)
+
+$ curl -s http://127.0.0.1:5000/ | grep -oE '<span class="title">[^<]+'
+<span class="title">Write Forge tests
+<span class="title">Buy milk
+
+$ curl -s -X POST http://127.0.0.1:5000/done/1 -w 'HTTP %{http_code}' -o /dev/null
+HTTP 302 (task 1 completed)
+
+$ curl -s -X POST http://127.0.0.1:5000/done/1 -w 'HTTP %{http_code}' -o /dev/null   # again - idempotent, not 404
+HTTP 302 (still 302 - the idempotency fix from the run)
+
+$ curl -s -X POST http://127.0.0.1:5000/delete/2 -w 'HTTP %{http_code}' -o /dev/null
+HTTP 302 (task 2 deleted)
+
+$ python -m unittest discover -s tests
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.204s
+
+OK
+
+$ kill 375   # stop the server
+demo complete.

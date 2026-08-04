@@ -1,0 +1,18 @@
+{
+  "proof": "flask-todo",
+  "status": "completed",
+  "language": "python",
+  "tasks": 8,
+  "events": 46,
+  "verification_passes": 9,
+  "verification_failures": 1,
+  "retries": 1,
+  "duration_minutes": 5,
+  "llm": "not recorded",
+  "forge_version": "0.1.0a1",
+  "conforms_to": "proof-spec-0.1",
+  "claims": [
+    "C6",
+    "C7"
+  ]
+}

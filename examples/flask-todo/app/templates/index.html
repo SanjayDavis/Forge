@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Tasks{% endblock %}
+{% block content %}
+<h1>Task Manager</h1>
+
+<form method="post" action="{{ url_for('tasks.add') }}" class="add-form">
+  <input type="text" name="title" placeholder="New task..." required autofocus>
+  <button type="submit">Add</button>
+</form>
+
+{% if tasks %}
+<ul class="task-list">
+  {% for task in tasks %}
+  <li class="task {% if task['done'] %}done{% endif %}">
+    <span class="title">{{ task['title'] }}</span>
+    <span class="meta">#{{ task['id'] }} · {{ task['created_at'] }}</span>
+    <span class="actions">
+      {% if not task['done'] %}
+      <form method="post" action="{{ url_for('tasks.done', task_id=task['id']) }}">
+        <button type="submit">Complete</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{{ url_for('tasks.remove', task_id=task['id']) }}">
+        <button type="submit" class="danger">Delete</button>
+      </form>
+    </span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No tasks yet. Add one above.</p>
+{% endif %}
+{% endblock %}

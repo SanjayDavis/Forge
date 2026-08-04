@@ -6,3 +6,6 @@ dist/
 .venv/
 events.lock
 events.log
+
+# proofs ship their raw event log as evidence
+!examples/**/events.log

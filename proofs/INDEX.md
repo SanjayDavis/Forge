@@ -12,7 +12,7 @@ VF / (VPass + VF).
 
 | # | Proof | Language | Status | Tasks | Events | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
 |---|-------|----------|--------|-------|--------|-------|----|---------|---------|----------------|-----|--------|-------|
-| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 46 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | no |
+| 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 46 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
 | 2 | subsystem-dense (CHIP-8) *(planned)* | Python | — | — | — | — | — | — | — | — | — | C1, C2, C7 | — |
 | 3 | expression-parser *(planned)* | C++ | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
@@ -58,13 +58,14 @@ returned 404 — `mark_done` conflated "not found" and "already done". The execu
 reopened `models`, made completion idempotent, retried `routes`, and verification
 passed. Real history, not a paint-by-numbers run.
 
-**Conformance:** **non-conforming** — the run predates the Proof Standard. Missing:
-graph.json, graph.png, replay.md, metrics.json, screenshots/, demo.mp4.
-**Backfill obligation:** move the run into `examples/flask-todo/`, generate the missing
-derived artifacts from its `events.log`, and record metrics. Until then it stays out of
-the comparison table.
+**Conformance:** **conforming** to `proof-spec-0.1` (backfilled from the original
+pre-standard run, Aug 2026). The full artifact bundle is present and the derived
+artifacts regenerate from `events.log` alone. The backfill surfaced one real
+documentation bug — the README omitted the `flask --app app init-db` step, without
+which `POST /add` fails on a fresh checkout (`no such table: tasks`) — fixed as part
+of the backfill (see Behavior notes in the proof README).
 
-**Current location:** `examples/flask-todo` (to be moved into the repo).
+**Location:** `examples/flask-todo/` (first entry in the corpus).
 
 ---
 
@@ -113,7 +114,7 @@ proofs if the 100+ task run and the multi-agent run are cleaner as separate evid
 
 ## Backlog
 
-- [ ] Backfill Proof #1 (flask-todo) to conformance
+- [x] Backfill Proof #1 (flask-todo) to conformance — done Aug 2026
 - [ ] Proof #2 CHIP-8 — build per standard
 - [ ] Proof #3 C++ expression parser
 - [ ] Proof #4 Rust CLI

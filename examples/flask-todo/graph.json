@@ -1,0 +1,97 @@
+{
+  "proof": "flask-todo",
+  "forge_version": "0.1.0a1",
+  "generated_at": "2026-08-04T12:49:02.555187Z",
+  "tasks": [
+    {
+      "id": "app-factory",
+      "title": "Flask app factory and config",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "core"
+    },
+    {
+      "id": "db-schema",
+      "title": "SQLite schema and init",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "core"
+    },
+    {
+      "id": "models",
+      "title": "Task data-access layer",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "core"
+    },
+    {
+      "id": "routes",
+      "title": "HTTP routes",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "web"
+    },
+    {
+      "id": "templates",
+      "title": "Templates",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "web"
+    },
+    {
+      "id": "static-css",
+      "title": "Minimal stylesheet",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "web"
+    },
+    {
+      "id": "tests",
+      "title": "Test suite",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "qa"
+    },
+    {
+      "id": "readme",
+      "title": "README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "docs"
+    }
+  ],
+  "dependencies": [
+    {
+      "task": "db-schema",
+      "depends_on": "app-factory"
+    },
+    {
+      "task": "models",
+      "depends_on": "db-schema"
+    },
+    {
+      "task": "routes",
+      "depends_on": "models"
+    },
+    {
+      "task": "templates",
+      "depends_on": "routes"
+    },
+    {
+      "task": "static-css",
+      "depends_on": "templates"
+    },
+    {
+      "task": "tests",
+      "depends_on": "routes"
+    },
+    {
+      "task": "readme",
+      "depends_on": "tests"
+    },
+    {
+      "task": "tests",
+      "depends_on": "templates"
+    }
+  ]
+}

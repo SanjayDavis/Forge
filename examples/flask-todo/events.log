@@ -1,0 +1,46 @@
+{"op": "task_created", "id": "app-factory", "title": "Flask app factory and config", "description": "create_app() factory, config dict, instance dir, register /health route", "acceptance": ["create_app() returns a Flask instance", "/health returns 200 with JSON body"], "files": ["app/__init__.py", "run.py"], "priority": "high", "notes": [], "seq": 1, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "db-schema", "title": "SQLite schema and init", "description": "schema.sql with tasks table (id, title, done, created_at); init_db() creates tables", "acceptance": ["init_db() creates the tasks table", "schema is idempotent"], "files": ["db.py", "schema.sql"], "priority": "high", "notes": [], "seq": 2, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "models", "title": "Task data-access layer", "description": "add_task/get_all/mark_done/delete over sqlite3 with row factory", "acceptance": ["add_task persists and returns an id", "get_all returns ordered rows", "mark_done and delete work"], "files": ["models.py"], "priority": "high", "notes": [], "seq": 3, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "routes", "title": "HTTP routes", "description": "GET / (list), POST /add (create), POST /done/<id>, POST /delete/<id>", "acceptance": ["POST /add redirects to /", "POST /done/<id> marks done", "unknown id returns 404"], "files": ["app/routes.py"], "priority": "high", "notes": [], "seq": 4, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "templates", "title": "Templates", "description": "base.html + index.html rendering task list with add/complete/delete forms", "acceptance": ["index renders all tasks", "empty list shows empty state"], "files": ["app/templates/base.html", "app/templates/index.html"], "priority": "medium", "notes": [], "seq": 5, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "static-css", "title": "Minimal stylesheet", "description": "static/style.css — clean default styling, no framework", "acceptance": ["stylesheet is linked in base.html", "done tasks render with strikethrough"], "files": ["app/static/style.css"], "priority": "low", "notes": [], "seq": 6, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "tests", "title": "Test suite", "description": "unittest over Flask test client: health, list, add, done, delete, 404", "acceptance": ["all tests pass", "covers every route"], "files": ["tests/test_app.py"], "priority": "high", "notes": [], "seq": 7, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_created", "id": "readme", "title": "README", "description": "setup, run, and test instructions", "acceptance": ["documents pip install, run, test commands"], "files": ["README.md"], "priority": "low", "notes": [], "seq": 8, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "db-schema", "depends_on": "app-factory", "seq": 9, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "models", "depends_on": "db-schema", "seq": 10, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "routes", "depends_on": "models", "seq": 11, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "templates", "depends_on": "routes", "seq": 12, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "static-css", "depends_on": "templates", "seq": 13, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "tests", "depends_on": "routes", "seq": 14, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "dependency_added", "task": "readme", "depends_on": "tests", "seq": 15, "ts": "2026-08-01T15:12:30+00:00", "v": 1}
+{"op": "task_started", "id": "app-factory", "seq": 16, "ts": "2026-08-01T15:12:43+00:00", "v": 1}
+{"op": "evidence_added", "id": "app-factory", "kind": "hard", "source": "python check", "detail": "create_app() returns Flask instance; GET /health -> 200 {'status': 'ok'}", "seq": 17, "ts": "2026-08-01T15:13:13+00:00", "v": 1}
+{"op": "verification_passed", "id": "app-factory", "force": false, "seq": 18, "ts": "2026-08-01T15:13:13+00:00", "v": 1}
+{"op": "task_started", "id": "db-schema", "seq": 19, "ts": "2026-08-01T15:13:20+00:00", "v": 1}
+{"op": "evidence_added", "id": "db-schema", "kind": "hard", "source": "python check", "detail": "init_db() twice (idempotent); tasks table exists with cols id,title,done,created_at", "seq": 20, "ts": "2026-08-01T15:13:54+00:00", "v": 1}
+{"op": "verification_passed", "id": "db-schema", "force": false, "seq": 21, "ts": "2026-08-01T15:13:54+00:00", "v": 1}
+{"op": "task_started", "id": "models", "seq": 22, "ts": "2026-08-01T15:14:01+00:00", "v": 1}
+{"op": "evidence_added", "id": "models", "kind": "hard", "source": "python check", "detail": "add/get_all/mark_done/delete verified, incl. idempotent no-ops", "seq": 23, "ts": "2026-08-01T15:14:13+00:00", "v": 1}
+{"op": "verification_passed", "id": "models", "force": false, "seq": 24, "ts": "2026-08-01T15:14:13+00:00", "v": 1}
+{"op": "task_started", "id": "routes", "seq": 25, "ts": "2026-08-01T15:14:20+00:00", "v": 1}
+{"op": "evidence_added", "id": "routes", "kind": "hard", "source": "flask test client", "detail": "add->302, done->302, unknown delete->404, done again->404", "seq": 26, "ts": "2026-08-01T15:14:49+00:00", "v": 1}
+{"op": "verification_failed", "id": "routes", "reason": "POST /done/<id> on an already-done task returns 404; mark_done returns False for both 'not found' and 'already done' — completion must be idempotent", "seq": 27, "ts": "2026-08-01T15:14:49+00:00", "v": 1}
+{"op": "task_reopened", "id": "models", "seq": 28, "ts": "2026-08-01T15:15:14+00:00", "v": 1}
+{"op": "evidence_added", "id": "models", "kind": "hard", "source": "python check", "detail": "mark_done now returns ok/already/missing (idempotent completion)", "seq": 29, "ts": "2026-08-01T15:15:14+00:00", "v": 1}
+{"op": "verification_passed", "id": "models", "force": false, "seq": 30, "ts": "2026-08-01T15:15:14+00:00", "v": 1}
+{"op": "task_retried", "id": "routes", "seq": 31, "ts": "2026-08-01T15:15:14+00:00", "v": 1}
+{"op": "evidence_added", "id": "routes", "kind": "hard", "source": "flask test client", "detail": "done twice -> 302 idempotent; unknown delete -> 404", "seq": 32, "ts": "2026-08-01T15:15:25+00:00", "v": 1}
+{"op": "verification_passed", "id": "routes", "force": false, "seq": 33, "ts": "2026-08-01T15:15:26+00:00", "v": 1}
+{"op": "task_started", "id": "tests", "seq": 34, "ts": "2026-08-01T15:15:35+00:00", "v": 1}
+{"op": "dependency_added", "task": "tests", "depends_on": "templates", "seq": 35, "ts": "2026-08-01T15:15:46+00:00", "v": 1}
+{"op": "task_started", "id": "templates", "seq": 36, "ts": "2026-08-01T15:15:47+00:00", "v": 1}
+{"op": "evidence_added", "id": "templates", "kind": "hard", "source": "flask test client", "detail": "index renders all tasks; done class; empty state", "seq": 37, "ts": "2026-08-01T15:16:30+00:00", "v": 1}
+{"op": "verification_passed", "id": "templates", "force": false, "seq": 38, "ts": "2026-08-01T15:16:30+00:00", "v": 1}
+{"op": "task_started", "id": "static-css", "seq": 39, "ts": "2026-08-01T15:16:37+00:00", "v": 1}
+{"op": "evidence_added", "id": "static-css", "kind": "hard", "source": "flask test client", "detail": "style.css served 200; linked in base.html; done-task strikethrough rule present", "seq": 40, "ts": "2026-08-01T15:16:48+00:00", "v": 1}
+{"op": "verification_passed", "id": "static-css", "force": false, "seq": 41, "ts": "2026-08-01T15:16:48+00:00", "v": 1}
+{"op": "evidence_added", "id": "tests", "kind": "hard", "source": "unittest", "detail": "7/7 pass: health, index, add redirect, done idempotent, done/delete 404", "seq": 42, "ts": "2026-08-01T15:17:12+00:00", "v": 1}
+{"op": "verification_passed", "id": "tests", "force": false, "seq": 43, "ts": "2026-08-01T15:17:13+00:00", "v": 1}
+{"op": "task_started", "id": "readme", "seq": 44, "ts": "2026-08-01T15:17:19+00:00", "v": 1}
+{"op": "evidence_added", "id": "readme", "kind": "soft", "source": "content check", "detail": "setup, run, test commands all documented", "seq": 45, "ts": "2026-08-01T15:17:26+00:00", "v": 1}
+{"op": "verification_passed", "id": "readme", "force": false, "seq": 46, "ts": "2026-08-01T15:17:26+00:00", "v": 1}
