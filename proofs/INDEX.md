@@ -13,7 +13,7 @@ VF / (VPass + VF).
 | # | Proof | Language | Status | Tasks | Events | MaxQ | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
 |---|-------|----------|--------|-------|--------|------|-------|----|---------|---------|----------------|-----|--------|-------|
 | 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 1 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
-| 2 | subsystem-dense (CHIP-8) *(executing)* | Python | in progress | 9/42 | 165 | 8 | 10 | 0 | — | — | 17 | Hermes agent | C1, C2, C7 | — |
+| 2 | [CHIP-8 emulator](#proof-2--chip-8-emulator) | Python | completed | 42 | 259 | 23 | 42 | 2 | 0 | 0 | 44 | not recorded | C1, C2, C7 | **yes** |
 | 3 | expression-parser *(planned)* | C++ | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
@@ -69,33 +69,53 @@ of the backfill (see Behavior notes in the proof README).
 
 ---
 
-## Proof #2 — Subsystem-Dense Systems Project (CHIP-8) *(planning — executing next)*
+## Proof #2 — CHIP-8 Emulator
 
-**Language:** Python · **Claims:** C1, C2, C7
+**Language:** Python · **Status:** completed · **Claims:** C1, C2, C7
 
-**Planning phase done (Aug 2026):** `examples/chip8/proposal.json` holds a 42-task,
+| Metric | Value |
+|--------|-------|
+| tasks | 42 |
+| events | 259 |
+| verification passes | 42 |
+| verification failures | 2 |
+| failure rate | 4.5% (2 of 44 attempts) |
+| retries | 0 (failures model retry as re-verification) |
+| max_ready_queue | 23 (at seq 173, when cpu-fde passed) |
+| duration (min) | 44 |
+| llm | not recorded |
+
+**Planning (Aug 2026):** `examples/chip8/proposal.json` holds the 42-task,
 91-edge decomposition (proposal id `prop_chip8_001`): 8 core subsystems
 (memory, registers, stack, timers, RNG, framebuffer, keypad, fontset), the
-fetch-decode-execute dispatch core, 22 opcode units, 7 test groups, CLI, README.
-Verified acyclic DAG, max depth 6. Execution is live (foundation done: core
-subsystems + tests-core, 22/22 tests, events.log seq 1..165, executor = Hermes
-agent); remaining: dispatch, opcode units, integration tests, CLI, README.
+fetch-decode-execute dispatch core, 22 opcode units, 7 test groups, CLI,
+README — a verified acyclic DAG, depth 5, executed by the Forge executor.
 
-`MaxQ` = max ready queue: the widest simultaneously-executable frontier derived
-from events.log. It measures the graph's inherent parallelism, independent of
-the executor — flask-todo's serial chain exposes MaxQ 1, while CHIP-8's parallel
-subsystems already expose MaxQ 8 (the 8 core subsystems) and will grow as the
-opcode units unlock. The graph is snapshotted to `demo/snapshots/<N>-<name>.
-graph.json` after each major subsystem so the demo can show it evolving.
+**Story (replay.md summary):** the foundation (9 subsystems + tests-core, 22
+tests) landed clean; execution then built the ROM loader, the high-nibble
+FDE dispatch, all 22 opcode units (each verified by its test group), the
+remaining test groups, the headless CLI, and the README. Two genuine failure
+cycles are preserved in the journal: (1) the FDE dispatch handed units the
+raw opcode instead of decoded operands — `op_ld_i` set `I = 0xA123` for
+`0xA123`, 22 test errors, fixed by moving decode into the dispatch table;
+(2) suite wiring under `discover -s tests` (top-level imports broke relative
+imports) plus five wrong test assertions, fixed with a top-level `_util`
+helper and canary-based two-step skip tests. Final: 66 unit/integration
+tests green, including a real ROM run end-to-end.
 
-Why: the proof isn't about emulation — it's about dependency structure. CHIP-8 stresses
-Forge structurally: CPU, memory, timers, display, input, ROM loading, and tests are
-independent subsystems, which makes a deep, wide dependency DAG. It answers "toy
-examples" (C1), "web apps" (C2), and "structured complexity" (C7) at once. Its README
-must lead with the subsystem-DAG argument, not with "it's an emulator."
+**Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
+`graph.json`/`metrics.json`/snapshots regenerate byte-identically from
+`events.log` alone (verified by double-derive hash match).
 
-Target shape: ~40–90 tasks, non-trivial event count, at least one genuine verification
-failure + retry cycle, full artifact bundle per the standard.
+**MaxQ interpretation:** `max_ready_queue = 23` is the widest
+simultaneously-executable frontier — reached at the moment `cpu-fde`
+completes, when the 22 opcode units (each depending only on the FDE core +
+one subsystem) all become ready at once. Against flask-todo's serial chain
+(MaxQ 1), this is the first quantitative read on what wide, deep dependency
+structure does to an execution frontier. The evolving graph is snapshotted
+under `examples/chip8/demo/snapshots/` (01-foundation → 06-cli-readme).
+
+**Location:** `examples/chip8/` (second entry in the corpus).
 
 ---
 

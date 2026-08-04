@@ -1,19 +1,19 @@
 {
   "proof": "chip8",
-  "status": "partial",
+  "status": "completed",
   "language": "python",
   "tasks": 42,
-  "events": 165,
-  "verification_passes": 10,
-  "verification_failures": 0,
+  "events": 259,
+  "verification_passes": 42,
+  "verification_failures": 2,
   "retries": 0,
-  "max_ready_queue": 8,
+  "max_ready_queue": 23,
   "max_ready_queue_at": {
-    "seq": 138,
+    "seq": 173,
     "event": "verification_passed",
-    "id": "project-skeleton"
+    "id": "cpu-fde"
   },
-  "duration_minutes": 17,
+  "duration_minutes": 44,
   "llm": "not recorded",
   "forge_version": "0.2.0",
   "conforms_to": "proof-spec-0.1",

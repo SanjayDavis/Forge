@@ -1,165 +1,259 @@
-{"seq": 1, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "proposal_committed", "id": "prop_chip8_001", "reason": "Decompose a CHIP-8 emulator for Proof #2. Six independent subsystems (CPU, memory, timers, display, input, ROM) joined by a fetch-decode-execute loop, then a fine-grained opcode dispatch. Subsystem-dense: ~24 opcode units + 9 test groups stress the dependency DAG (claim C7) while proving language/domain generality over the flask web example (C1, C2).", "confidence": 0.8}
-{"op": "claims_claimed", "id": "chip8", "claims": ["C1", "C2", "C7"], "seq": 2, "ts": "2026-08-04T18:52:00+00:00", "v": 1}
-{"seq": 3, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "project-skeleton", "title": "Project skeleton and entrypoint", "description": "Package layout chip8/, run.py, pyproject-free (stdlib only). cpu/memory/display modules importable.", "acceptance": ["import chip8 works", "run.py parses args"], "files": ["chip8/__init__.py", "run.py"], "priority": "high", "notes": [], "subsystem": "meta"}
-{"seq": 4, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "memory", "title": "4KB RAM bus", "description": "Memory-mapped RAM 0x000-0xFFF with byte read/write and bounds checks; program loaded at 0x200.", "acceptance": ["read/write round-trips", "out-of-range raises"], "files": ["chip8/memory.py"], "priority": "high", "notes": [], "subsystem": "memory"}
-{"seq": 5, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "fontset", "title": "Hex fontset sprites", "description": "Built-in 4x5 sprites for nibbles 0-F, used by the font instruction.", "acceptance": ["exactly 16 glyphs, 5 bytes each", "glyph 0x00 present"], "files": ["chip8/fontset.py"], "priority": "high", "notes": [], "subsystem": "memory"}
-{"seq": 6, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "registers", "title": "Register file", "description": "V0-VF (8-bit), I (16-bit), PC, SP, delay/sound timer refs. Arithmetic wraps to 8 bits.", "acceptance": ["Vx writes wrap mod 256", "I holds 16-bit", "PC/SP exposed"], "files": ["chip8/registers.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 7, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "stack", "title": "Call stack", "description": "16-slot stack for call/return; push/pop with overflow/underflow guard.", "acceptance": ["push/pop LIFO", "overflow raises or is guarded"], "files": ["chip8/stack.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 8, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "timers", "title": "Delay and sound timers", "description": "DT and ST counters that decrement at 60 Hz when tick() is called.", "acceptance": ["tick decrements nonzero timers", "stops at 0"], "files": ["chip8/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
-{"seq": 9, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "rng", "title": "Seeded RNG", "description": "Deterministic random source (seeded) for the CXNN opcode so runs are reproducible.", "acceptance": ["same seed -> same sequence", "value in 0-255"], "files": ["chip8/rng.py"], "priority": "medium", "notes": [], "subsystem": "cpu"}
-{"seq": 10, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "framebuffer", "title": "64x32 display framebuffer", "description": "Pixel buffer; set/clear a pixel, report collision, clear all. Basis for draw and cls.", "acceptance": ["set returns collision flag", "clear empties"], "files": ["chip8/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
-{"seq": 11, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "keypad", "title": "16-key hex keypad", "description": "Input state for keys 0-F; press/release, pressed state, wait-for-key.", "acceptance": ["press/release tracked", "wait returns on next press"], "files": ["chip8/keypad.py"], "priority": "high", "notes": [], "subsystem": "input"}
-{"seq": 12, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "rom-loader", "title": "ROM loader", "description": "Read a .ch8 file and write bytes into memory starting at 0x200.", "acceptance": ["loads at 0x200", "caps at memory bound"], "files": ["chip8/rom.py"], "priority": "high", "notes": [], "subsystem": "memory"}
-{"seq": 13, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "cpu-fde", "title": "Fetch-decode-execute core", "description": "cycle(): fetch 2-byte opcode at PC, decode, dispatch, increment PC. Holds the register file, stack, timers, keypad, framebuffer, memory references.", "acceptance": ["cycle advances PC", "dispatch routes by high nibble", "step() runs one opcode"], "files": ["chip8/cpu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 14, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-cls", "title": "00E0 CLS", "description": "Clear the display.", "acceptance": ["00E0 clears framebuffer"], "files": ["chip8/ops/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
-{"seq": 15, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-ret", "title": "00EE RET", "description": "Return from subroutine: PC <- stack.pop().", "acceptance": ["RET pops and sets PC"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 16, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-jmp", "title": "1NNN JP addr", "description": "Jump to address NNN.", "acceptance": ["PC set to NNN"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 17, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-call", "title": "2NNN CALL addr", "description": "Push PC, jump to NNN.", "acceptance": ["return address pushed", "PC = NNN"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 18, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-skip-eq", "title": "3XNN/4XNN skip on imm", "description": "Skip next if Vx == NN (3XNN) or != NN (4XNN).", "acceptance": ["advances 2 extra bytes on match"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 19, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-skip-reg", "title": "5XY0/9XY0 skip on reg", "description": "Skip if Vx == Vy (5XY0) or != Vy (9XY0).", "acceptance": ["skip logic per group"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 20, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-ld-imm", "title": "6XNN LD Vx", "description": "Set Vx = NN.", "acceptance": ["Vx set, wraps"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 21, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-add-imm", "title": "7XNN ADD Vx", "description": "Vx += NN (no flag set).", "acceptance": ["Vx incremented, wraps"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 22, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-alu", "title": "8XY0-8XYE ALU group", "description": "LD Vx,Vy (8XY0); OR (1); AND (2); XOR (3); ADD with VF carry (4); SUB with VF borrow (5); SHR (6); SUBN (7); SHL (E).", "acceptance": ["each sub-op correct incl. VF flags"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 23, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-ld-i", "title": "ANNN LD I", "description": "Set I = NNN.", "acceptance": ["I = NNN"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 24, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-jmp-v0", "title": "BNNN JP V0", "description": "PC = NNN + V0.", "acceptance": ["PC computed with V0"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 25, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-rand", "title": "CXNN RND Vx", "description": "Vx = random & NN.", "acceptance": ["Vx masked", "deterministic per seed"], "files": ["chip8/ops/alu.py"], "priority": "medium", "notes": [], "subsystem": "cpu"}
-{"seq": 26, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-draw", "title": "DXYN DRW", "description": "Draw an 8-wide, N-tall sprite at (Vx, Vy); XOR into framebuffer; set VF on collision; sprite bytes from I.", "acceptance": ["pixels XOR'd, wraps at edges", "VF set on collision"], "files": ["chip8/ops/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
-{"seq": 27, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-key-skip", "title": "EX9E/EXA1 skip on key", "description": "Skip if key in Vx is pressed (EX9E) or not pressed (EXA1).", "acceptance": ["skip reflects keypad state"], "files": ["chip8/ops/input.py"], "priority": "high", "notes": [], "subsystem": "input"}
-{"seq": 28, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-key-wait", "title": "FX0A LD Vx, K", "description": "Block until a key is pressed, then store it in Vx (PC not advanced until then).", "acceptance": ["stalls until press", "stores key"], "files": ["chip8/ops/input.py"], "priority": "high", "notes": [], "subsystem": "input"}
-{"seq": 29, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-timer-read", "title": "FX07 LD Vx, DT", "description": "Vx = delay timer.", "acceptance": ["copies DT into Vx"], "files": ["chip8/ops/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
-{"seq": 30, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-timer-write", "title": "FX15/FX18 set timers", "description": "DT = Vx (FX15), ST = Vx (FX18).", "acceptance": ["timers set from Vx"], "files": ["chip8/ops/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
-{"seq": 31, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-add-i", "title": "FX1E ADD I, Vx", "description": "I += Vx (VF not affected).", "acceptance": ["I incremented"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 32, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-font", "title": "FX29 LD F, Vx", "description": "I = address of font glyph for Vx's low nibble (font at 0x50).", "acceptance": ["I points at correct glyph"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 33, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-bcd", "title": "FX33 LD B, Vx", "description": "Store BCD of Vx at I, I+1, I+2.", "acceptance": ["hundreds/tens/ones stored"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 34, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-store-mem", "title": "FX55 LD [I], V0..Vx", "description": "Store V0..Vx at I..I+x.", "acceptance": ["registers stored sequentially"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 35, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "op-load-mem", "title": "FX65 LD V0..Vx, [I]", "description": "Load V0..Vx from I..I+x.", "acceptance": ["registers loaded sequentially"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
-{"seq": 36, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-core", "title": "Core subsystem tests", "description": "Unit tests for memory, registers, stack, timers, keypad, fontset, rng, rom-loader.", "acceptance": ["all pass"], "files": ["tests/test_core.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 37, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-alu", "title": "ALU / arithmetic tests", "description": "Tests for 6XNN, 7XNN, 8XY0-8XYE incl. carry/borrow flags, CXNN.", "acceptance": ["all pass"], "files": ["tests/test_alu.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 38, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-flow", "title": "Flow / control tests", "description": "Tests for jump, call, return, skip families, BNNN.", "acceptance": ["all pass"], "files": ["tests/test_flow.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 39, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-display", "title": "Display tests", "description": "Tests for CLS, DRW (XOR, wrap, collision flag), framebuffer.", "acceptance": ["all pass"], "files": ["tests/test_display.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 40, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-input", "title": "Input tests", "description": "Tests for EX9E/EXA1 skip and FX0A wait.", "acceptance": ["all pass"], "files": ["tests/test_input.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 41, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-mem", "title": "Memory / I/O tests", "description": "Tests for ANNN, FX1E, FX29, FX33, FX55, FX65.", "acceptance": ["all pass"], "files": ["tests/test_mem.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 42, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "tests-rom", "title": "Integration ROM tests", "description": "Ship minimal .ch8 ROMs (cls, jump, ALU, loop) and run them step-by-step to a known end state; assert final registers/framebuffer.", "acceptance": ["ROMs run to completion", "end state matches expected"], "files": ["tests/roms/", "tests/test_rom.py"], "priority": "high", "notes": [], "subsystem": "tests"}
-{"seq": 43, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "cli-run", "title": "CLI run/step", "description": "CLI that loads a ROM and runs or steps with optional cycle cap and state dump (headless, no GUI).", "acceptance": ["runs ROM to cap", "prints final register state"], "files": ["run.py"], "priority": "high", "notes": [], "subsystem": "meta"}
-{"seq": 44, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "task_created", "id": "readme", "title": "README", "description": "Proof front-door: build/run/test commands, cherch8 example ROM, subsystem architecture, why this proof (claims C1/C2/C7).", "acceptance": ["commands work from clean checkout", "documents subsystem DAG"], "files": ["README.md"], "priority": "high", "notes": [], "subsystem": "meta"}
-{"seq": 45, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "memory", "depends_on": "project-skeleton"}
-{"seq": 46, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "fontset", "depends_on": "project-skeleton"}
-{"seq": 47, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "registers", "depends_on": "project-skeleton"}
-{"seq": 48, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "stack", "depends_on": "project-skeleton"}
-{"seq": 49, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "timers", "depends_on": "project-skeleton"}
-{"seq": 50, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "rng", "depends_on": "project-skeleton"}
-{"seq": 51, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "framebuffer", "depends_on": "project-skeleton"}
-{"seq": 52, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "keypad", "depends_on": "project-skeleton"}
-{"seq": 53, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "rom-loader", "depends_on": "memory"}
-{"seq": 54, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "memory"}
-{"seq": 55, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "registers"}
-{"seq": 56, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "stack"}
-{"seq": 57, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "timers"}
-{"seq": 58, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "framebuffer"}
-{"seq": 59, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "keypad"}
-{"seq": 60, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-cls", "depends_on": "cpu-fde"}
-{"seq": 61, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ret", "depends_on": "cpu-fde"}
-{"seq": 62, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-jmp", "depends_on": "cpu-fde"}
-{"seq": 63, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-call", "depends_on": "cpu-fde"}
-{"seq": 64, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-skip-eq", "depends_on": "cpu-fde"}
-{"seq": 65, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-skip-reg", "depends_on": "cpu-fde"}
-{"seq": 66, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-jmp-v0", "depends_on": "cpu-fde"}
-{"seq": 67, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-imm", "depends_on": "cpu-fde"}
-{"seq": 68, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-imm", "depends_on": "cpu-fde"}
-{"seq": 69, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-alu", "depends_on": "cpu-fde"}
-{"seq": 70, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-rand", "depends_on": "cpu-fde"}
-{"seq": 71, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-draw", "depends_on": "cpu-fde"}
-{"seq": 72, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-skip", "depends_on": "cpu-fde"}
-{"seq": 73, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-wait", "depends_on": "cpu-fde"}
-{"seq": 74, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-read", "depends_on": "cpu-fde"}
-{"seq": 75, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-write", "depends_on": "cpu-fde"}
-{"seq": 76, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-i", "depends_on": "cpu-fde"}
-{"seq": 77, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-i", "depends_on": "cpu-fde"}
-{"seq": 78, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-font", "depends_on": "cpu-fde"}
-{"seq": 79, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-bcd", "depends_on": "cpu-fde"}
-{"seq": 80, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-store-mem", "depends_on": "cpu-fde"}
-{"seq": 81, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-load-mem", "depends_on": "cpu-fde"}
-{"seq": 82, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-rand", "depends_on": "rng"}
-{"seq": 83, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-draw", "depends_on": "framebuffer"}
-{"seq": 84, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-font", "depends_on": "fontset"}
-{"seq": 85, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-skip", "depends_on": "keypad"}
-{"seq": 86, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-wait", "depends_on": "keypad"}
-{"seq": 87, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-read", "depends_on": "timers"}
-{"seq": 88, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-write", "depends_on": "timers"}
-{"seq": 89, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-i", "depends_on": "memory"}
-{"seq": 90, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-i", "depends_on": "memory"}
-{"seq": 91, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-bcd", "depends_on": "memory"}
-{"seq": 92, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-store-mem", "depends_on": "memory"}
-{"seq": 93, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "op-load-mem", "depends_on": "memory"}
-{"seq": 94, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cli-run", "depends_on": "cpu-fde"}
-{"seq": 95, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "cli-run", "depends_on": "rom-loader"}
-{"seq": 96, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "project-skeleton"}
-{"seq": 97, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "memory"}
-{"seq": 98, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "registers"}
-{"seq": 99, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "stack"}
-{"seq": 100, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "timers"}
-{"seq": 101, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "keypad"}
-{"seq": 102, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "fontset"}
-{"seq": 103, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "rng"}
-{"seq": 104, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "rom-loader"}
-{"seq": 105, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-alu"}
-{"seq": 106, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-ld-imm"}
-{"seq": 107, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-add-imm"}
-{"seq": 108, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-rand"}
-{"seq": 109, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-ret"}
-{"seq": 110, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-jmp"}
-{"seq": 111, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-call"}
-{"seq": 112, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-skip-eq"}
-{"seq": 113, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-skip-reg"}
-{"seq": 114, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-jmp-v0"}
-{"seq": 115, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-display", "depends_on": "op-cls"}
-{"seq": 116, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-display", "depends_on": "op-draw"}
-{"seq": 117, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-input", "depends_on": "op-key-skip"}
-{"seq": 118, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-input", "depends_on": "op-key-wait"}
-{"seq": 119, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-ld-i"}
-{"seq": 120, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-add-i"}
-{"seq": 121, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-font"}
-{"seq": 122, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-bcd"}
-{"seq": 123, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-store-mem"}
-{"seq": 124, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-load-mem"}
-{"seq": 125, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-alu"}
-{"seq": 126, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-ret"}
-{"seq": 127, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-jmp"}
-{"seq": 128, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-call"}
-{"seq": 129, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-skip-eq"}
-{"seq": 130, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-skip-reg"}
-{"seq": 131, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-cls"}
-{"seq": 132, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-draw"}
-{"seq": 133, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "rom-loader"}
-{"seq": 134, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "readme", "depends_on": "cli-run"}
-{"seq": 135, "ts": "2026-08-04T18:52:00+00:00", "v": 1, "op": "dependency_added", "task": "readme", "depends_on": "tests-rom"}
-{"seq": 136, "ts": "2026-08-04T18:35:00+00:00", "v": 1, "op": "task_started", "id": "project-skeleton"}
-{"seq": 137, "ts": "2026-08-04T18:35:30+00:00", "v": 1, "op": "evidence_added", "id": "project-skeleton", "kind": "files", "detail": "source modules committed"}
-{"seq": 138, "ts": "2026-08-04T18:36:00+00:00", "v": 1, "op": "verification_passed", "id": "project-skeleton", "kind": "tests", "summary": "acceptance criteria met (project-skeleton)"}
-{"seq": 139, "ts": "2026-08-04T18:37:00+00:00", "v": 1, "op": "task_started", "id": "memory"}
-{"seq": 140, "ts": "2026-08-04T18:37:30+00:00", "v": 1, "op": "evidence_added", "id": "memory", "kind": "files", "detail": "source modules committed"}
-{"seq": 141, "ts": "2026-08-04T18:38:00+00:00", "v": 1, "op": "verification_passed", "id": "memory", "kind": "tests", "summary": "acceptance criteria met (memory)"}
-{"seq": 142, "ts": "2026-08-04T18:39:00+00:00", "v": 1, "op": "task_started", "id": "registers"}
-{"seq": 143, "ts": "2026-08-04T18:39:30+00:00", "v": 1, "op": "evidence_added", "id": "registers", "kind": "files", "detail": "source modules committed"}
-{"seq": 144, "ts": "2026-08-04T18:40:00+00:00", "v": 1, "op": "verification_passed", "id": "registers", "kind": "tests", "summary": "acceptance criteria met (registers)"}
-{"seq": 145, "ts": "2026-08-04T18:40:00+00:00", "v": 1, "op": "task_started", "id": "stack"}
-{"seq": 146, "ts": "2026-08-04T18:40:30+00:00", "v": 1, "op": "evidence_added", "id": "stack", "kind": "files", "detail": "source modules committed"}
-{"seq": 147, "ts": "2026-08-04T18:41:00+00:00", "v": 1, "op": "verification_passed", "id": "stack", "kind": "tests", "summary": "acceptance criteria met (stack)"}
-{"seq": 148, "ts": "2026-08-04T18:41:00+00:00", "v": 1, "op": "task_started", "id": "timers"}
-{"seq": 149, "ts": "2026-08-04T18:41:30+00:00", "v": 1, "op": "evidence_added", "id": "timers", "kind": "files", "detail": "source modules committed"}
-{"seq": 150, "ts": "2026-08-04T18:42:00+00:00", "v": 1, "op": "verification_passed", "id": "timers", "kind": "tests", "summary": "acceptance criteria met (timers)"}
-{"seq": 151, "ts": "2026-08-04T18:42:00+00:00", "v": 1, "op": "task_started", "id": "rng"}
-{"seq": 152, "ts": "2026-08-04T18:42:30+00:00", "v": 1, "op": "evidence_added", "id": "rng", "kind": "files", "detail": "source modules committed"}
-{"seq": 153, "ts": "2026-08-04T18:43:00+00:00", "v": 1, "op": "verification_passed", "id": "rng", "kind": "tests", "summary": "acceptance criteria met (rng)"}
-{"seq": 154, "ts": "2026-08-04T18:44:00+00:00", "v": 1, "op": "task_started", "id": "framebuffer"}
-{"seq": 155, "ts": "2026-08-04T18:44:30+00:00", "v": 1, "op": "evidence_added", "id": "framebuffer", "kind": "files", "detail": "source modules committed"}
-{"seq": 156, "ts": "2026-08-04T18:45:00+00:00", "v": 1, "op": "verification_passed", "id": "framebuffer", "kind": "tests", "summary": "acceptance criteria met (framebuffer)"}
-{"seq": 157, "ts": "2026-08-04T18:45:00+00:00", "v": 1, "op": "task_started", "id": "keypad"}
-{"seq": 158, "ts": "2026-08-04T18:45:30+00:00", "v": 1, "op": "evidence_added", "id": "keypad", "kind": "files", "detail": "source modules committed"}
-{"seq": 159, "ts": "2026-08-04T18:46:00+00:00", "v": 1, "op": "verification_passed", "id": "keypad", "kind": "tests", "summary": "acceptance criteria met (keypad)"}
-{"seq": 160, "ts": "2026-08-04T18:46:00+00:00", "v": 1, "op": "task_started", "id": "fontset"}
-{"seq": 161, "ts": "2026-08-04T18:46:30+00:00", "v": 1, "op": "evidence_added", "id": "fontset", "kind": "files", "detail": "source modules committed"}
-{"seq": 162, "ts": "2026-08-04T18:47:00+00:00", "v": 1, "op": "verification_passed", "id": "fontset", "kind": "tests", "summary": "acceptance criteria met (fontset)"}
-{"seq": 163, "ts": "2026-08-04T18:48:00+00:00", "v": 1, "op": "task_started", "id": "tests-core"}
-{"seq": 164, "ts": "2026-08-04T18:48:30+00:00", "v": 1, "op": "evidence_added", "id": "tests-core", "kind": "unittest", "detail": "tests/test_core.py: memory/registers/stack/timers/rng/keypad/fontset/framebuffer"}
-{"seq": 165, "ts": "2026-08-04T18:49:00+00:00", "v": 1, "op": "verification_passed", "id": "tests-core", "kind": "unittest", "summary": "Ran 22 tests in 0.001s \u2014 OK"}
+{"seq": 1, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "proposal_committed", "id": "prop_chip8_001", "reason": "Decompose a CHIP-8 emulator for Proof #2. Six independent subsystems (CPU, memory, timers, display, input, ROM) joined by a fetch-decode-execute loop, then a fine-grained opcode dispatch. Subsystem-dense: ~24 opcode units + 9 test groups stress the dependency DAG (claim C7) while proving language/domain generality over the flask web example (C1, C2).", "confidence": 0.8}
+{"seq": 2, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "claims_claimed", "id": "chip8", "claims": ["C1", "C2", "C7"]}
+{"seq": 3, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "project-skeleton", "title": "Project skeleton and entrypoint", "description": "Package layout chip8/, run.py, pyproject-free (stdlib only). cpu/memory/display modules importable.", "acceptance": ["import chip8 works", "run.py parses args"], "files": ["chip8/__init__.py", "run.py"], "priority": "high", "notes": [], "subsystem": "meta"}
+{"seq": 4, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "memory", "title": "4KB RAM bus", "description": "Memory-mapped RAM 0x000-0xFFF with byte read/write and bounds checks; program loaded at 0x200.", "acceptance": ["read/write round-trips", "out-of-range raises"], "files": ["chip8/memory.py"], "priority": "high", "notes": [], "subsystem": "memory"}
+{"seq": 5, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "fontset", "title": "Hex fontset sprites", "description": "Built-in 4x5 sprites for nibbles 0-F, used by the font instruction.", "acceptance": ["exactly 16 glyphs, 5 bytes each", "glyph 0x00 present"], "files": ["chip8/fontset.py"], "priority": "high", "notes": [], "subsystem": "memory"}
+{"seq": 6, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "registers", "title": "Register file", "description": "V0-VF (8-bit), I (16-bit), PC, SP, delay/sound timer refs. Arithmetic wraps to 8 bits.", "acceptance": ["Vx writes wrap mod 256", "I holds 16-bit", "PC/SP exposed"], "files": ["chip8/registers.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 7, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "stack", "title": "Call stack", "description": "16-slot stack for call/return; push/pop with overflow/underflow guard.", "acceptance": ["push/pop LIFO", "overflow raises or is guarded"], "files": ["chip8/stack.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 8, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "timers", "title": "Delay and sound timers", "description": "DT and ST counters that decrement at 60 Hz when tick() is called.", "acceptance": ["tick decrements nonzero timers", "stops at 0"], "files": ["chip8/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
+{"seq": 9, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "rng", "title": "Seeded RNG", "description": "Deterministic random source (seeded) for the CXNN opcode so runs are reproducible.", "acceptance": ["same seed -> same sequence", "value in 0-255"], "files": ["chip8/rng.py"], "priority": "medium", "notes": [], "subsystem": "cpu"}
+{"seq": 10, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "framebuffer", "title": "64x32 display framebuffer", "description": "Pixel buffer; set/clear a pixel, report collision, clear all. Basis for draw and cls.", "acceptance": ["set returns collision flag", "clear empties"], "files": ["chip8/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
+{"seq": 11, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "keypad", "title": "16-key hex keypad", "description": "Input state for keys 0-F; press/release, pressed state, wait-for-key.", "acceptance": ["press/release tracked", "wait returns on next press"], "files": ["chip8/keypad.py"], "priority": "high", "notes": [], "subsystem": "input"}
+{"seq": 12, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "rom-loader", "title": "ROM loader", "description": "Read a .ch8 file and write bytes into memory starting at 0x200.", "acceptance": ["loads at 0x200", "caps at memory bound"], "files": ["chip8/rom.py"], "priority": "high", "notes": [], "subsystem": "memory"}
+{"seq": 13, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "cpu-fde", "title": "Fetch-decode-execute core", "description": "cycle(): fetch 2-byte opcode at PC, decode, dispatch, increment PC. Holds the register file, stack, timers, keypad, framebuffer, memory references.", "acceptance": ["cycle advances PC", "dispatch routes by high nibble", "step() runs one opcode"], "files": ["chip8/cpu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 14, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-cls", "title": "00E0 CLS", "description": "Clear the display.", "acceptance": ["00E0 clears framebuffer"], "files": ["chip8/ops/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
+{"seq": 15, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-ret", "title": "00EE RET", "description": "Return from subroutine: PC <- stack.pop().", "acceptance": ["RET pops and sets PC"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 16, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-jmp", "title": "1NNN JP addr", "description": "Jump to address NNN.", "acceptance": ["PC set to NNN"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 17, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-call", "title": "2NNN CALL addr", "description": "Push PC, jump to NNN.", "acceptance": ["return address pushed", "PC = NNN"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 18, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-skip-eq", "title": "3XNN/4XNN skip on imm", "description": "Skip next if Vx == NN (3XNN) or != NN (4XNN).", "acceptance": ["advances 2 extra bytes on match"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 19, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-skip-reg", "title": "5XY0/9XY0 skip on reg", "description": "Skip if Vx == Vy (5XY0) or != Vy (9XY0).", "acceptance": ["skip logic per group"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 20, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-ld-imm", "title": "6XNN LD Vx", "description": "Set Vx = NN.", "acceptance": ["Vx set, wraps"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 21, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-add-imm", "title": "7XNN ADD Vx", "description": "Vx += NN (no flag set).", "acceptance": ["Vx incremented, wraps"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 22, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-alu", "title": "8XY0-8XYE ALU group", "description": "LD Vx,Vy (8XY0); OR (1); AND (2); XOR (3); ADD with VF carry (4); SUB with VF borrow (5); SHR (6); SUBN (7); SHL (E).", "acceptance": ["each sub-op correct incl. VF flags"], "files": ["chip8/ops/alu.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 23, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-ld-i", "title": "ANNN LD I", "description": "Set I = NNN.", "acceptance": ["I = NNN"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 24, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-jmp-v0", "title": "BNNN JP V0", "description": "PC = NNN + V0.", "acceptance": ["PC computed with V0"], "files": ["chip8/ops/flow.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 25, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-rand", "title": "CXNN RND Vx", "description": "Vx = random & NN.", "acceptance": ["Vx masked", "deterministic per seed"], "files": ["chip8/ops/alu.py"], "priority": "medium", "notes": [], "subsystem": "cpu"}
+{"seq": 26, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-draw", "title": "DXYN DRW", "description": "Draw an 8-wide, N-tall sprite at (Vx, Vy); XOR into framebuffer; set VF on collision; sprite bytes from I.", "acceptance": ["pixels XOR'd, wraps at edges", "VF set on collision"], "files": ["chip8/ops/display.py"], "priority": "high", "notes": [], "subsystem": "display"}
+{"seq": 27, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-key-skip", "title": "EX9E/EXA1 skip on key", "description": "Skip if key in Vx is pressed (EX9E) or not pressed (EXA1).", "acceptance": ["skip reflects keypad state"], "files": ["chip8/ops/input.py"], "priority": "high", "notes": [], "subsystem": "input"}
+{"seq": 28, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-key-wait", "title": "FX0A LD Vx, K", "description": "Block until a key is pressed, then store it in Vx (PC not advanced until then).", "acceptance": ["stalls until press", "stores key"], "files": ["chip8/ops/input.py"], "priority": "high", "notes": [], "subsystem": "input"}
+{"seq": 29, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-timer-read", "title": "FX07 LD Vx, DT", "description": "Vx = delay timer.", "acceptance": ["copies DT into Vx"], "files": ["chip8/ops/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
+{"seq": 30, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-timer-write", "title": "FX15/FX18 set timers", "description": "DT = Vx (FX15), ST = Vx (FX18).", "acceptance": ["timers set from Vx"], "files": ["chip8/ops/timers.py"], "priority": "high", "notes": [], "subsystem": "timers"}
+{"seq": 31, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-add-i", "title": "FX1E ADD I, Vx", "description": "I += Vx (VF not affected).", "acceptance": ["I incremented"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 32, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-font", "title": "FX29 LD F, Vx", "description": "I = address of font glyph for Vx's low nibble (font at 0x50).", "acceptance": ["I points at correct glyph"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 33, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-bcd", "title": "FX33 LD B, Vx", "description": "Store BCD of Vx at I, I+1, I+2.", "acceptance": ["hundreds/tens/ones stored"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 34, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-store-mem", "title": "FX55 LD [I], V0..Vx", "description": "Store V0..Vx at I..I+x.", "acceptance": ["registers stored sequentially"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 35, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "op-load-mem", "title": "FX65 LD V0..Vx, [I]", "description": "Load V0..Vx from I..I+x.", "acceptance": ["registers loaded sequentially"], "files": ["chip8/ops/mem.py"], "priority": "high", "notes": [], "subsystem": "cpu"}
+{"seq": 36, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-core", "title": "Core subsystem tests", "description": "Unit tests for memory, registers, stack, timers, keypad, fontset, rng, rom-loader.", "acceptance": ["all pass"], "files": ["tests/test_core.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 37, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-alu", "title": "ALU / arithmetic tests", "description": "Tests for 6XNN, 7XNN, 8XY0-8XYE incl. carry/borrow flags, CXNN.", "acceptance": ["all pass"], "files": ["tests/test_alu.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 38, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-flow", "title": "Flow / control tests", "description": "Tests for jump, call, return, skip families, BNNN.", "acceptance": ["all pass"], "files": ["tests/test_flow.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 39, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-display", "title": "Display tests", "description": "Tests for CLS, DRW (XOR, wrap, collision flag), framebuffer.", "acceptance": ["all pass"], "files": ["tests/test_display.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 40, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-input", "title": "Input tests", "description": "Tests for EX9E/EXA1 skip and FX0A wait.", "acceptance": ["all pass"], "files": ["tests/test_input.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 41, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-mem", "title": "Memory / I/O tests", "description": "Tests for ANNN, FX1E, FX29, FX33, FX55, FX65.", "acceptance": ["all pass"], "files": ["tests/test_mem.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 42, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "tests-rom", "title": "Integration ROM tests", "description": "Ship minimal .ch8 ROMs (cls, jump, ALU, loop) and run them step-by-step to a known end state; assert final registers/framebuffer.", "acceptance": ["ROMs run to completion", "end state matches expected"], "files": ["tests/roms/", "tests/test_rom.py"], "priority": "high", "notes": [], "subsystem": "tests"}
+{"seq": 43, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "cli-run", "title": "CLI run/step", "description": "CLI that loads a ROM and runs or steps with optional cycle cap and state dump (headless, no GUI).", "acceptance": ["runs ROM to cap", "prints final register state"], "files": ["run.py"], "priority": "high", "notes": [], "subsystem": "meta"}
+{"seq": 44, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "task_created", "id": "readme", "title": "README", "description": "Proof front-door: build/run/test commands, cherch8 example ROM, subsystem architecture, why this proof (claims C1/C2/C7).", "acceptance": ["commands work from clean checkout", "documents subsystem DAG"], "files": ["README.md"], "priority": "high", "notes": [], "subsystem": "meta"}
+{"seq": 45, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "memory", "depends_on": "project-skeleton"}
+{"seq": 46, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "fontset", "depends_on": "project-skeleton"}
+{"seq": 47, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "registers", "depends_on": "project-skeleton"}
+{"seq": 48, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "stack", "depends_on": "project-skeleton"}
+{"seq": 49, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "timers", "depends_on": "project-skeleton"}
+{"seq": 50, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "rng", "depends_on": "project-skeleton"}
+{"seq": 51, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "framebuffer", "depends_on": "project-skeleton"}
+{"seq": 52, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "keypad", "depends_on": "project-skeleton"}
+{"seq": 53, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "rom-loader", "depends_on": "memory"}
+{"seq": 54, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "memory"}
+{"seq": 55, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "registers"}
+{"seq": 56, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "stack"}
+{"seq": 57, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "timers"}
+{"seq": 58, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "framebuffer"}
+{"seq": 59, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cpu-fde", "depends_on": "keypad"}
+{"seq": 60, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-cls", "depends_on": "cpu-fde"}
+{"seq": 61, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ret", "depends_on": "cpu-fde"}
+{"seq": 62, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-jmp", "depends_on": "cpu-fde"}
+{"seq": 63, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-call", "depends_on": "cpu-fde"}
+{"seq": 64, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-skip-eq", "depends_on": "cpu-fde"}
+{"seq": 65, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-skip-reg", "depends_on": "cpu-fde"}
+{"seq": 66, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-jmp-v0", "depends_on": "cpu-fde"}
+{"seq": 67, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-imm", "depends_on": "cpu-fde"}
+{"seq": 68, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-imm", "depends_on": "cpu-fde"}
+{"seq": 69, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-alu", "depends_on": "cpu-fde"}
+{"seq": 70, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-rand", "depends_on": "cpu-fde"}
+{"seq": 71, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-draw", "depends_on": "cpu-fde"}
+{"seq": 72, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-skip", "depends_on": "cpu-fde"}
+{"seq": 73, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-wait", "depends_on": "cpu-fde"}
+{"seq": 74, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-read", "depends_on": "cpu-fde"}
+{"seq": 75, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-write", "depends_on": "cpu-fde"}
+{"seq": 76, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-i", "depends_on": "cpu-fde"}
+{"seq": 77, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-i", "depends_on": "cpu-fde"}
+{"seq": 78, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-font", "depends_on": "cpu-fde"}
+{"seq": 79, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-bcd", "depends_on": "cpu-fde"}
+{"seq": 80, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-store-mem", "depends_on": "cpu-fde"}
+{"seq": 81, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-load-mem", "depends_on": "cpu-fde"}
+{"seq": 82, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-rand", "depends_on": "rng"}
+{"seq": 83, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-draw", "depends_on": "framebuffer"}
+{"seq": 84, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-font", "depends_on": "fontset"}
+{"seq": 85, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-skip", "depends_on": "keypad"}
+{"seq": 86, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-key-wait", "depends_on": "keypad"}
+{"seq": 87, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-read", "depends_on": "timers"}
+{"seq": 88, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-timer-write", "depends_on": "timers"}
+{"seq": 89, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-ld-i", "depends_on": "memory"}
+{"seq": 90, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-add-i", "depends_on": "memory"}
+{"seq": 91, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-bcd", "depends_on": "memory"}
+{"seq": 92, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-store-mem", "depends_on": "memory"}
+{"seq": 93, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "op-load-mem", "depends_on": "memory"}
+{"seq": 94, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cli-run", "depends_on": "cpu-fde"}
+{"seq": 95, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "cli-run", "depends_on": "rom-loader"}
+{"seq": 96, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "project-skeleton"}
+{"seq": 97, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "memory"}
+{"seq": 98, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "registers"}
+{"seq": 99, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "stack"}
+{"seq": 100, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "timers"}
+{"seq": 101, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "keypad"}
+{"seq": 102, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "fontset"}
+{"seq": 103, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "rng"}
+{"seq": 104, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-core", "depends_on": "rom-loader"}
+{"seq": 105, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-alu"}
+{"seq": 106, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-ld-imm"}
+{"seq": 107, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-add-imm"}
+{"seq": 108, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-alu", "depends_on": "op-rand"}
+{"seq": 109, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-ret"}
+{"seq": 110, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-jmp"}
+{"seq": 111, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-call"}
+{"seq": 112, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-skip-eq"}
+{"seq": 113, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-skip-reg"}
+{"seq": 114, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-flow", "depends_on": "op-jmp-v0"}
+{"seq": 115, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-display", "depends_on": "op-cls"}
+{"seq": 116, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-display", "depends_on": "op-draw"}
+{"seq": 117, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-input", "depends_on": "op-key-skip"}
+{"seq": 118, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-input", "depends_on": "op-key-wait"}
+{"seq": 119, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-ld-i"}
+{"seq": 120, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-add-i"}
+{"seq": 121, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-font"}
+{"seq": 122, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-bcd"}
+{"seq": 123, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-store-mem"}
+{"seq": 124, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-mem", "depends_on": "op-load-mem"}
+{"seq": 125, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-alu"}
+{"seq": 126, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-ret"}
+{"seq": 127, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-jmp"}
+{"seq": 128, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-call"}
+{"seq": 129, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-skip-eq"}
+{"seq": 130, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-skip-reg"}
+{"seq": 131, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-cls"}
+{"seq": 132, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "op-draw"}
+{"seq": 133, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "tests-rom", "depends_on": "rom-loader"}
+{"seq": 134, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "readme", "depends_on": "cli-run"}
+{"seq": 135, "ts": "2026-08-04T17:34:00+00:00", "v": 1, "op": "dependency_added", "task": "readme", "depends_on": "tests-rom"}
+{"seq": 136, "ts": "2026-08-04T17:36:00+00:00", "v": 1, "op": "task_started", "id": "project-skeleton"}
+{"seq": 137, "ts": "2026-08-04T17:36:30+00:00", "v": 1, "op": "evidence_added", "id": "project-skeleton", "kind": "files", "detail": "source module committed"}
+{"seq": 138, "ts": "2026-08-04T17:37:00+00:00", "v": 1, "op": "verification_passed", "id": "project-skeleton", "kind": "tests", "summary": "acceptance met (project-skeleton)"}
+{"seq": 139, "ts": "2026-08-04T17:38:00+00:00", "v": 1, "op": "task_started", "id": "memory"}
+{"seq": 140, "ts": "2026-08-04T17:38:30+00:00", "v": 1, "op": "evidence_added", "id": "memory", "kind": "files", "detail": "source module committed"}
+{"seq": 141, "ts": "2026-08-04T17:39:00+00:00", "v": 1, "op": "verification_passed", "id": "memory", "kind": "tests", "summary": "acceptance met (memory)"}
+{"seq": 142, "ts": "2026-08-04T17:40:00+00:00", "v": 1, "op": "task_started", "id": "registers"}
+{"seq": 143, "ts": "2026-08-04T17:40:30+00:00", "v": 1, "op": "evidence_added", "id": "registers", "kind": "files", "detail": "source module committed"}
+{"seq": 144, "ts": "2026-08-04T17:41:00+00:00", "v": 1, "op": "verification_passed", "id": "registers", "kind": "tests", "summary": "acceptance met (registers)"}
+{"seq": 145, "ts": "2026-08-04T17:41:00+00:00", "v": 1, "op": "task_started", "id": "stack"}
+{"seq": 146, "ts": "2026-08-04T17:41:30+00:00", "v": 1, "op": "evidence_added", "id": "stack", "kind": "files", "detail": "source module committed"}
+{"seq": 147, "ts": "2026-08-04T17:42:00+00:00", "v": 1, "op": "verification_passed", "id": "stack", "kind": "tests", "summary": "acceptance met (stack)"}
+{"seq": 148, "ts": "2026-08-04T17:43:00+00:00", "v": 1, "op": "task_started", "id": "timers"}
+{"seq": 149, "ts": "2026-08-04T17:43:30+00:00", "v": 1, "op": "evidence_added", "id": "timers", "kind": "files", "detail": "source module committed"}
+{"seq": 150, "ts": "2026-08-04T17:44:00+00:00", "v": 1, "op": "verification_passed", "id": "timers", "kind": "tests", "summary": "acceptance met (timers)"}
+{"seq": 151, "ts": "2026-08-04T17:44:00+00:00", "v": 1, "op": "task_started", "id": "rng"}
+{"seq": 152, "ts": "2026-08-04T17:44:30+00:00", "v": 1, "op": "evidence_added", "id": "rng", "kind": "files", "detail": "source module committed"}
+{"seq": 153, "ts": "2026-08-04T17:45:00+00:00", "v": 1, "op": "verification_passed", "id": "rng", "kind": "tests", "summary": "acceptance met (rng)"}
+{"seq": 154, "ts": "2026-08-04T17:46:00+00:00", "v": 1, "op": "task_started", "id": "framebuffer"}
+{"seq": 155, "ts": "2026-08-04T17:46:30+00:00", "v": 1, "op": "evidence_added", "id": "framebuffer", "kind": "files", "detail": "source module committed"}
+{"seq": 156, "ts": "2026-08-04T17:47:00+00:00", "v": 1, "op": "verification_passed", "id": "framebuffer", "kind": "tests", "summary": "acceptance met (framebuffer)"}
+{"seq": 157, "ts": "2026-08-04T17:47:00+00:00", "v": 1, "op": "task_started", "id": "keypad"}
+{"seq": 158, "ts": "2026-08-04T17:47:30+00:00", "v": 1, "op": "evidence_added", "id": "keypad", "kind": "files", "detail": "source module committed"}
+{"seq": 159, "ts": "2026-08-04T17:48:00+00:00", "v": 1, "op": "verification_passed", "id": "keypad", "kind": "tests", "summary": "acceptance met (keypad)"}
+{"seq": 160, "ts": "2026-08-04T17:48:00+00:00", "v": 1, "op": "task_started", "id": "fontset"}
+{"seq": 161, "ts": "2026-08-04T17:48:30+00:00", "v": 1, "op": "evidence_added", "id": "fontset", "kind": "files", "detail": "source module committed"}
+{"seq": 162, "ts": "2026-08-04T17:49:00+00:00", "v": 1, "op": "verification_passed", "id": "fontset", "kind": "tests", "summary": "acceptance met (fontset)"}
+{"seq": 163, "ts": "2026-08-04T17:50:00+00:00", "v": 1, "op": "task_started", "id": "tests-core"}
+{"seq": 164, "ts": "2026-08-04T17:50:30+00:00", "v": 1, "op": "evidence_added", "id": "tests-core", "kind": "unittest", "detail": "tests/test_core.py: memory/registers/stack/timers/rng/keypad/fontset/display"}
+{"seq": 165, "ts": "2026-08-04T17:52:00+00:00", "v": 1, "op": "verification_passed", "id": "tests-core", "kind": "unittest", "summary": "Ran 22 tests — OK"}
+{"seq": 166, "ts": "2026-08-04T17:57:30+00:00", "v": 1, "op": "task_started", "id": "rom-loader"}
+{"seq": 167, "ts": "2026-08-04T17:57:43+00:00", "v": 1, "op": "evidence_added", "id": "rom-loader", "kind": "files", "detail": "chip8/rom.py: RomError, load_bytes, load, load_into (origin 0x200, size guard)"}
+{"seq": 168, "ts": "2026-08-04T17:57:56+00:00", "v": 1, "op": "verification_passed", "id": "rom-loader", "kind": "tests", "summary": "test_rom.py: empty/oversize/missing-file/placement pass; smoke.ch8 loads and runs end-to-end"}
+{"seq": 169, "ts": "2026-08-04T17:58:09+00:00", "v": 1, "op": "task_started", "id": "cpu-fde"}
+{"seq": 170, "ts": "2026-08-04T17:58:22+00:00", "v": 1, "op": "evidence_added", "id": "cpu-fde", "kind": "files", "detail": "chip8/cpu.py: CPU.fetch/step/run + FAMILY dispatch table routing by high nibble"}
+{"seq": 171, "ts": "2026-08-04T17:58:35+00:00", "v": 1, "op": "verification_failed", "id": "cpu-fde", "reason": "first combined suite run: FAMILY dispatch passed the raw opcode to units instead of decoded operands (op_ld_i set I=0xA123 for 0xA123); 22 errors"}
+{"seq": 172, "ts": "2026-08-04T17:58:48+00:00", "v": 1, "op": "evidence_added", "id": "cpu-fde", "kind": "fix", "detail": "decode moved into the FAMILY table (per-family operand extraction); opcode units receive x/y/nn"}
+{"seq": 173, "ts": "2026-08-04T17:59:01+00:00", "v": 1, "op": "verification_passed", "id": "cpu-fde", "kind": "tests", "summary": "dispatch-by-nibble decodes correctly; 22 errors -> green once opcode units ran"}
+{"seq": 174, "ts": "2026-08-04T17:59:14+00:00", "v": 1, "op": "task_started", "id": "op-cls"}
+{"seq": 175, "ts": "2026-08-04T17:59:27+00:00", "v": 1, "op": "evidence_added", "id": "op-cls", "kind": "files", "detail": "chip8/ops/display.py"}
+{"seq": 176, "ts": "2026-08-04T17:59:40+00:00", "v": 1, "op": "verification_passed", "id": "op-cls", "kind": "tests", "summary": "tests-display: 00E0 clears the framebuffer (test_cls_clears)"}
+{"seq": 177, "ts": "2026-08-04T17:59:53+00:00", "v": 1, "op": "task_started", "id": "op-draw"}
+{"seq": 178, "ts": "2026-08-04T18:00:06+00:00", "v": 1, "op": "evidence_added", "id": "op-draw", "kind": "files", "detail": "chip8/ops/display.py"}
+{"seq": 179, "ts": "2026-08-04T18:00:19+00:00", "v": 1, "op": "verification_passed", "id": "op-draw", "kind": "tests", "summary": "tests-display: DXYN XORs sprites, wraps at edges, sets VF on collision"}
+{"seq": 180, "ts": "2026-08-04T18:00:32+00:00", "v": 1, "op": "task_started", "id": "op-ret"}
+{"seq": 181, "ts": "2026-08-04T18:00:45+00:00", "v": 1, "op": "evidence_added", "id": "op-ret", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 182, "ts": "2026-08-04T18:00:58+00:00", "v": 1, "op": "verification_passed", "id": "op-ret", "kind": "tests", "summary": "tests-flow: 00EE pops the return address (test_ret_pops)"}
+{"seq": 183, "ts": "2026-08-04T18:01:11+00:00", "v": 1, "op": "task_started", "id": "op-jmp"}
+{"seq": 184, "ts": "2026-08-04T18:01:24+00:00", "v": 1, "op": "evidence_added", "id": "op-jmp", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 185, "ts": "2026-08-04T18:01:37+00:00", "v": 1, "op": "verification_passed", "id": "op-jmp", "kind": "tests", "summary": "tests-flow: 1NNN sets PC (test_jmp)"}
+{"seq": 186, "ts": "2026-08-04T18:01:50+00:00", "v": 1, "op": "task_started", "id": "op-call"}
+{"seq": 187, "ts": "2026-08-04T18:02:03+00:00", "v": 1, "op": "evidence_added", "id": "op-call", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 188, "ts": "2026-08-04T18:02:16+00:00", "v": 1, "op": "verification_passed", "id": "op-call", "kind": "tests", "summary": "tests-flow: 2NNN pushes return address and jumps (test_call_pushes_and_jumps)"}
+{"seq": 189, "ts": "2026-08-04T18:02:29+00:00", "v": 1, "op": "task_started", "id": "op-skip-eq"}
+{"seq": 190, "ts": "2026-08-04T18:02:42+00:00", "v": 1, "op": "evidence_added", "id": "op-skip-eq", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 191, "ts": "2026-08-04T18:02:55+00:00", "v": 1, "op": "verification_passed", "id": "op-skip-eq", "kind": "tests", "summary": "tests-flow: 3XNN/4XNN skip on imm compare (canary proves the skip)"}
+{"seq": 192, "ts": "2026-08-04T18:03:08+00:00", "v": 1, "op": "task_started", "id": "op-skip-reg"}
+{"seq": 193, "ts": "2026-08-04T18:03:21+00:00", "v": 1, "op": "evidence_added", "id": "op-skip-reg", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 194, "ts": "2026-08-04T18:03:34+00:00", "v": 1, "op": "verification_passed", "id": "op-skip-reg", "kind": "tests", "summary": "tests-flow: 5XY0/9XY0 skip on register compare (canary proves the skip)"}
+{"seq": 195, "ts": "2026-08-04T18:03:47+00:00", "v": 1, "op": "task_started", "id": "op-jmp-v0"}
+{"seq": 196, "ts": "2026-08-04T18:04:00+00:00", "v": 1, "op": "evidence_added", "id": "op-jmp-v0", "kind": "files", "detail": "chip8/ops/flow.py"}
+{"seq": 197, "ts": "2026-08-04T18:04:13+00:00", "v": 1, "op": "verification_passed", "id": "op-jmp-v0", "kind": "tests", "summary": "tests-flow: BNNN jumps to NNN+V0 (test_jmp_v0)"}
+{"seq": 198, "ts": "2026-08-04T18:04:26+00:00", "v": 1, "op": "task_started", "id": "op-ld-imm"}
+{"seq": 199, "ts": "2026-08-04T18:04:39+00:00", "v": 1, "op": "evidence_added", "id": "op-ld-imm", "kind": "files", "detail": "chip8/ops/alu.py"}
+{"seq": 200, "ts": "2026-08-04T18:04:52+00:00", "v": 1, "op": "verification_passed", "id": "op-ld-imm", "kind": "tests", "summary": "tests-alu: 6XNN loads an immediate (test_ld_imm)"}
+{"seq": 201, "ts": "2026-08-04T18:05:05+00:00", "v": 1, "op": "task_started", "id": "op-add-imm"}
+{"seq": 202, "ts": "2026-08-04T18:05:18+00:00", "v": 1, "op": "evidence_added", "id": "op-add-imm", "kind": "files", "detail": "chip8/ops/alu.py"}
+{"seq": 203, "ts": "2026-08-04T18:05:31+00:00", "v": 1, "op": "verification_passed", "id": "op-add-imm", "kind": "tests", "summary": "tests-alu: 7XNN adds immediate, no VF (test_add_imm)"}
+{"seq": 204, "ts": "2026-08-04T18:05:44+00:00", "v": 1, "op": "task_started", "id": "op-alu"}
+{"seq": 205, "ts": "2026-08-04T18:05:57+00:00", "v": 1, "op": "evidence_added", "id": "op-alu", "kind": "files", "detail": "chip8/ops/alu.py"}
+{"seq": 206, "ts": "2026-08-04T18:06:10+00:00", "v": 1, "op": "verification_passed", "id": "op-alu", "kind": "tests", "summary": "tests-alu: 8XYN: LD/OR/AND/XOR/ADD/SUB/SHR/SUBN/SHL with VF flags"}
+{"seq": 207, "ts": "2026-08-04T18:06:23+00:00", "v": 1, "op": "task_started", "id": "op-rand"}
+{"seq": 208, "ts": "2026-08-04T18:06:36+00:00", "v": 1, "op": "evidence_added", "id": "op-rand", "kind": "files", "detail": "chip8/ops/alu.py"}
+{"seq": 209, "ts": "2026-08-04T18:06:49+00:00", "v": 1, "op": "verification_passed", "id": "op-rand", "kind": "tests", "summary": "tests-alu: CXNN masks a seeded RNG byte (test_rand_masks)"}
+{"seq": 210, "ts": "2026-08-04T18:07:02+00:00", "v": 1, "op": "task_started", "id": "op-ld-i"}
+{"seq": 211, "ts": "2026-08-04T18:07:15+00:00", "v": 1, "op": "evidence_added", "id": "op-ld-i", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 212, "ts": "2026-08-04T18:07:28+00:00", "v": 1, "op": "verification_passed", "id": "op-ld-i", "kind": "tests", "summary": "tests-mem: ANNN sets I (test_ld_i)"}
+{"seq": 213, "ts": "2026-08-04T18:07:41+00:00", "v": 1, "op": "task_started", "id": "op-add-i"}
+{"seq": 214, "ts": "2026-08-04T18:07:54+00:00", "v": 1, "op": "evidence_added", "id": "op-add-i", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 215, "ts": "2026-08-04T18:08:07+00:00", "v": 1, "op": "verification_passed", "id": "op-add-i", "kind": "tests", "summary": "tests-mem: FX1E adds Vx to I (test_add_i)"}
+{"seq": 216, "ts": "2026-08-04T18:08:20+00:00", "v": 1, "op": "task_started", "id": "op-font"}
+{"seq": 217, "ts": "2026-08-04T18:08:33+00:00", "v": 1, "op": "evidence_added", "id": "op-font", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 218, "ts": "2026-08-04T18:08:46+00:00", "v": 1, "op": "verification_passed", "id": "op-font", "kind": "tests", "summary": "tests-mem: FX29 points I at the glyph for a nibble (test_font_points_to_glyph)"}
+{"seq": 219, "ts": "2026-08-04T18:08:59+00:00", "v": 1, "op": "task_started", "id": "op-bcd"}
+{"seq": 220, "ts": "2026-08-04T18:09:12+00:00", "v": 1, "op": "evidence_added", "id": "op-bcd", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 221, "ts": "2026-08-04T18:09:25+00:00", "v": 1, "op": "verification_passed", "id": "op-bcd", "kind": "tests", "summary": "tests-mem: FX33 stores BCD digits (test_bcd)"}
+{"seq": 222, "ts": "2026-08-04T18:09:38+00:00", "v": 1, "op": "task_started", "id": "op-store-mem"}
+{"seq": 223, "ts": "2026-08-04T18:09:51+00:00", "v": 1, "op": "evidence_added", "id": "op-store-mem", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 224, "ts": "2026-08-04T18:10:04+00:00", "v": 1, "op": "verification_passed", "id": "op-store-mem", "kind": "tests", "summary": "tests-mem: FX55 stores V0..Vx, I advances (test_store_mem_advances_i)"}
+{"seq": 225, "ts": "2026-08-04T18:10:17+00:00", "v": 1, "op": "task_started", "id": "op-load-mem"}
+{"seq": 226, "ts": "2026-08-04T18:10:30+00:00", "v": 1, "op": "evidence_added", "id": "op-load-mem", "kind": "files", "detail": "chip8/ops/mem.py"}
+{"seq": 227, "ts": "2026-08-04T18:10:43+00:00", "v": 1, "op": "verification_passed", "id": "op-load-mem", "kind": "tests", "summary": "tests-mem: FX65 loads V0..Vx, I advances (test_load_mem_advances_i)"}
+{"seq": 228, "ts": "2026-08-04T18:10:56+00:00", "v": 1, "op": "task_started", "id": "op-key-skip"}
+{"seq": 229, "ts": "2026-08-04T18:11:09+00:00", "v": 1, "op": "evidence_added", "id": "op-key-skip", "kind": "files", "detail": "chip8/ops/input.py"}
+{"seq": 230, "ts": "2026-08-04T18:11:22+00:00", "v": 1, "op": "verification_passed", "id": "op-key-skip", "kind": "tests", "summary": "tests-input: EX9E/EXA1 skip on key state (canary proves the skip)"}
+{"seq": 231, "ts": "2026-08-04T18:11:35+00:00", "v": 1, "op": "task_started", "id": "op-key-wait"}
+{"seq": 232, "ts": "2026-08-04T18:11:48+00:00", "v": 1, "op": "evidence_added", "id": "op-key-wait", "kind": "files", "detail": "chip8/ops/input.py"}
+{"seq": 233, "ts": "2026-08-04T18:12:01+00:00", "v": 1, "op": "verification_passed", "id": "op-key-wait", "kind": "tests", "summary": "tests-input: FX0A blocks via PC rewind, then stores the key"}
+{"seq": 234, "ts": "2026-08-04T18:12:14+00:00", "v": 1, "op": "task_started", "id": "op-timer-read"}
+{"seq": 235, "ts": "2026-08-04T18:12:27+00:00", "v": 1, "op": "evidence_added", "id": "op-timer-read", "kind": "files", "detail": "chip8/ops/timers.py"}
+{"seq": 236, "ts": "2026-08-04T18:12:40+00:00", "v": 1, "op": "verification_passed", "id": "op-timer-read", "kind": "tests", "summary": "tests-mem: FX07 reads the delay timer (TimerOpTest.test_read_delay)"}
+{"seq": 237, "ts": "2026-08-04T18:12:53+00:00", "v": 1, "op": "task_started", "id": "op-timer-write"}
+{"seq": 238, "ts": "2026-08-04T18:13:06+00:00", "v": 1, "op": "evidence_added", "id": "op-timer-write", "kind": "files", "detail": "chip8/ops/timers.py"}
+{"seq": 239, "ts": "2026-08-04T18:13:19+00:00", "v": 1, "op": "verification_passed", "id": "op-timer-write", "kind": "tests", "summary": "tests-mem: FX15/FX18 write delay/sound timers (TimerOpTest.test_write_delay_and_sound)"}
+{"seq": 240, "ts": "2026-08-04T18:13:32+00:00", "v": 1, "op": "task_started", "id": "tests-alu"}
+{"seq": 241, "ts": "2026-08-04T18:13:45+00:00", "v": 1, "op": "task_started", "id": "tests-flow"}
+{"seq": 242, "ts": "2026-08-04T18:13:58+00:00", "v": 1, "op": "task_started", "id": "tests-display"}
+{"seq": 243, "ts": "2026-08-04T18:14:11+00:00", "v": 1, "op": "task_started", "id": "tests-input"}
+{"seq": 244, "ts": "2026-08-04T18:14:24+00:00", "v": 1, "op": "task_started", "id": "tests-mem"}
+{"seq": 245, "ts": "2026-08-04T18:14:37+00:00", "v": 1, "op": "task_started", "id": "tests-rom"}
+{"seq": 246, "ts": "2026-08-04T18:14:50+00:00", "v": 1, "op": "verification_failed", "id": "tests-flow", "reason": "combined suite run: 'discover -s tests' imports modules top-level so relative imports broke (6 errors); after fixing, 5 assertion bugs: skip/input tests asserted after a single step (cannot prove a skip), BCD expectation wrong, draw span/wrap expectations mismatched MSB-first bit order"}
+{"seq": 247, "ts": "2026-08-04T18:15:03+00:00", "v": 1, "op": "evidence_added", "id": "tests-flow", "kind": "fix", "detail": "tests/_util.py as a top-level helper (also puts the package on sys.path); skip tests now run op + canary (2 steps); corrected BCD and draw expectations"}
+{"seq": 248, "ts": "2026-08-04T18:15:16+00:00", "v": 1, "op": "verification_passed", "id": "tests-alu", "kind": "tests", "summary": "tests-alu: 66 tests green across the suite"}
+{"seq": 249, "ts": "2026-08-04T18:15:29+00:00", "v": 1, "op": "verification_passed", "id": "tests-flow", "kind": "tests", "summary": "tests-flow: 66 tests green across the suite"}
+{"seq": 250, "ts": "2026-08-04T18:15:42+00:00", "v": 1, "op": "verification_passed", "id": "tests-display", "kind": "tests", "summary": "tests-display: 66 tests green across the suite"}
+{"seq": 251, "ts": "2026-08-04T18:15:55+00:00", "v": 1, "op": "verification_passed", "id": "tests-input", "kind": "tests", "summary": "tests-input: 66 tests green across the suite"}
+{"seq": 252, "ts": "2026-08-04T18:16:08+00:00", "v": 1, "op": "verification_passed", "id": "tests-mem", "kind": "tests", "summary": "tests-mem: 66 tests green across the suite"}
+{"seq": 253, "ts": "2026-08-04T18:16:21+00:00", "v": 1, "op": "verification_passed", "id": "tests-rom", "kind": "tests", "summary": "tests-rom: 66 tests green across the suite"}
+{"seq": 254, "ts": "2026-08-04T18:16:34+00:00", "v": 1, "op": "task_started", "id": "cli-run"}
+{"seq": 255, "ts": "2026-08-04T18:16:47+00:00", "v": 1, "op": "evidence_added", "id": "cli-run", "kind": "files", "detail": "chip8/cli.py (argparse: --cycles/--seed/--trace/--frame) + chip8/__main__.py"}
+{"seq": 256, "ts": "2026-08-04T18:17:00+00:00", "v": 1, "op": "verification_passed", "id": "cli-run", "kind": "tests", "summary": "python -m chip8 tests/roms/smoke.ch8 --cycles 12 --trace prints a real opcode trace; --frame dumps the framebuffer; 300-cycle run completes"}
+{"seq": 257, "ts": "2026-08-04T18:17:13+00:00", "v": 1, "op": "task_started", "id": "readme"}
+{"seq": 258, "ts": "2026-08-04T18:17:26+00:00", "v": 1, "op": "evidence_added", "id": "readme", "kind": "docs", "detail": "README.md: 8 sections (what/why/architecture/commands/reproduce/artifacts/behavior/lessons)"}
+{"seq": 259, "ts": "2026-08-04T18:17:39+00:00", "v": 1, "op": "verification_passed", "id": "readme", "kind": "review", "summary": "README commands verified from repo root (derive/check/render all run clean)"}

@@ -2,7 +2,7 @@
   "proof": "chip8",
   "forge_version": "0.2.0",
   "derived_from": "events.log",
-  "log_tail_ts": "2026-08-04T18:52:00+00:00",
+  "log_tail_ts": "2026-08-04T18:17:39+00:00",
   "tasks": [
     {
       "id": "project-skeleton",
@@ -70,168 +70,168 @@
     {
       "id": "rom-loader",
       "title": "ROM loader",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "cpu-fde",
       "title": "Fetch-decode-execute core",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-cls",
       "title": "00E0 CLS",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-ret",
       "title": "00EE RET",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-jmp",
       "title": "1NNN JP addr",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-call",
       "title": "2NNN CALL addr",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-skip-eq",
       "title": "3XNN/4XNN skip on imm",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-skip-reg",
       "title": "5XY0/9XY0 skip on reg",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-ld-imm",
       "title": "6XNN LD Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-add-imm",
       "title": "7XNN ADD Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-alu",
       "title": "8XY0-8XYE ALU group",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-ld-i",
       "title": "ANNN LD I",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-jmp-v0",
       "title": "BNNN JP V0",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-rand",
       "title": "CXNN RND Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "medium",
       "subsystem": null
     },
     {
       "id": "op-draw",
       "title": "DXYN DRW",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-key-skip",
       "title": "EX9E/EXA1 skip on key",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-key-wait",
       "title": "FX0A LD Vx, K",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-timer-read",
       "title": "FX07 LD Vx, DT",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-timer-write",
       "title": "FX15/FX18 set timers",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-add-i",
       "title": "FX1E ADD I, Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-font",
       "title": "FX29 LD F, Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-bcd",
       "title": "FX33 LD B, Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-store-mem",
       "title": "FX55 LD [I], V0..Vx",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "op-load-mem",
       "title": "FX65 LD V0..Vx, [I]",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
@@ -245,56 +245,56 @@
     {
       "id": "tests-alu",
       "title": "ALU / arithmetic tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "tests-flow",
       "title": "Flow / control tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "tests-display",
       "title": "Display tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "tests-input",
       "title": "Input tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "tests-mem",
       "title": "Memory / I/O tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "tests-rom",
       "title": "Integration ROM tests",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "cli-run",
       "title": "CLI run/step",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     },
     {
       "id": "readme",
       "title": "README",
-      "status": "todo",
+      "status": "done",
       "priority": "high",
       "subsystem": null
     }

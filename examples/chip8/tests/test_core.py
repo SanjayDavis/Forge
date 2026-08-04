@@ -1,8 +1,8 @@
 """Core subsystem unit tests: memory, registers, stack, timers, rng, keypad,
-fontset, framebuffer."""
+fontset, display."""
 import unittest
 
-from chip8 import memory, registers, stack, timers, rng, keypad, fontset, framebuffer
+from chip8 import memory, registers, stack, timers, rng, keypad, fontset, display
 
 
 class MemoryTest(unittest.TestCase):
@@ -133,13 +133,13 @@ class FontsetTest(unittest.TestCase):
 
 class FrameBufferTest(unittest.TestCase):
     def test_clear(self):
-        d = framebuffer.Display()
+        d = display.Display()
         d.pixels[0] = 1
         d.clear()
         self.assertEqual(sum(d.pixels), 0)
 
     def test_collision_flag(self):
-        d = framebuffer.Display()
+        d = display.Display()
         # draw a full block, then re-draw the same block -> collision
         block = bytes([0xFF] * 5)
         first = d.draw_sprite(0, 0, block)
@@ -150,8 +150,8 @@ class FrameBufferTest(unittest.TestCase):
         self.assertEqual(sum(d.pixels), 0)
 
     def test_wraps_at_edges(self):
-        d = framebuffer.Display()
-        d.draw_sprite(framebuffer.WIDTH - 1, framebuffer.HEIGHT - 1, b"\x80")
+        d = display.Display()
+        d.draw_sprite(display.WIDTH - 1, display.HEIGHT - 1, b"\x80")
         # a single set bit at the last pixel
         self.assertEqual(d.pixels[-1], 1)
 

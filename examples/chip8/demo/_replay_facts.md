@@ -1,6 +1,6 @@
 # Replay facts (derived from events.log)
 
-- tasks: 42 · events: 165 · passes: 10 · failures: 0 · retries: 0 · duration: 17 min
+- tasks: 42 · events: 259 · passes: 42 · failures: 2 · retries: 0 · duration: 44 min
 
 - seq 3  task_created           project-skeleton — planned
 - seq 4  task_created           memory — planned
@@ -54,3 +54,37 @@
 - seq 159  verification_passed    keypad
 - seq 162  verification_passed    fontset
 - seq 165  verification_passed    tests-core
+- seq 168  verification_passed    rom-loader
+- seq 171  verification_failed    cpu-fde — first combined suite run: FAMILY dispatch passed the raw opcode to units instead of decoded operands (op_ld_i set I=0xA123 for 0xA123); 22 errors
+- seq 173  verification_passed    cpu-fde
+- seq 176  verification_passed    op-cls
+- seq 179  verification_passed    op-draw
+- seq 182  verification_passed    op-ret
+- seq 185  verification_passed    op-jmp
+- seq 188  verification_passed    op-call
+- seq 191  verification_passed    op-skip-eq
+- seq 194  verification_passed    op-skip-reg
+- seq 197  verification_passed    op-jmp-v0
+- seq 200  verification_passed    op-ld-imm
+- seq 203  verification_passed    op-add-imm
+- seq 206  verification_passed    op-alu
+- seq 209  verification_passed    op-rand
+- seq 212  verification_passed    op-ld-i
+- seq 215  verification_passed    op-add-i
+- seq 218  verification_passed    op-font
+- seq 221  verification_passed    op-bcd
+- seq 224  verification_passed    op-store-mem
+- seq 227  verification_passed    op-load-mem
+- seq 230  verification_passed    op-key-skip
+- seq 233  verification_passed    op-key-wait
+- seq 236  verification_passed    op-timer-read
+- seq 239  verification_passed    op-timer-write
+- seq 246  verification_failed    tests-flow — combined suite run: 'discover -s tests' imports modules top-level so relative imports broke (6 errors); after fixing, 5 assertion bugs: skip/input tests asserted after a single step (cannot prove a skip), BCD expectation wrong, draw span/wrap expectations mismatched MSB-first bit order
+- seq 248  verification_passed    tests-alu
+- seq 249  verification_passed    tests-flow
+- seq 250  verification_passed    tests-display
+- seq 251  verification_passed    tests-input
+- seq 252  verification_passed    tests-mem
+- seq 253  verification_passed    tests-rom
+- seq 256  verification_passed    cli-run
+- seq 259  verification_passed    readme

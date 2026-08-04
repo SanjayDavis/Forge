@@ -9,3 +9,4 @@ events.log
 
 # proofs ship their raw event log as evidence
 !examples/**/events.log
+demo/.frames/
