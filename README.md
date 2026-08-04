@@ -89,20 +89,24 @@ with a terminal, an MCP server, a VS Code panel.
 
 ```bash
 pip install forge-kernel forge-planner   # from PyPI (once published)
+pip install forge-mcp                    # optional: MCP server transport
 forge --help
 ```
 
 `forge` is the kernel + CLI + public SDK. `forge-planner` is the
 reference planner (a separate distribution) and registers the `forge
-plan` command at runtime through a `forge.commands` entry point. Every
-other client (executor, reviewer, MCP server, a future VS Code panel)
-is the same shape: an installable package that consumes only the SDK.
+plan` command at runtime through a `forge.commands` entry point.
+`forge-mcp` is the MCP server (a separate distribution, run as
+`forge-mcp -d PROJECT`), a stdio transport any MCP client can talk to.
+Every other client (executor, reviewer, a future VS Code panel) is the
+same shape: an installable package that consumes only the SDK.
 
 For development, install from the repository root:
 
 ```bash
 python -m pip install -e .
 python -m pip install -e packages/forge-planner
+python -m pip install -e packages/forge-mcp
 forge --help
 ```
 

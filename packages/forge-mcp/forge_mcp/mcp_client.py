@@ -8,7 +8,7 @@ forge_query / forge_replay surface, exercised over the wire instead of
 through the SDK directly — proving the server is a real MCP server,
 not a local helper.
 
-    python plugins/mcp/mcp_client.py -d PROJECT [--limit N]
+    python -m forge_mcp.mcp_client -d PROJECT [--limit N]
 
 A walk: propose (if given a proposal file), next, context, verify,
 query, replay — the six tools in one pass over whatever is ready.
@@ -21,7 +21,11 @@ import os
 import subprocess
 import sys
 
-REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# This client may be run from a checkout (packages/forge-mcp) or from an
+# installed package; either way the directory containing the `forge_mcp`
+# package is the parent of this file, so `python -m forge_mcp.server`
+# resolves whether the distribution is installed or not.
+PKG_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def rpc(p: subprocess.Popen, msg_id: int, method: str,
@@ -51,9 +55,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     env = dict(os.environ)
-    env["PYTHONPATH"] = REPO + os.pathsep + env.get("PYTHONPATH", "")
-    server = os.path.join(REPO, "plugins", "mcp", "server.py")
-    p = subprocess.Popen([sys.executable, server, "-d", args.dir],
+    env["PYTHONPATH"] = PKG_ROOT + os.pathsep + env.get("PYTHONPATH", "")
+    server = [sys.executable, "-m", "forge_mcp.server", "-d", args.dir]
+    p = subprocess.Popen(server,
                          stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, text=True,
                          encoding="utf-8", env=env)

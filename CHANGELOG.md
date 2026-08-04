@@ -17,6 +17,13 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
   kernel. Known ecosystem commands whose package is missing get an
   install-hint stub (`pip install forge-planner`) instead of an opaque
   argparse error.
+- **`forge-mcp` distribution.** The MCP server graduated from
+  `plugins/mcp/` to its own installable package
+  (`packages/forge-mcp/`, import name `forge_mcp`) with its own
+  pyproject/LICENSE/README and a `forge-mcp` console script
+  (`forge-mcp -d PROJECT`). Stdlib-only JSON-RPC 2.0 server, six
+  tools, one SDK call each — a transport, nothing more. `plugins/mcp/`
+  removed from the core tree.
 - **`forge-planner` distribution.** The reference planner graduated
   from `plugins/planner/` to its own installable package
   (`packages/forge-planner/`, import name `forge_planner`), with its

@@ -74,8 +74,10 @@ Status:
   (executor slot) and judged (reviewer slot) to done by the reference
   client script. An LLM reviewer is a drop-in judge behind the same
   protocol.
-- **M5 (MCP server) is DONE.** `plugins/mcp/` ships `ForgeMCPServer`,
-  the SDK as a wire protocol: JSON-RPC 2.0 over stdio, stdlib-only,
+- **M5 (MCP server) is DONE.** Ships as `forge-mcp`
+  (packages/forge-mcp, run `forge-mcp -d PROJECT`) providing
+  `ForgeMCPServer` — the SDK as a wire protocol: JSON-RPC 2.0 over
+  stdio, stdlib-only,
   exactly the six roadmap tools (`forge_next`, `forge_context`,
   `forge_propose`, `forge_verify`, `forge_query`, `forge_replay`),
   one SDK call each, zero business logic. The reference server

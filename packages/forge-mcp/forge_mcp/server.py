@@ -1,5 +1,5 @@
-"""M5 — the MCP server plugin (SPEC Appendix A: plugins are clients of
-the kernel API; MCP interfaces may evolve freely).
+"""M5 — the MCP server (SPEC Appendix A: MCP interfaces may evolve
+freely). Ships as the `forge-mcp` distribution; import name `forge_mcp`.
 
 The Forge wire protocol in one file, stdlib-only: JSON-RPC 2.0 over
 stdio, one JSON object per line (the MCP stdio framing), six tools —
@@ -9,7 +9,8 @@ logic: the server is a transport, and that is the whole point. The
 kernel decides; the SDK exposes; this translates JSON-RPC to SDK calls
 and back.
 
-    python plugins/mcp/server.py -d PROJECT
+    forge-mcp -d PROJECT
+    python -m forge_mcp.server -d PROJECT
 
 Clients: any MCP client (Claude, Hermes, `mcp` SDK) speaks to it over
 stdio. This reference server implements the protocol itself — no `mcp`

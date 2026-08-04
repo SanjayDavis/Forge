@@ -27,13 +27,15 @@ import unittest
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, "packages", "forge-planner"))
+sys.path.insert(0, os.path.join(REPO, "packages", "forge-mcp"))
 
 from forge import ForgeClient  # noqa: E402
 from forge_planner import ReferencePlanner  # noqa: E402
-from plugins.mcp import TOOLS, ForgeMCPServer  # noqa: E402
+from forge_mcp import TOOLS, ForgeMCPServer  # noqa: E402
 
-SERVER = os.path.join(REPO, "plugins", "mcp", "server.py")
-MCP_CLIENT = os.path.join(REPO, "plugins", "mcp", "mcp_client.py")
+SERVER = os.path.join(REPO, "packages", "forge-mcp", "forge_mcp", "server.py")
+MCP_CLIENT = os.path.join(REPO, "packages", "forge-mcp", "forge_mcp",
+                          "mcp_client.py")
 TOOL_NAMES = ["forge_next", "forge_context", "forge_propose",
               "forge_verify", "forge_query", "forge_replay"]
 
@@ -392,8 +394,8 @@ class TestBoundary(unittest.TestCase):
             self.assertNotIn(banned, self.src)
 
     def test_plugin_imports_are_public(self):
-        from plugins.mcp import (ForgeMCPServer, PROTOCOL_VERSION,  # noqa
-                                 SERVER_INFO, TOOLS, main)
+        from forge_mcp import (ForgeMCPServer, PROTOCOL_VERSION,  # noqa
+                               SERVER_INFO, TOOLS, main)
         self.assertEqual(len(TOOLS), 6)
         self.assertEqual(SERVER_INFO["name"], "forge")
 

@@ -100,11 +100,13 @@ Each plugin is a separate product on top of the kernel.
 - **M5 — MCP server (done).** A thin transport over the SDK —
   `forge_next()`, `forge_context()`, `forge_propose()`,
   `forge_verify()`, `forge_query()`, `forge_replay()`. No business
-  logic. `plugins/mcp/` ships `ForgeMCPServer` (JSON-RPC 2.0 over
-  stdio, stdlib-only, six tools, one SDK call each) plus a reference
-  MCP client. The test suite drives it both with a minimal wire client
-  and with the official `mcp` Python SDK client (skipped when not
-  installed — the canonical suite stays dependency-free).
+  logic. Ships as its own distribution: `forge-mcp`
+  (packages/forge-mcp, run `forge-mcp -d PROJECT`), which provides
+  `ForgeMCPServer` (JSON-RPC 2.0 over stdio, stdlib-only, six tools,
+  one SDK call each) plus a reference MCP client. The test suite
+  drives it both with a minimal wire client and with the official
+  `mcp` Python SDK client (skipped when not installed — the canonical
+  suite stays dependency-free).
 - **M6 — VS Code extension.** The CLI with a panel.
 - **M7 — Web UI.** `forge ui`: project, graph, history, replay,
   evidence.

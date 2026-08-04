@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mcp"
+version = "0.1.0a1"
+description = "Forge MCP server: JSON-RPC 2.0 over stdio, six tools, one SDK call each. A transport, nothing more."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Sanjay Davis", email = "psanjuknl@gmail.com" }]
+keywords = ["forge", "mcp", "sdk", "autonomous-software", "json-rpc"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+# Depends on the forge-kernel distribution (PyPI name; the import name
+# is "forge"). NEVER depend on plain "forge" — that name is owned by an
+# unrelated Django project on PyPI.
+dependencies = ["forge-kernel"]
+
+[project.scripts]
+# The MCP server is a standalone process, not a `forge` subcommand — it
+# gets its own console script, like any MCP server binary.
+forge-mcp = "forge_mcp.server:main"
+
+[tool.setuptools]
+packages = ["forge_mcp"]
