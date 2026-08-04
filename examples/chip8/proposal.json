@@ -1,0 +1,1072 @@
+{
+  "proposal_id": "prop_chip8_001",
+  "reason": "Decompose a CHIP-8 emulator for Proof #2. Six independent subsystems (CPU, memory, timers, display, input, ROM) joined by a fetch-decode-execute loop, then a fine-grained opcode dispatch. Subsystem-dense: ~24 opcode units + 9 test groups stress the dependency DAG (claim C7) while proving language/domain generality over the flask web example (C1, C2).",
+  "confidence": 0.8,
+  "events": [
+    {
+      "op": "task_created",
+      "id": "project-skeleton",
+      "title": "Project skeleton and entrypoint",
+      "description": "Package layout chip8/, run.py, pyproject-free (stdlib only). cpu/memory/display modules importable.",
+      "acceptance": [
+        "import chip8 works",
+        "run.py parses args"
+      ],
+      "files": [
+        "chip8/__init__.py",
+        "run.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "memory",
+      "title": "4KB RAM bus",
+      "description": "Memory-mapped RAM 0x000-0xFFF with byte read/write and bounds checks; program loaded at 0x200.",
+      "acceptance": [
+        "read/write round-trips",
+        "out-of-range raises"
+      ],
+      "files": [
+        "chip8/memory.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "fontset",
+      "title": "Hex fontset sprites",
+      "description": "Built-in 4x5 sprites for nibbles 0-F, used by the font instruction.",
+      "acceptance": [
+        "exactly 16 glyphs, 5 bytes each",
+        "glyph 0x00 present"
+      ],
+      "files": [
+        "chip8/fontset.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "registers",
+      "title": "Register file",
+      "description": "V0-VF (8-bit), I (16-bit), PC, SP, delay/sound timer refs. Arithmetic wraps to 8 bits.",
+      "acceptance": [
+        "Vx writes wrap mod 256",
+        "I holds 16-bit",
+        "PC/SP exposed"
+      ],
+      "files": [
+        "chip8/registers.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "stack",
+      "title": "Call stack",
+      "description": "16-slot stack for call/return; push/pop with overflow/underflow guard.",
+      "acceptance": [
+        "push/pop LIFO",
+        "overflow raises or is guarded"
+      ],
+      "files": [
+        "chip8/stack.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "timers",
+      "title": "Delay and sound timers",
+      "description": "DT and ST counters that decrement at 60 Hz when tick() is called.",
+      "acceptance": [
+        "tick decrements nonzero timers",
+        "stops at 0"
+      ],
+      "files": [
+        "chip8/timers.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "rng",
+      "title": "Seeded RNG",
+      "description": "Deterministic random source (seeded) for the CXNN opcode so runs are reproducible.",
+      "acceptance": [
+        "same seed -> same sequence",
+        "value in 0-255"
+      ],
+      "files": [
+        "chip8/rng.py"
+      ],
+      "priority": "medium",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "framebuffer",
+      "title": "64x32 display framebuffer",
+      "description": "Pixel buffer; set/clear a pixel, report collision, clear all. Basis for draw and cls.",
+      "acceptance": [
+        "set returns collision flag",
+        "clear empties"
+      ],
+      "files": [
+        "chip8/display.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "keypad",
+      "title": "16-key hex keypad",
+      "description": "Input state for keys 0-F; press/release, pressed state, wait-for-key.",
+      "acceptance": [
+        "press/release tracked",
+        "wait returns on next press"
+      ],
+      "files": [
+        "chip8/keypad.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "rom-loader",
+      "title": "ROM loader",
+      "description": "Read a .ch8 file and write bytes into memory starting at 0x200.",
+      "acceptance": [
+        "loads at 0x200",
+        "caps at memory bound"
+      ],
+      "files": [
+        "chip8/rom.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "cpu-fde",
+      "title": "Fetch-decode-execute core",
+      "description": "cycle(): fetch 2-byte opcode at PC, decode, dispatch, increment PC. Holds the register file, stack, timers, keypad, framebuffer, memory references.",
+      "acceptance": [
+        "cycle advances PC",
+        "dispatch routes by high nibble",
+        "step() runs one opcode"
+      ],
+      "files": [
+        "chip8/cpu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-cls",
+      "title": "00E0 CLS",
+      "description": "Clear the display.",
+      "acceptance": [
+        "00E0 clears framebuffer"
+      ],
+      "files": [
+        "chip8/ops/display.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-ret",
+      "title": "00EE RET",
+      "description": "Return from subroutine: PC <- stack.pop().",
+      "acceptance": [
+        "RET pops and sets PC"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-jmp",
+      "title": "1NNN JP addr",
+      "description": "Jump to address NNN.",
+      "acceptance": [
+        "PC set to NNN"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-call",
+      "title": "2NNN CALL addr",
+      "description": "Push PC, jump to NNN.",
+      "acceptance": [
+        "return address pushed",
+        "PC = NNN"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-skip-eq",
+      "title": "3XNN/4XNN skip on imm",
+      "description": "Skip next if Vx == NN (3XNN) or != NN (4XNN).",
+      "acceptance": [
+        "advances 2 extra bytes on match"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-skip-reg",
+      "title": "5XY0/9XY0 skip on reg",
+      "description": "Skip if Vx == Vy (5XY0) or != Vy (9XY0).",
+      "acceptance": [
+        "skip logic per group"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-ld-imm",
+      "title": "6XNN LD Vx",
+      "description": "Set Vx = NN.",
+      "acceptance": [
+        "Vx set, wraps"
+      ],
+      "files": [
+        "chip8/ops/alu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-add-imm",
+      "title": "7XNN ADD Vx",
+      "description": "Vx += NN (no flag set).",
+      "acceptance": [
+        "Vx incremented, wraps"
+      ],
+      "files": [
+        "chip8/ops/alu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-alu",
+      "title": "8XY0-8XYE ALU group",
+      "description": "LD Vx,Vy (8XY0); OR (1); AND (2); XOR (3); ADD with VF carry (4); SUB with VF borrow (5); SHR (6); SUBN (7); SHL (E).",
+      "acceptance": [
+        "each sub-op correct incl. VF flags"
+      ],
+      "files": [
+        "chip8/ops/alu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-ld-i",
+      "title": "ANNN LD I",
+      "description": "Set I = NNN.",
+      "acceptance": [
+        "I = NNN"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-jmp-v0",
+      "title": "BNNN JP V0",
+      "description": "PC = NNN + V0.",
+      "acceptance": [
+        "PC computed with V0"
+      ],
+      "files": [
+        "chip8/ops/flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-rand",
+      "title": "CXNN RND Vx",
+      "description": "Vx = random & NN.",
+      "acceptance": [
+        "Vx masked",
+        "deterministic per seed"
+      ],
+      "files": [
+        "chip8/ops/alu.py"
+      ],
+      "priority": "medium",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-draw",
+      "title": "DXYN DRW",
+      "description": "Draw an 8-wide, N-tall sprite at (Vx, Vy); XOR into framebuffer; set VF on collision; sprite bytes from I.",
+      "acceptance": [
+        "pixels XOR'd, wraps at edges",
+        "VF set on collision"
+      ],
+      "files": [
+        "chip8/ops/display.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-key-skip",
+      "title": "EX9E/EXA1 skip on key",
+      "description": "Skip if key in Vx is pressed (EX9E) or not pressed (EXA1).",
+      "acceptance": [
+        "skip reflects keypad state"
+      ],
+      "files": [
+        "chip8/ops/input.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-key-wait",
+      "title": "FX0A LD Vx, K",
+      "description": "Block until a key is pressed, then store it in Vx (PC not advanced until then).",
+      "acceptance": [
+        "stalls until press",
+        "stores key"
+      ],
+      "files": [
+        "chip8/ops/input.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-timer-read",
+      "title": "FX07 LD Vx, DT",
+      "description": "Vx = delay timer.",
+      "acceptance": [
+        "copies DT into Vx"
+      ],
+      "files": [
+        "chip8/ops/timers.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-timer-write",
+      "title": "FX15/FX18 set timers",
+      "description": "DT = Vx (FX15), ST = Vx (FX18).",
+      "acceptance": [
+        "timers set from Vx"
+      ],
+      "files": [
+        "chip8/ops/timers.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-add-i",
+      "title": "FX1E ADD I, Vx",
+      "description": "I += Vx (VF not affected).",
+      "acceptance": [
+        "I incremented"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-font",
+      "title": "FX29 LD F, Vx",
+      "description": "I = address of font glyph for Vx's low nibble (font at 0x50).",
+      "acceptance": [
+        "I points at correct glyph"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-bcd",
+      "title": "FX33 LD B, Vx",
+      "description": "Store BCD of Vx at I, I+1, I+2.",
+      "acceptance": [
+        "hundreds/tens/ones stored"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-store-mem",
+      "title": "FX55 LD [I], V0..Vx",
+      "description": "Store V0..Vx at I..I+x.",
+      "acceptance": [
+        "registers stored sequentially"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "op-load-mem",
+      "title": "FX65 LD V0..Vx, [I]",
+      "description": "Load V0..Vx from I..I+x.",
+      "acceptance": [
+        "registers loaded sequentially"
+      ],
+      "files": [
+        "chip8/ops/mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-core",
+      "title": "Core subsystem tests",
+      "description": "Unit tests for memory, registers, stack, timers, keypad, fontset, rng, rom-loader.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_core.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-alu",
+      "title": "ALU / arithmetic tests",
+      "description": "Tests for 6XNN, 7XNN, 8XY0-8XYE incl. carry/borrow flags, CXNN.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_alu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-flow",
+      "title": "Flow / control tests",
+      "description": "Tests for jump, call, return, skip families, BNNN.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_flow.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-display",
+      "title": "Display tests",
+      "description": "Tests for CLS, DRW (XOR, wrap, collision flag), framebuffer.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_display.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-input",
+      "title": "Input tests",
+      "description": "Tests for EX9E/EXA1 skip and FX0A wait.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_input.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-mem",
+      "title": "Memory / I/O tests",
+      "description": "Tests for ANNN, FX1E, FX29, FX33, FX55, FX65.",
+      "acceptance": [
+        "all pass"
+      ],
+      "files": [
+        "tests/test_mem.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "tests-rom",
+      "title": "Integration ROM tests",
+      "description": "Ship minimal .ch8 ROMs (cls, jump, ALU, loop) and run them step-by-step to a known end state; assert final registers/framebuffer.",
+      "acceptance": [
+        "ROMs run to completion",
+        "end state matches expected"
+      ],
+      "files": [
+        "tests/roms/",
+        "tests/test_rom.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "cli-run",
+      "title": "CLI run/step",
+      "description": "CLI that loads a ROM and runs or steps with optional cycle cap and state dump (headless, no GUI).",
+      "acceptance": [
+        "runs ROM to cap",
+        "prints final register state"
+      ],
+      "files": [
+        "run.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "readme",
+      "title": "README",
+      "description": "Proof front-door: build/run/test commands, cherch8 example ROM, subsystem architecture, why this proof (claims C1/C2/C7).",
+      "acceptance": [
+        "commands work from clean checkout",
+        "documents subsystem DAG"
+      ],
+      "files": [
+        "README.md"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "dependency_added",
+      "task": "memory",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "fontset",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "registers",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "stack",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "timers",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "rng",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "framebuffer",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "keypad",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "rom-loader",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "registers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "stack"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "timers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "framebuffer"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cpu-fde",
+      "depends_on": "keypad"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-cls",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-ret",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-jmp",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-call",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-skip-eq",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-skip-reg",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-jmp-v0",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-ld-imm",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-add-imm",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-alu",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-rand",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-draw",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-key-skip",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-key-wait",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-timer-read",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-timer-write",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-ld-i",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-add-i",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-font",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-bcd",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-store-mem",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-load-mem",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-rand",
+      "depends_on": "rng"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-draw",
+      "depends_on": "framebuffer"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-font",
+      "depends_on": "fontset"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-key-skip",
+      "depends_on": "keypad"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-key-wait",
+      "depends_on": "keypad"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-timer-read",
+      "depends_on": "timers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-timer-write",
+      "depends_on": "timers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-ld-i",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-add-i",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-bcd",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-store-mem",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "op-load-mem",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-run",
+      "depends_on": "cpu-fde"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-run",
+      "depends_on": "rom-loader"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "memory"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "registers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "stack"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "timers"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "keypad"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "fontset"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "rng"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-core",
+      "depends_on": "rom-loader"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-alu",
+      "depends_on": "op-alu"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-alu",
+      "depends_on": "op-ld-imm"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-alu",
+      "depends_on": "op-add-imm"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-alu",
+      "depends_on": "op-rand"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-ret"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-jmp"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-call"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-skip-eq"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-skip-reg"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-flow",
+      "depends_on": "op-jmp-v0"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-display",
+      "depends_on": "op-cls"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-display",
+      "depends_on": "op-draw"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-input",
+      "depends_on": "op-key-skip"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-input",
+      "depends_on": "op-key-wait"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-ld-i"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-add-i"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-font"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-bcd"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-store-mem"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-mem",
+      "depends_on": "op-load-mem"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-alu"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-ret"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-jmp"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-call"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-skip-eq"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-skip-reg"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-cls"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "op-draw"
+    },
+    {
+      "op": "dependency_added",
+      "task": "tests-rom",
+      "depends_on": "rom-loader"
+    },
+    {
+      "op": "dependency_added",
+      "task": "readme",
+      "depends_on": "cli-run"
+    },
+    {
+      "op": "dependency_added",
+      "task": "readme",
+      "depends_on": "tests-rom"
+    }
+  ]
+}

@@ -69,9 +69,16 @@ of the backfill (see Behavior notes in the proof README).
 
 ---
 
-## Proof #2 — Subsystem-Dense Systems Project (CHIP-8) *(planned, next)*
+## Proof #2 — Subsystem-Dense Systems Project (CHIP-8) *(planning — executing next)*
 
 **Language:** Python · **Claims:** C1, C2, C7
+
+**Planning phase done (Aug 2026):** `examples/chip8/proposal.json` holds a 42-task,
+91-edge decomposition (proposal id `prop_chip8_001`): 8 core subsystems
+(memory, registers, stack, timers, RNG, framebuffer, keypad, fontset), the
+fetch-decode-execute dispatch core, 22 opcode units, 7 test groups, CLI, README.
+Verified acyclic DAG, max depth 6. Execution of tasks into a live `events.log` begins
+after Proof #1's backfill is reviewed.
 
 Why: the proof isn't about emulation — it's about dependency structure. CHIP-8 stresses
 Forge structurally: CPU, memory, timers, display, input, ROM loading, and tests are
