@@ -17,10 +17,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-# Depends on the forge-kernel distribution (PyPI name; the import name
+# Depends on the forge-foundation distribution (PyPI name; the import name
 # is "forge"). NEVER depend on plain "forge" — that name is owned by an
 # unrelated Django project on PyPI.
-dependencies = ["forge-kernel"]
+dependencies = ["forge-foundation"]
 
 [project.scripts]
 # The MCP server is a standalone process, not a `forge` subcommand — it

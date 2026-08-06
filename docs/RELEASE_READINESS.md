@@ -167,7 +167,7 @@ methods (now matches the implementation).
 
 ## Summary
 
-Forge is installable (`pip install forge-kernel` -> `forge --help`), its SDK is
+Forge is installable (`pip install forge-foundation` -> `forge --help`), its SDK is
 the complete public contract (proven by every existing client, one
 re-export closed the only private reach), CI verifies tests +
 compliance + packaging with warnings as errors, and the next milestone

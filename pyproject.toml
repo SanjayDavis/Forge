@@ -3,10 +3,11 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# Distribution name is "forge-kernel" because "forge" is taken on PyPI by
-# an unrelated Django project. The import name and the CLI command stay
-# "forge". This is a PEP 503 naming decision, not a rename of the product.
-name = "forge-kernel"
+# Distribution name is "forge-foundation" because "forge", "forge-sdk",
+# "forge-core", and "forge-kernel" are all taken on PyPI by unrelated
+# projects. The import name and the CLI command stay "forge". This is a
+# PEP 503 naming decision, not a rename of the product.
+name = "forge-foundation"
 version = "0.1.0a1"
 description = "Forge — a deterministic project kernel for autonomous software development. Project state is deterministic; intelligence is replaceable."
 readme = "README.md"

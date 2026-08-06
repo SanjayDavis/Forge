@@ -9,6 +9,21 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
 
 ## [0.1.0a1] - 2026-08
 
+### Changed
+
+- **Core distribution renamed `forge-kernel` → `forge-foundation`.** `forge`,
+  `forge-sdk`, `forge-core`, and `forge-kernel` are all squatted on PyPI by
+  unrelated projects, so the core ships under `forge-foundation`. The import
+  name (`forge`) and CLI command (`forge`) are unchanged. `forge-planner` and
+  `forge-mcp` now declare `forge-foundation` as their dependency.
+
+### Published (2026-08)
+
+- **`forge-foundation` 0.1.0a1** and **`forge-planner` 0.1.0a1** are live on
+  PyPI. `pip install forge-foundation forge-planner` → `forge --help` verified
+  from a clean environment. `forge-mcp` remains unpublished (name squatted by
+  ioteverythin/forgemcp); rename pending.
+
 ### Added
 
 - **Plugin command registry.** `forge/plugins.py` — the CLI discovers
