@@ -24,6 +24,7 @@ Adversarial (spec §3.3, §12.5):
 import json
 import os
 import random
+import re
 import string
 import subprocess
 import sys
@@ -513,6 +514,65 @@ class ComplianceAdversarial(unittest.TestCase):
             s2.read_events()
         with self.assertRaises(GraphError):
             Kernel(d2)
+
+
+class ComplianceRoadmap(unittest.TestCase):
+    """ROAD_TO_1.0.md must agree with proofs/INDEX.md — a checked box with no
+    backing evidence is a bug in the checklist, not a milestone."""
+
+    PROOFS = {  # roadmap name -> index row label (substring, unique in table)
+        "flask-todo": "flask-todo",
+        "chip8": "CHIP-8 emulator",
+        "expr-parser": "expression-parser",
+        "rust-cli": "rust-cli",
+        "multi-agent": "multi-agent",
+    }
+
+    def setUp(self):
+        # REPO (above) resolves to the tests/ dir; the repo root is its parent.
+        self.root = os.path.dirname(REPO)
+
+    def test_road_to_1_0_checklist_matches_index(self):
+        road = os.path.join(self.root, "ROAD_TO_1.0.md")
+        index = os.path.join(self.root, "proofs", "INDEX.md")
+        self.assertTrue(os.path.exists(road), "ROAD_TO_1.0.md missing at repo root")
+        self.assertTrue(os.path.exists(index), "proofs/INDEX.md missing")
+
+        road_text = open(road, encoding="utf-8").read()
+        index_text = open(index, encoding="utf-8").read()
+
+        # split the Evidence section so user/validation lines never match
+        evidence = road_text.split("## Evidence")[1].split("## Validation")[0]
+
+        for name, row_label in self.PROOFS.items():
+            # the roadmap line: "- [x] `name` ..." or "- [ ] `name` ..."
+            m = re.search(r"- \[([ x])\] `" + re.escape(name) + r"`", evidence)
+            self.assertIsNotNone(m, f"ROAD_TO_1.0.md missing evidence line for {name}")
+            checked = m.group(1) == "x"
+
+            # the index row: find the line in the comparison table containing the label
+            row = next((ln for ln in index_text.splitlines()
+                        if row_label in ln and ln.strip().startswith("|")), None)
+            self.assertIsNotNone(row, f"proofs/INDEX.md missing table row for {name}")
+            conforming = "**yes**" in row
+
+            self.assertEqual(
+                checked, conforming,
+                f"ROAD_TO_1.0.md [{name}] is {'checked' if checked else 'unchecked'} "
+                f"but proofs/INDEX.md marks it {'conforming' if conforming else 'not conforming'}")
+
+    def test_road_to_1_0_has_no_checked_unverifiable_box(self):
+        """Any [x] outside Evidence must be justified by an explicit source —
+        in practice only 'compliance suite green' and 'proof suite green' may be
+        checked before the corpus completes."""
+        road = os.path.join(self.root, "ROAD_TO_1.0.md")
+        text = open(road, encoding="utf-8").read()
+        evidence = text.split("## Evidence")[1].split("## Validation")[0]
+        for line in text.splitlines():
+            if line.strip().startswith("- [x]") and line not in evidence.splitlines():
+                allowed = ("Compliance suite green", "Proof suite green")
+                self.assertTrue(any(a in line for a in allowed),
+                                f"checked box with no verifiable source: {line}")
 
 
 if __name__ == "__main__":
