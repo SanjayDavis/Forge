@@ -150,7 +150,7 @@ proofs if the 100+ task run and the multi-agent run are cleaner as separate evid
 ## Backlog
 
 - [x] Backfill Proof #1 (flask-todo) to conformance — done Aug 2026
-- [ ] Proof #2 CHIP-8 — build per standard
+- [x] Proof #2 CHIP-8 — build per standard
 - [ ] Proof #3 C++ expression parser
 - [ ] Proof #4 Rust CLI
 - [ ] Proof #5 multi-agent / 100+ task run
