@@ -88,10 +88,19 @@ with a terminal, an MCP server, a VS Code panel.
 ## Install
 
 ```bash
-pip install forge-foundation forge-planner   # from PyPI (once published)
-pip install forge-mcp-base                # optional: MCP server transport
+pip install forge-foundation forge-planner
+pip install forge-mcp-base            # optional: MCP server transport
 forge --help
 ```
+
+Naming, to keep it unambiguous:
+
+| What you call it | Value |
+|------------------|-------|
+| **Project** | Forge |
+| **PyPI package** | `forge-foundation` (the names `forge`, `forge-sdk`, `forge-core`, `forge-kernel` are squatted on PyPI) |
+| **Python module** | `forge` — `from forge import ForgeClient` |
+| **CLI** | `forge` — `forge init`, `forge plan`, `forge next` |
 
 `forge` is the kernel + CLI + public SDK. `forge-planner` is the
 reference planner (a separate distribution) and registers the `forge
