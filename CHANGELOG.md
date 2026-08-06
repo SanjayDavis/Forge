@@ -5,7 +5,20 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
+alpha `0.1.0a2` is the current release.
+
+## [0.1.0a2] - 2026-08-06
+
+### Added
+
+- **CHIP-8 proof conforming** (`proofs/INDEX.md` #2): 42 tasks, 259 events, 42
+  checks green; closes the "toy examples" and "web apps only" gaps prior to the
+  non-Python proofs. Backlog checkbox flipped to reflect the completed run.
+
+### Changed
+- **Version bump to `0.1.0a2`** across `forge-foundation`, `forge-planner`,
+  and `forge-mcp-base` (all published to PyPI). Purely a confidence marker for
+  the now-conforming CHIP-8 proof; the kernel contract (SPEC v1) is untouched.
 
 ## [0.1.0a1] - 2026-08
 
