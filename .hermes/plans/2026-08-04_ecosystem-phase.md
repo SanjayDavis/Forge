@@ -127,7 +127,7 @@ task's context contract as HTML; screenshot for the release/demo.
 
 ## Phase D — Demo video (75-90s, terminal only)
 
-**Files:** `forge-launch/screencast-script.md` (exists —
+**Files:** `forge-launch/screencast-script.md` (drafted locally, exists —
 follow it verbatim), OBS or terminal recording, ffmpeg 8.1.2 available.
 
 **Steps:** record takes 1-4 per script (init → plan → next/context/evidence/
@@ -140,7 +140,7 @@ explanation. Upload to YouTube unlisted first, then public at launch.
 ## Phase E — Get users (launch execution)
 
 **Files:** `show-hn.md`, `reddit.md`, `x-thread.md`, `launch-checklist.md`
-(all drafted in `forge-launch/`).
+(all drafted in the local `forge-launch/` folder).
 
 **Pre-launch gate:** resolve the replay-number inconsistency
 (verification.md <1s vs measured 1.40-1.56s) — pick one number everywhere.

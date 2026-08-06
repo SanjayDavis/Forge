@@ -12,3 +12,6 @@ events.log
 demo/.frames/
 dist/
 .venv-test/
+
+# local planning scratch — never commit (contains machine-local paths)
+.hermes/
