@@ -127,7 +127,7 @@ jobs:
       - name: bare forge install prints the plan install hint
         run: |
           python -m venv /tmp/forge-bare-venv
-          /tmp/forge-bare-venv/bin/pip install dist/forge_kernel-*.whl
+          /tmp/forge-bare-venv/bin/pip install dist/forge_foundation-*.whl
           cd /tmp/pkg-demo
           /tmp/forge-bare-venv/bin/forge plan "x" 2>&1 | grep -q "pip install forge-planner" || \
             (echo "FAIL: bare forge install must hint at forge-planner" && exit 1)
