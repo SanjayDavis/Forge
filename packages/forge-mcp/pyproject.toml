@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "forge-mcp"
+name = "forge-mcp-base"
 version = "0.1.0a1"
 description = "Forge MCP server: JSON-RPC 2.0 over stdio, six tools, one SDK call each. A transport, nothing more."
 readme = "README.md"

@@ -19,10 +19,13 @@ the project version is `0.1.0-alpha` (normalized `0.1.0a1`).
 
 ### Published (2026-08)
 
-- **`forge-foundation` 0.1.0a1** and **`forge-planner` 0.1.0a1** are live on
-  PyPI. `pip install forge-foundation forge-planner` → `forge --help` verified
-  from a clean environment. `forge-mcp` remains unpublished (name squatted by
-  ioteverythin/forgemcp); rename pending.
+- **`forge-foundation` 0.1.0a1**, **`forge-planner` 0.1.0a1**, and
+  **`forge-mcp-base` 0.1.0a1** are live on PyPI. `pip install
+  forge-foundation forge-planner forge-mcp-base` → `forge --help` and the
+  `forge-mcp` server both verified from a clean environment. The MCP server
+  ships as `forge-mcp-base` because `forge-mcp` and `forge-mcp-server` are
+  squatted on PyPI by unrelated projects; `forge-mcp` remains the console
+  script.
 
 ### Added
 

@@ -12,7 +12,7 @@ This package is the ecosystem proof behind the SDK boundary: it is a
 ## Install
 
 ```sh
-pip install forge-foundation forge-mcp
+pip install forge-foundation forge-mcp-base
 ```
 
 ## Use
