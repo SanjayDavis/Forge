@@ -1,8 +1,10 @@
 # Proof #3 (expr-parser) build artifacts — never commit these.
-expr
-expr.exe
-expr_tests
-expr_tests.exe
+# NOTE: bare `expr` would also match the include/expr/ source dir, so these are
+# root-anchored to the proof's binary outputs.
+/expr
+/expr.exe
+/expr_tests
+/expr_tests.exe
 *.o
 *.exe
 # demo render staging frames
