@@ -1,0 +1,38 @@
+# Replay facts (derived from events.log)
+
+- tasks: 17 · events: 96 · passes: 17 · failures: 0 · retries: 0 · duration: 19 min
+
+- seq 1  task_created           project-skeleton — planned
+- seq 2  task_created           build-system — planned
+- seq 3  task_created           token-def — planned
+- seq 4  task_created           error-report — planned
+- seq 5  task_created           lexer — planned
+- seq 6  task_created           lexer-tests — planned
+- seq 7  task_created           ast-def — planned
+- seq 8  task_created           parser — planned
+- seq 9  task_created           parser-tests — planned
+- seq 10  task_created           context — planned
+- seq 11  task_created           evaluator — planned
+- seq 12  task_created           evaluator-tests — planned
+- seq 13  task_created           print-ast — planned
+- seq 14  task_created           repl — planned
+- seq 15  task_created           cli-tests — planned
+- seq 16  task_created           edge-cases — planned
+- seq 17  task_created           readme — planned
+- seq 47  verification_passed    project-skeleton
+- seq 51  verification_passed    build-system
+- seq 54  verification_passed    token-def
+- seq 57  verification_passed    error-report
+- seq 60  verification_passed    lexer
+- seq 63  verification_passed    lexer-tests
+- seq 66  verification_passed    ast-def
+- seq 69  verification_passed    context
+- seq 72  verification_passed    parser
+- seq 75  verification_passed    parser-tests
+- seq 78  verification_passed    evaluator
+- seq 81  verification_passed    print-ast
+- seq 84  verification_passed    evaluator-tests
+- seq 87  verification_passed    repl
+- seq 90  verification_passed    cli-tests
+- seq 93  verification_passed    edge-cases
+- seq 96  verification_passed    readme

@@ -1,0 +1,66 @@
+$ make
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/main.o src/main.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/context.o src/context.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/evaluator.o src/evaluator.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/lexer.o src/lexer.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/parser.o src/parser.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o src/print.o src/print.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude -o expr src/main.o src/context.o src/evaluator.o src/lexer.o src/parser.o src/print.o
+
+$ make test
+g++ -std=c++14 -Wall -Wextra -Iinclude -o expr src/main.o src/context.o src/evaluator.o src/lexer.o src/parser.o src/print.o
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/cli_tests.o tests/cli_tests.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/edge_cases.o tests/edge_cases.cpp
+tests/edge_cases.cpp:50:6: warning: 'void {anonymous}::expect_parse_error(const string&)' defined but not used [-Wunused-function]
+ void expect_parse_error(const std::string& in) {
+      ^~~~~~~~~~~~~~~~~~
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/evaluator_tests.o tests/evaluator_tests.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/lexer_tests.o tests/lexer_tests.cpp
+tests/lexer_tests.cpp: In function 'int run_lexer_tests()':
+tests/lexer_tests.cpp:47:69: warning: unknown conversion type character 'z' in format [-Wformat=]
+                         c.input.c_str(), toks.size(), c.kinds.size());
+                                                                     ^
+tests/lexer_tests.cpp:47:69: warning: unknown conversion type character 'z' in format [-Wformat=]
+tests/lexer_tests.cpp:47:69: warning: too many arguments for format [-Wformat-extra-args]
+tests/lexer_tests.cpp:57:62: warning: unknown conversion type character 'z' in format [-Wformat=]
+                             expr::token_kind_name(c.kinds[i]));
+                                                              ^
+tests/lexer_tests.cpp:57:62: warning: format '%s' expects argument of type 'char*', but argument 3 has type 'std::size_t {aka unsigned int}' [-Wformat=]
+tests/lexer_tests.cpp:57:62: warning: too many arguments for format [-Wformat-extra-args]
+tests/lexer_tests.cpp:70:91: warning: unknown conversion type character 'z' in format [-Wformat=]
+         std::printf("FAIL  lex(\"2$3\"): error token pos = %zu, expected 1\n", toks[1].pos);
+                                                                                           ^
+tests/lexer_tests.cpp:70:91: warning: too many arguments for format [-Wformat-extra-args]
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/main.o tests/main.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude   -c -o tests/parser_tests.o tests/parser_tests.cpp
+g++ -std=c++14 -Wall -Wextra -Iinclude -o expr_tests src/context.o src/evaluator.o src/lexer.o src/parser.o src/print.o tests/cli_tests.o tests/edge_cases.o tests/evaluator_tests.o tests/lexer_tests.o tests/main.o tests/parser_tests.o
+./expr_tests
+lexer tests: 13 passed, 0 failed
+parser tests: 18 passed, 0 failed
+evaluator tests: 25 passed, 0 failed
+cli tests: 13 passed, 0 failed
+edge-case tests: 25 passed, 0 failed
+all test suites passed
+
+$ ./expr 2+3
+5
+
+$ ./expr 2^3^2
+512
+
+$ ./expr -2^2
+-4
+
+$ ./expr 1/0
+division by zero
+
+$ ./expr
+> 2+3
+5
+> sqrt(9)
+3
+> :ast 2+3*4
+(+ 2 (* 3 4))
+> 1/0
+division by zero
+> quit

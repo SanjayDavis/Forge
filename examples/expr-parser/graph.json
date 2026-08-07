@@ -1,0 +1,237 @@
+{
+  "proof": "expr-parser",
+  "forge_version": "0.1.0a2",
+  "derived_from": "events.log",
+  "log_tail_ts": "2026-08-06T11:18:02+00:00",
+  "tasks": [
+    {
+      "id": "project-skeleton",
+      "title": "Project skeleton and layout",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "build-system",
+      "title": "Makefile build/test/clean",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "token-def",
+      "title": "Token kind enum and Token struct",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "error-report",
+      "title": "ParseError and EvalError with positions",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "lexer",
+      "title": "Lexer with numbers, identifiers, operators, errors",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "lexer-tests",
+      "title": "Lexer unit tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "ast-def",
+      "title": "AST node definitions",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "parser",
+      "title": "Precedence-climbing parser",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "parser-tests",
+      "title": "Parser unit tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "context",
+      "title": "Variable context and builtin functions",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "evaluator",
+      "title": "Evaluator over the AST",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "evaluator-tests",
+      "title": "Evaluator pipeline tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "print-ast",
+      "title": "AST pretty printer",
+      "status": "done",
+      "priority": "low",
+      "subsystem": null
+    },
+    {
+      "id": "repl",
+      "title": "REPL and single-shot CLI",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "cli-tests",
+      "title": "CLI end-to-end tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "edge-cases",
+      "title": "Edge-case stress tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "readme",
+      "title": "Proof README (front door)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    }
+  ],
+  "dependencies": [
+    {
+      "task": "build-system",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "token-def",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "error-report",
+      "depends_on": "token-def"
+    },
+    {
+      "task": "lexer",
+      "depends_on": "token-def"
+    },
+    {
+      "task": "lexer",
+      "depends_on": "error-report"
+    },
+    {
+      "task": "lexer-tests",
+      "depends_on": "lexer"
+    },
+    {
+      "task": "lexer-tests",
+      "depends_on": "build-system"
+    },
+    {
+      "task": "ast-def",
+      "depends_on": "token-def"
+    },
+    {
+      "task": "parser",
+      "depends_on": "lexer"
+    },
+    {
+      "task": "parser",
+      "depends_on": "ast-def"
+    },
+    {
+      "task": "parser",
+      "depends_on": "error-report"
+    },
+    {
+      "task": "parser-tests",
+      "depends_on": "parser"
+    },
+    {
+      "task": "parser-tests",
+      "depends_on": "build-system"
+    },
+    {
+      "task": "context",
+      "depends_on": "ast-def"
+    },
+    {
+      "task": "evaluator",
+      "depends_on": "parser"
+    },
+    {
+      "task": "evaluator",
+      "depends_on": "context"
+    },
+    {
+      "task": "evaluator",
+      "depends_on": "error-report"
+    },
+    {
+      "task": "evaluator-tests",
+      "depends_on": "evaluator"
+    },
+    {
+      "task": "evaluator-tests",
+      "depends_on": "build-system"
+    },
+    {
+      "task": "print-ast",
+      "depends_on": "ast-def"
+    },
+    {
+      "task": "repl",
+      "depends_on": "evaluator"
+    },
+    {
+      "task": "repl",
+      "depends_on": "print-ast"
+    },
+    {
+      "task": "cli-tests",
+      "depends_on": "repl"
+    },
+    {
+      "task": "cli-tests",
+      "depends_on": "build-system"
+    },
+    {
+      "task": "edge-cases",
+      "depends_on": "evaluator-tests"
+    },
+    {
+      "task": "readme",
+      "depends_on": "repl"
+    },
+    {
+      "task": "readme",
+      "depends_on": "build-system"
+    }
+  ]
+}

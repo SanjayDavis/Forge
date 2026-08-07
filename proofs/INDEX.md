@@ -14,7 +14,7 @@ VF / (VPass + VF).
 |---|-------|----------|--------|-------|--------|------|-------|----|---------|---------|----------------|-----|--------|-------|
 | 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 1 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
 | 2 | [CHIP-8 emulator](#proof-2--chip-8-emulator) | Python | completed | 42 | 259 | 23 | 42 | 2 | 0 | 0 | 44 | not recorded | C1, C2, C7 | **yes** |
-| 3 | expression-parser *(planned)* | C++ | — | — | — | — | — | — | — | — | — | C1, C3 | — |
+| 3 | [expression-parser](#proof-3--c-expression-parser) | C++ | completed | 17 | 96 | 3 | 17 | 0 | 0 | 0 | 19 | not recorded | C1, C3 | **yes** |
 | 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
 | 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
 
@@ -23,11 +23,11 @@ VF / (VPass + VF).
 | Claim | Criticism answered | flask-todo | CHIP-8 | expr-parser | rust-cli | multi-agent |
 |-------|--------------------|:---:|:---:|:---:|:---:|:---:|
 | C1 | "Only works on toy examples" | | X | X | X | |
-| C2 | "Only works for web apps" | | X | X | X | |
+| C2 | "Only works for web apps" | | X | | X | |
 | C3 | "Tied to Python" | | | X | X | |
 | C4 | "Can't handle long projects" | | | | | X |
 | C5 | "Only works with one agent" | | | | | X |
-| C6 | "Just a fancy todo list" | X | X | X | X | X |
+| C6 | "Just a fancy todo list" | X | X | | X | X |
 | C7 | "Can't handle structured complexity" | X | X | | | X |
 
 An X means the proof's artifacts are expected to support the claim — it becomes binding
@@ -119,12 +119,51 @@ under `examples/chip8/demo/snapshots/` (01-foundation → 06-cli-readme).
 
 ---
 
-## Proof #3 — C++ Expression Parser *(planned)*
+## Proof #3 — C++ Expression Parser
 
-**Language:** C++ · **Claims:** C1, C3
+**Language:** C++ · **Status:** completed · **Claims:** C1, C3
 
-Why: first non-Python proof. Lexer → parser → AST → evaluator → REPL, plus tests.
-Deliberately small but complete; its job is the language claim, not scale.
+|| Metric | Value |
+||---|--------|-------|
+|| tasks | 17 |
+|| events | 96 |
+|| verification passes | 17 |
+|| verification failures | 0 |
+|| failure rate | 0% (17 of 17 attempts) |
+|| retries | 0 |
+|| max_ready_queue | 3 (at seq 66, when ast-def passed) |
+|| duration (min) | 19 |
+|| llm | not recorded |
+
+**Planning (Aug 2026):** `examples/expr-parser/proposal.json` holds the 17-task,
+27-edge decomposition (proposal id `prop_expr_parser_001`): foundation
+(skeleton, Makefile), frontend (token-def, error-report, lexer, ast-def,
+precedence-climbing parser, print-ast), runtime (context, evaluator), app (REPL
+CLI), and test suites (lexer, parser, evaluator, CLI end-to-end, edge-cases).
+A verified acyclic DAG, depth 7, single entry point `project-skeleton`,
+`max_ready_queue = 3`.
+
+**Story (replay.md summary):** executed substrate → frontend → runtime → app →
+tests in 7 levels. All 17 tasks passed verification on first claim; every
+mid-implementation error was caught before the verification gate. Three real
+engineering events: (1) unary-vs-exponent precedence — first pass bound `-2^2`
+as `(-2)^2` (C-style); the proposal contract wanted the math convention
+`-(2^2)`, fixed by moving unary into the precedence loop at level 25; (2) a
+"…unqualified-id before '&'" compiler-noise class that turned out to be an
+undeclared exception type (`expr::ParseError` without an `error.h` include) —
+found across four files at once by grepping catch clauses; (3) the 13-case CLI
+suite went entirely red on Windows because `system()` uses `cmd.exe`, which
+rejects `./`-paths — switched to bare `expr`. The harness also caught a wrong
+*test* expectation, not wrong code (`floor(2.7)+ceil(2.1)==5` was the test's
+arithmetic error; the code was correct). Final: 94 checks green
+(13 lexer + 18 parser + 25 evaluator + 13 CLI + 25 edge-case) under `-Wall
+-Wextra` with zero warnings, `make`-driven, no Python in the build path.
+
+**Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
+`graph.json`/`metrics.json`/`graph.png` derive from `events.log` alone.
+This proof is the C++ half of the non-Python generalization release (`0.1.0a3`).
+
+**Location:** `examples/expr-parser/` (third entry in the corpus).
 
 ---
 
@@ -151,7 +190,7 @@ proofs if the 100+ task run and the multi-agent run are cleaner as separate evid
 
 - [x] Backfill Proof #1 (flask-todo) to conformance — done Aug 2026
 - [x] Proof #2 CHIP-8 — build per standard
-- [ ] Proof #3 C++ expression parser
+- [x] Proof #3 C++ expression parser — conforming Aug 2026
 - [ ] Proof #4 Rust CLI
 - [ ] Proof #5 multi-agent / 100+ task run
 - [ ] Tooling (optional): a `proof-check` script that validates a proof's bundle against

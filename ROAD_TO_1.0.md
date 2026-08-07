@@ -26,7 +26,7 @@ Source of truth: [`proofs/INDEX.md`](proofs/INDEX.md). A box is checked only whe
 
 - [x] `flask-todo` — Python web app (Proof #1, claims C6, C7)
 - [x] `chip8` — CHIP-8 emulator, headless CLI (Proof #2, claims C1, C2, C7)
-- [ ] `expr-parser` — C++ expression parser (Proof #3, claims C1, C3)
+- [x] `expr-parser` — C++ expression parser (Proof #3, claims C1, C3)
 - [ ] `rust-cli` — Rust CLI (Proof #4, claims C1, C3)
 - [ ] `multi-agent` — 100+ task multi-agent run (Proof #5, claims C4, C5)
 

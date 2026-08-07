@@ -1,0 +1,24 @@
+{
+  "proof": "expr-parser",
+  "status": "completed",
+  "language": "C++",
+  "tasks": 17,
+  "events": 96,
+  "verification_passes": 17,
+  "verification_failures": 0,
+  "retries": 0,
+  "max_ready_queue": 3,
+  "max_ready_queue_at": {
+    "seq": 66,
+    "event": "verification_passed",
+    "id": "ast-def"
+  },
+  "duration_minutes": 19,
+  "llm": "not recorded",
+  "forge_version": "0.1.0a2",
+  "conforms_to": "proof-spec-0.1",
+  "claims": [
+    "C1",
+    "C3"
+  ]
+}

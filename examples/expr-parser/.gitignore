@@ -1,0 +1,9 @@
+# Proof #3 (expr-parser) build artifacts — never commit these.
+expr
+expr.exe
+expr_tests
+expr_tests.exe
+*.o
+*.exe
+# demo render staging frames
+demo/.frames
