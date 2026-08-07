@@ -5,7 +5,29 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-alpha `0.1.0a2` is the current release.
+alpha `0.1.0a3` is the current release.
+
+## [0.1.0a3] - 2026-08-07
+
+### Added
+
+- **Generalization corpus complete (Phase 1 closed)**: the non-Python
+  datapoints the architecture question needed. **Proof #3** `expr-parser`
+  (C++, 17 tasks, 94 checks, `-Wall -Wextra` clean) and **Proof #4**
+  `rust-cli` (Rust, std-only, 15 tasks, 48 checks) are both **conforming**;
+  the corpus now spans Python, C++, and Rust. `proofs/INDEX.md` gains a
+  Milestones table; `ROAD_TO_1.0.md` evidence list is fully checked through
+  Proof #4.
+- **Proof #5 designed** (`proofs/PHASE2_DESIGN.md`): the 100+ task
+  multi-agent stress proof answering C4/C5 — the next release gate
+  (`0.1.0a4`, per `ROAD_TO_1.0.md`).
+
+### Changed
+
+- **Version bump to `0.1.0a3`** across `forge-foundation`, `forge-planner`,
+  and `forge-mcp-base`. Per the publish-only-after-evidence policy this is
+  **prepared and tagged, not uploaded to PyPI**; the previous live release
+  remains `0.1.0a2`. The kernel contract (SPEC v1) is untouched.
 
 ## [0.1.0a2] - 2026-08-06
 

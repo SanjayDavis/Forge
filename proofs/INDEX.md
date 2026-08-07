@@ -8,6 +8,20 @@ Legend: **VPass** = verification passes · **VF** = verification failures ·
 **Conf.** = conforms to the Proof Standard. Failure rate per proof =
 VF / (VPass + VF).
 
+## Milestones (phases)
+
+| Phase | Question | Evidence | Status |
+|-------|----------|----------|--------|
+| 0 | Forge is real | core + SDK + planner + MCP + CLI milestones (tags `m2b`…`m5.1`); Proofs #1/#2 | **closed** |
+| 1 | "Forge is Python-specific" / "only web apps / toys" (C1–C3) | Proofs #3 (C++) + #4 (Rust) — non-Python generalization datapoints | **closed** — evidence for `0.1.0a3` |
+| 2 | "Can't handle long projects / one agent" (C4, C5) | Proof #5: 100+ task multi-agent stress proof (*designed*, see [PHASE2_DESIGN.md](PHASE2_DESIGN.md)) | **next** |
+| 3 | publish-per-evidence gate | dists already live for foundation/planner/mcp; each release ships behind its phase evidence | gate |
+
+`0.1.0a3` — **Generalization** — is the tagged release-point whose evidence corpus is the
+closing of Phase 1 (C++ and Rust proofs added to the Python-established corpus). Per the
+publish-only-after-evidence policy it is prepared and tagged, not uploaded (see the
+version note in the Proof #4 entry). `0.1.0a4` will carry the Phase 2 multi-agent milestone.
+
 ## Comparison table
 
 | # | Proof | Language | Status | Tasks | Events | MaxQ | VPass | VF | Retries | Reopens | Duration (min) | LLM | Claims | Conf. |
