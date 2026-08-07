@@ -15,3 +15,6 @@ dist/
 
 # local planning scratch — never commit (contains machine-local paths)
 .hermes/
+
+# transient proof driver (Proof #4 lifecycle)
+drive_proof4.py

@@ -1,0 +1,24 @@
+{
+  "proof": "rust-cli",
+  "status": "completed",
+  "language": "Rust",
+  "tasks": 15,
+  "events": 86,
+  "verification_passes": 15,
+  "verification_failures": 0,
+  "retries": 0,
+  "max_ready_queue": 6,
+  "max_ready_queue_at": {
+    "seq": 56,
+    "event": "verification_passed",
+    "id": "cargo-build"
+  },
+  "duration_minutes": 1,
+  "llm": "not recorded",
+  "forge_version": "0.1.0a2",
+  "conforms_to": "proof-spec-0.1",
+  "claims": [
+    "C1",
+    "C3"
+  ]
+}

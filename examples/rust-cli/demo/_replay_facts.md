@@ -1,0 +1,34 @@
+# Replay facts (derived from events.log)
+
+- tasks: 15 · events: 86 · passes: 15 · failures: 0 · retries: 0 · duration: 1 min
+
+- seq 1  task_created           project-skeleton — planned
+- seq 2  task_created           cargo-build — planned
+- seq 3  task_created           error-def — planned
+- seq 4  task_created           csv-parser — planned
+- seq 5  task_created           csv-parser-tests — planned
+- seq 6  task_created           stats-engine — planned
+- seq 7  task_created           stats-engine-tests — planned
+- seq 8  task_created           describe — planned
+- seq 9  task_created           head — planned
+- seq 10  task_created           cli-args — planned
+- seq 11  task_created           main-wiring — planned
+- seq 12  task_created           fixtures — planned
+- seq 13  task_created           cli-tests — planned
+- seq 14  task_created           edge-cases — planned
+- seq 15  task_created           readme — planned
+- seq 44  verification_passed    project-skeleton
+- seq 47  verification_passed    error-def
+- seq 50  verification_passed    csv-parser
+- seq 53  verification_passed    stats-engine
+- seq 56  verification_passed    cargo-build
+- seq 59  verification_passed    describe
+- seq 62  verification_passed    head
+- seq 65  verification_passed    cli-args
+- seq 68  verification_passed    csv-parser-tests
+- seq 71  verification_passed    stats-engine-tests
+- seq 74  verification_passed    main-wiring
+- seq 77  verification_passed    fixtures
+- seq 80  verification_passed    cli-tests
+- seq 83  verification_passed    edge-cases
+- seq 86  verification_passed    readme

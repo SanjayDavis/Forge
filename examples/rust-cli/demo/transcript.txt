@@ -1,0 +1,51 @@
+$ cargo build
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+
+$ cargo test
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+$ cargo run --quiet -- stats fixtures/numbers.csv
+name: count=5 sum=n/a mean=n/a median=n/a min=n/a max=n/a
+score: count=5 sum=20.5 mean=4.1 median=4 min=-3.5 max=10
+
+$ cargo run --quiet -- describe fixtures/mixed.csv
+id: rows=3 non_empty=3 type=numeric
+val: rows=3 non_empty=3 type=mixed
+note: rows=3 non_empty=3 type=string
+file: 3 data rows, 3 columns
+
+$ cargo run --quiet -- head fixtures/quoted.csv -n 2
+name,desc
+x,"has, comma"
+y,"say ""hi"""
+
+
+$ cargo run --quiet -- stats fixtures/nope.csv
+rcli: The system cannot find the file specified. (os error 2)
+
+$ rcli frobnicate x.csv
+rcli: unknown subcommand 'frobnicate'
+try: rcli --help
+
+$ rcli --help
+rcli — CSV statistics CLI (Proof #4)
+
+USAGE:
+    rcli stats <file>
+    rcli describe <file>
+    rcli head <file> [-n N]
+
+SUBCOMMANDS:
+    stats     per-column count/sum/mean/median/min/max
+    describe  column types and row counts
+    head      print the first N rows (default 10)
+
+OPTIONS:
+    -n N      number of rows for head
+    --help    show this help
+

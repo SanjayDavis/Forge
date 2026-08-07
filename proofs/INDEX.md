@@ -15,7 +15,7 @@ VF / (VPass + VF).
 | 1 | [flask-todo](#proof-1--flask-todo) | Python | completed | 8 | 47 | 1 | 9 | 1 | 1 | 1 | 5 | not recorded | C6, C7 | **yes** |
 | 2 | [CHIP-8 emulator](#proof-2--chip-8-emulator) | Python | completed | 42 | 259 | 23 | 42 | 2 | 0 | 0 | 44 | not recorded | C1, C2, C7 | **yes** |
 | 3 | [expression-parser](#proof-3--c-expression-parser) | C++ | completed | 17 | 96 | 3 | 17 | 0 | 0 | 0 | 19 | not recorded | C1, C3 | **yes** |
-| 4 | rust-cli *(planned)* | Rust | — | — | — | — | — | — | — | — | — | C1, C3 | — |
+| 4 | [rust-cli](#proof-4--rust-cli) | Rust | completed | 15 | 86 | 6 | 15 | 0 | 0 | 0 | 1 | not recorded | C1, C3 | **yes** |
 | 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
 
 ## Claim coverage
@@ -170,12 +170,56 @@ This proof is the C++ half of the non-Python generalization release (`0.1.0a3`).
 
 ---
 
-## Proof #4 — Rust CLI *(planned)*
+## Proof #4 — Rust CLI
 
-**Language:** Rust · **Claims:** C1, C3
+**Language:** Rust · **Status:** completed · **Claims:** C1, C3
 
-Why: second non-Python proof. Pairs with #3 to make the "not tied to Python" claim a
-pattern rather than an anecdote. CLI with subcommands, error handling, tests.
+||| Metric | Value |
+|||---|--------|-------|
+||| tasks | 15 |
+||| events | 86 |
+||| verification passes | 15 |
+||| verification failures | 0 |
+||| failure rate | 0% (15 of 15 attempts) |
+||| retries | 0 |
+||| max_ready_queue | 6 (at seq 56, when cargo-build passed) |
+||| duration (min) | 1 |
+||| llm | not recorded |
+
+**Planning (Aug 2026):** `examples/rust-cli/proposal.json` holds the 15-task,
+26-edge decomposition (proposal id `prop_rust_cli_001`): foundation
+(skeleton, cargo build/test pipeline), frontend (error-def, hand-rolled CSV
+parser + unit tests, stats engine + tests, describe, head), app (hand-rolled
+CLI arg parsing, main wiring with exit codes), data (fixtures), tests
+(CLI integration, edge/stress), and the README. A verified acyclic DAG,
+depth 5, `max_ready_queue = 6`. Std-only (no external crates), so the build
+is hermetic.
+
+**Story (replay.md summary):** executed skeleton → modules → build gate →
+tests → wiring → fixtures → integration/stress → readme in one pass. All 15
+tasks passed verification on first claim, 0 failures, 0 retries. The code
+itself fought back twice before the verification gate — both caught by the
+proof's own test suites: (1) the byte-oriented parser cast each byte to a
+char, silently double-encoding every non-ASCII field ("é" became "Ã©"); a
+unicode fixture through the parser caught it, rewritten to iterate
+`input.chars()`; (2) blank lines left a phantom empty row — row emission now
+guards on "line actually started". The Proof #3 `.gitignore` lesson
+recurs here as an independent regression: root-anchored `/target` only.
+Final: **48 checks green** (24 unit + 6 CLI integration via the real binary
++ 5 CLI arg + 8 edge/stress + 5 stats) on rustc/cargo 1.97.1
+(`x86_64-pc-windows-gnu`, MSYS2 gcc linker), zero warnings, `Cargo.lock`
+committed, no Python in the build path (run.py is a thin shell-out wrapper).
+
+**Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
+`graph.json`/`metrics.json`/`graph.png` derive from `events.log` alone
+(86 events, contiguous seq 1–86). Toolchain lesson preserved in replay.md:
+on Windows, cargo must be invoked directly — routing it through a
+`bash -lc` PATH export under native python silently drops the toolchain.
+This proof is the Rust half of the non-Python generalization release
+(`0.1.0a3`), pairing with #3 to make the language-independence claim a
+pattern rather than an anecdote.
+
+**Location:** `examples/rust-cli/` (fourth entry in the corpus).
 
 ---
 
@@ -194,7 +238,7 @@ proofs if the 100+ task run and the multi-agent run are cleaner as separate evid
 - [x] Backfill Proof #1 (flask-todo) to conformance — done Aug 2026
 - [x] Proof #2 CHIP-8 — build per standard
 - [x] Proof #3 C++ expression parser — conforming Aug 2026
-- [ ] Proof #4 Rust CLI
+- [x] Proof #4 Rust CLI — conforming Aug 2026
 - [ ] Proof #5 multi-agent / 100+ task run
 - [ ] Tooling (optional): a `proof-check` script that validates a proof's bundle against
       PROOF_SPEC.md — a convenience, not part of the standard

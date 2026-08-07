@@ -1,0 +1,219 @@
+{
+  "proof": "rust-cli",
+  "forge_version": "0.1.0a2",
+  "derived_from": "events.log",
+  "log_tail_ts": "2026-08-07T08:40:26+00:00",
+  "tasks": [
+    {
+      "id": "project-skeleton",
+      "title": "Cargo project skeleton",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "cargo-build",
+      "title": "Build/test pipeline green with zero warnings",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "error-def",
+      "title": "RcliError enum with Display",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "csv-parser",
+      "title": "CSV parser with quoted fields and positioned errors",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "csv-parser-tests",
+      "title": "CSV parser unit tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "stats-engine",
+      "title": "Per-column stats engine",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "stats-engine-tests",
+      "title": "Stats engine unit tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "describe",
+      "title": "Describe subcommand logic",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "head",
+      "title": "Head subcommand logic",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "cli-args",
+      "title": "Hand-rolled CLI argument parsing",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "main-wiring",
+      "title": "main.rs dispatch, error rendering, exit codes",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    },
+    {
+      "id": "fixtures",
+      "title": "Fixture CSV files",
+      "status": "done",
+      "priority": "low",
+      "subsystem": null
+    },
+    {
+      "id": "cli-tests",
+      "title": "CLI integration tests (real binary)",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "edge-cases",
+      "title": "Edge-case and stress tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": null
+    },
+    {
+      "id": "readme",
+      "title": "Proof README (front door)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": null
+    }
+  ],
+  "dependencies": [
+    {
+      "task": "cargo-build",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "error-def",
+      "depends_on": "project-skeleton"
+    },
+    {
+      "task": "csv-parser",
+      "depends_on": "error-def"
+    },
+    {
+      "task": "csv-parser-tests",
+      "depends_on": "csv-parser"
+    },
+    {
+      "task": "csv-parser-tests",
+      "depends_on": "cargo-build"
+    },
+    {
+      "task": "stats-engine",
+      "depends_on": "error-def"
+    },
+    {
+      "task": "stats-engine-tests",
+      "depends_on": "stats-engine"
+    },
+    {
+      "task": "stats-engine-tests",
+      "depends_on": "cargo-build"
+    },
+    {
+      "task": "describe",
+      "depends_on": "csv-parser"
+    },
+    {
+      "task": "describe",
+      "depends_on": "error-def"
+    },
+    {
+      "task": "head",
+      "depends_on": "csv-parser"
+    },
+    {
+      "task": "head",
+      "depends_on": "error-def"
+    },
+    {
+      "task": "cli-args",
+      "depends_on": "error-def"
+    },
+    {
+      "task": "main-wiring",
+      "depends_on": "cli-args"
+    },
+    {
+      "task": "main-wiring",
+      "depends_on": "stats-engine"
+    },
+    {
+      "task": "main-wiring",
+      "depends_on": "describe"
+    },
+    {
+      "task": "main-wiring",
+      "depends_on": "head"
+    },
+    {
+      "task": "main-wiring",
+      "depends_on": "csv-parser"
+    },
+    {
+      "task": "fixtures",
+      "depends_on": "cargo-build"
+    },
+    {
+      "task": "cli-tests",
+      "depends_on": "main-wiring"
+    },
+    {
+      "task": "cli-tests",
+      "depends_on": "fixtures"
+    },
+    {
+      "task": "edge-cases",
+      "depends_on": "csv-parser-tests"
+    },
+    {
+      "task": "edge-cases",
+      "depends_on": "stats-engine-tests"
+    },
+    {
+      "task": "edge-cases",
+      "depends_on": "fixtures"
+    },
+    {
+      "task": "readme",
+      "depends_on": "main-wiring"
+    },
+    {
+      "task": "readme",
+      "depends_on": "cargo-build"
+    }
+  ]
+}
