@@ -203,10 +203,14 @@ claims C4/C5 checked, and `ROAD_TO_1.0.md` evidence box flipped only on a
       venv (public CLI only, no private calls).
 - [ ] DAG simulation over `proposal.json` validates: task targets 110+, acyclic,
       MaxQ predicted, subsystem→agent map covers every task.
-- [ ] A brute launch of N=4 processes appends 200 benign events to a scratch
-      dir; verify seq contiguity + byte parity first. **This is the lung test:**
-      if even the benign concurrent append is corrupted, STOP and raise it before
-      any further planning for the proof (kernel untouched).
+- [x] **Lung gate (2026-08-07): PASSED.** 4 independent OS processes × 50
+      benign `create_task` appends (200 `task_created` events) to one scratch
+      project via the public `Kernel` SDK, started simultaneously: all workers
+      rc=0 in 8.4s; `seq` contiguous 1..200 (no gaps/dupes); exported events ==
+      raw log lines == 200; every line valid JSON (no garbled interleave); all
+      200 ids present in the replayed graph. The store's documented
+      cross-process lock claim (`forge/store.py`) holds under contention —
+      proceed to scaffolding. (Scratch project under `%TEMP%`, removed after.)
 - [ ] `proof-check` baseline passes on the newest conforming proof (regression
       the tool itself).
 
