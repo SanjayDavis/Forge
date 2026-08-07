@@ -112,6 +112,10 @@ C++14 compiler (`g++`) and GNU `make`.
   relative paths. This is a Windows-only trap caught by the tests themselves.
 - **GCC 6.3's `printf` format checker doesn't know `%zu`** — positions are
   printed via `%lu` casts to stay warning-clean under `-Wall -Wextra`.
+- **A bare `expr` in `.gitignore` also matches `include/expr/`** — the C++
+  headers were silently excluded from the first commit. Root-anchor binary
+  ignore patterns (`/expr`). Caught by post-conformance verification (see
+  replay.md).
 - **`std::variant` is unavailable** on GCC 6.3's libstdc++; the AST uses a
   tagged struct with `std::shared_ptr` children (C++14).
 

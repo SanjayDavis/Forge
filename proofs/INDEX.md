@@ -161,6 +161,9 @@ arithmetic error; the code was correct). Final: 94 checks green
 
 **Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
 `graph.json`/`metrics.json`/`graph.png` derive from `events.log` alone.
+Post-conformance verification caught a `.gitignore` defect that had silently
+excluded `include/expr/` (headers); root-anchored patterns, committed the
+headers, clean-clone `make test` → 94/94. See replay.md.
 This proof is the C++ half of the non-Python generalization release (`0.1.0a3`).
 
 **Location:** `examples/expr-parser/` (third entry in the corpus).

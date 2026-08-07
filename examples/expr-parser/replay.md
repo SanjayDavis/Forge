@@ -55,3 +55,23 @@ executable, so execution proceeded in 7 levels of depth.
    `floor(2.7)+ceil(2.1)==5` proudly "failing" while the implementation was
    right — `2+2 == 4`. The harness correctly caught the *test's* arithmetic
    bug. Both sides of the boundary were covered.
+
+## Post-conformance verification catch (Aug 2026)
+
+The proof was declared conforming, and then **focused verification found a real
+defect that would have broken a clean consumer checkout**. The proof's
+`.gitignore` line `expr` (intended for the build binary) also matched the
+`include/expr/` source directory — so all 8 C++ headers were silently excluded:
+`git ls-files examples/expr-parser/include/` returned 0 even though the commit
+looked complete. `git add examples/expr-parser/` had skipped them without a
+warning.
+
+Fix: root-anchored the binary patterns (`/expr`, `/expr.exe`) so they can't
+match the source directory, committed the headers, and re-verified the *fixed*
+tree independently: clean-clone `make test` → 94/94 checks green, CI green.
+
+The sequence — proof appears complete → focused verification → real defect →
+clean checkout would fail → fix → clean checkout → 94/94 → CI green — is
+exactly the loop proofs are for. **Verification failures (0 in the log) and
+engineering corrections (4 here) are different metrics**; the raw replay stays
+the authoritative story, numbers and all.
