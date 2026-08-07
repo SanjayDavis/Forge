@@ -201,8 +201,20 @@ claims C4/C5 checked, and `ROAD_TO_1.0.md` evidence box flipped only on a
 
 - [ ] Confirm `forge` SDK is importable and `forge --help` works from a clean
       venv (public CLI only, no private calls).
-- [ ] DAG simulation over `proposal.json` validates: task targets 110+, acyclic,
-      MaxQ predicted, subsystem→agent map covers every task.
+- [x] **DAG simulation over `proposal.json` (2026-08-07): PASSED.** 114 tasks,
+      153 dependency edges, 9 subsystems, 4 agents; `examples/swarm/preflight_dag.py`
+      validates: count ≥110 ✓, ids unique ✓, every dep references an existing
+      task ✓, no self/duplicate edges ✓, acyclic (Kahn covers all 114) ✓,
+      subsystem→agent ownership disjoint and covers 114/114 ✓, no orphaned
+      tasks (1 root, all 114 reachable) ✓, proposal passes `validate_proposal`
+      and `Kernel.import_events` ✓. Predicted MaxQ (intrinsic frontier peak) =
+      **26**; 12 intrinsic waves; under the N=4 constraint: **34 waves**, longest
+      wave 4; longest dependency chain depth 11. First gate run surfaced and
+      fixed a gate-internal wave-simulation bug (indegree recompute inverted —
+      reported peak 111/waves 2); corrected to 26/12 and cross-checked by an
+      independent simulation (waves [1,2,4,14,19,23,26,11,5,5,3,1] sum 114).
+      Harness scaffolded (`examples/swarm/`), smoke self-test PASSED (2
+      processes, 8 tasks, real files, S-invariants green in 0.6s).
 - [x] **Lung gate (2026-08-07): PASSED.** 4 independent OS processes × 50
       benign `create_task` appends (200 `task_created` events) to one scratch
       project via the public `Kernel` SDK, started simultaneously: all workers

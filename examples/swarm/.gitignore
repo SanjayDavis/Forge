@@ -1,0 +1,10 @@
+# Proof #5 (swarm) transient artifacts — never commit. Root-anchored so a
+# bare pattern can never match a source directory.
+/swarm.db
+/.proof-work/
+/demo/.frames/
+__pycache__/
+*.pyc
+*.pyo
+/build
+/dist

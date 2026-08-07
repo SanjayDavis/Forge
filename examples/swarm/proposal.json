@@ -1,0 +1,2796 @@
+{
+  "proposal_id": "prop_swarm_001",
+  "reason": "Proof #5: a 118-task multi-agent stress proof answering C4 (long projects) and C5 (multi-agent). One shared Forge project implemented by 4 concurrent agent processes across 9 subsystems (foundation, contract, storage, auth, gateway, worker, cli, observe, integration). Public SDK/CLI only; kernel frozen.",
+  "confidence": 0.8,
+  "events": [
+    {
+      "op": "task_created",
+      "id": "auth-claims",
+      "title": "token claims model",
+      "description": "swarm/auth/claims.py: make_claims(user_id, scopes, ttl_seconds=3600) -> dict {sub, scopes: [str], exp: unix}; parse_claims(d) validates presence/types and raises AuthError on missing exp.",
+      "acceptance": [
+        "make_claims roundtrips through parse_claims",
+        "exp is a future unix timestamp within ttl"
+      ],
+      "files": [
+        "swarm/auth/claims.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-constant-time",
+      "title": "constant-time signature compare",
+      "description": "swarm/auth/token.py: signature comparison must use hmac.compare_digest (never ==).",
+      "acceptance": [
+        "verify rejects a near-miss signature",
+        "source uses hmac.compare_digest for the signature check"
+      ],
+      "files": [
+        "swarm/auth/token.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-docs",
+      "title": "auth README",
+      "description": "swarm/auth/README.md: claims, token format, scope model, rotation policy.",
+      "acceptance": [
+        "swarm/auth/README.md exists and documents token format"
+      ],
+      "files": [
+        "swarm/auth/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-errors",
+      "title": "auth error hierarchy",
+      "description": "swarm/auth/errors.py: AuthError(SwarmError), InvalidToken(AuthError), TokenExpired(AuthError), InsufficientScope(AuthError, carries required scope).",
+      "acceptance": [
+        "all four classes derive from SwarmError via AuthError",
+        "InsufficientScope str() mentions the required scope"
+      ],
+      "files": [
+        "swarm/auth/errors.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-hmac",
+      "title": "HMAC token sign/verify (stdlib)",
+      "description": "swarm/auth/token.py: issue(secret, claims) -> token string '<b64payload>.<b64sig>' where sig = HMAC-SHA256(secret, payload); verify(secret, token) -> claims dict or raises InvalidToken/TokenExpired. No third-party deps (hmac, hashlib, base64, json).",
+      "acceptance": [
+        "issue then verify returns the claims",
+        "tampered payload raises InvalidToken",
+        "wrong secret raises InvalidToken"
+      ],
+      "files": [
+        "swarm/auth/token.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-rotate",
+      "title": "key rotation support",
+      "description": "swarm/auth/keys.py: KeyRing with current secret + list of retired secrets; verify accepts any active secret; issue uses current; retire(key) removes it.",
+      "acceptance": [
+        "token issued under old key verifies while old key active",
+        "after retire(old), that token raises InvalidToken"
+      ],
+      "files": [
+        "swarm/auth/keys.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-scopes",
+      "title": "scope checks",
+      "description": "swarm/auth/scopes.py: requires(claims, scope) raises InsufficientScope unless scope in claims['scopes']; SCOPES = ['admin', 'operator', 'read'].",
+      "acceptance": [
+        "requires passes when scope present",
+        "requires raises InsufficientScope when absent"
+      ],
+      "files": [
+        "swarm/auth/scopes.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-tests-claims",
+      "title": "claims tests",
+      "description": "tests/test_auth_claims.py: roundtrip, exp validity.",
+      "acceptance": [
+        "pytest tests/test_auth_claims.py passes"
+      ],
+      "files": [
+        "tests/test_auth_claims.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-tests-errors",
+      "title": "error tests",
+      "description": "tests/test_auth_errors.py: hierarchy + str rendering.",
+      "acceptance": [
+        "pytest tests/test_auth_errors.py passes"
+      ],
+      "files": [
+        "tests/test_auth_errors.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-tests-hmac",
+      "title": "HMAC tests",
+      "description": "tests/test_auth_token.py: issue/verify, tamper, wrong secret, expiry (exp in past -> TokenExpired).",
+      "acceptance": [
+        "pytest tests/test_auth_token.py passes"
+      ],
+      "files": [
+        "tests/test_auth_token.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-tests-rotate",
+      "title": "rotation tests",
+      "description": "tests/test_auth_keys.py: retire semantics.",
+      "acceptance": [
+        "pytest tests/test_auth_keys.py passes"
+      ],
+      "files": [
+        "tests/test_auth_keys.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "auth-tests-scopes",
+      "title": "scope tests",
+      "description": "tests/test_auth_scopes.py: pass/fail matrix.",
+      "acceptance": [
+        "pytest tests/test_auth_scopes.py passes"
+      ],
+      "files": [
+        "tests/test_auth_scopes.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: auth",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "ci-script",
+      "title": "scripts/ci.sh gate",
+      "description": "scripts/ci.sh: runs python -m compileall -q swarm tests, then pytest, then a smoke import of every subpackage; set -e; prints 'CI OK'. chmod +x.",
+      "acceptance": [
+        "bash scripts/ci.sh exits 0 on the skeleton",
+        "script is executable (shebang + chmod)"
+      ],
+      "files": [
+        "scripts/ci.sh"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-docs",
+      "title": "CLI README",
+      "description": "swarm/cli/README.md: command reference + exit codes.",
+      "acceptance": [
+        "swarm/cli/README.md exists with the command reference"
+      ],
+      "files": [
+        "swarm/cli/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-errors",
+      "title": "friendly CLI errors + exit codes",
+      "description": "swarm/cli/parser.py: usage errors exit 1 with message to stderr; runtime errors (NotFound etc.) exit 2 with 'error: <msg>'.",
+      "acceptance": [
+        "missing required arg exits 1",
+        "jobs retry on unknown id exits 2 with error message"
+      ],
+      "files": [
+        "swarm/cli/parser.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-events",
+      "title": "events subcommand",
+      "description": "swarm/cli/parser.py: events [-n N] tails recent events.",
+      "acceptance": [
+        "events -n 2 prints at most 2 events"
+      ],
+      "files": [
+        "swarm/cli/parser.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-jobs",
+      "title": "jobs subcommand",
+      "description": "swarm/cli/parser.py: jobs list [--status S] prints jobs; jobs retry <id> resets a failed job to todo.",
+      "acceptance": [
+        "jobs list prints created jobs",
+        "jobs retry flips a failed job to todo"
+      ],
+      "files": [
+        "swarm/cli/parser.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-output",
+      "title": "table/JSON output formatting",
+      "description": "swarm/cli/output.py: render_table(headers, rows) and render_json(obj); --json flag switches output.",
+      "acceptance": [
+        "render_table aligns columns",
+        "--json emits valid JSON"
+      ],
+      "files": [
+        "swarm/cli/output.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-parser",
+      "title": "admin CLI parser",
+      "description": "swarm/cli/parser.py: argparse with global --db PATH (default ./swarm.db) and subcommands users, jobs, events, status, retry.",
+      "acceptance": [
+        "python -m swarm.cli --help exits 0 and lists all 5 subcommands",
+        "unknown subcommand exits with code 2"
+      ],
+      "files": [
+        "swarm/cli/parser.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-tests-events",
+      "title": "events CLI tests",
+      "description": "tests/test_cli_events.py: tail limit.",
+      "acceptance": [
+        "pytest tests/test_cli_events.py passes"
+      ],
+      "files": [
+        "tests/test_cli_events.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-tests-jobs",
+      "title": "jobs CLI tests",
+      "description": "tests/test_cli_jobs.py: list + retry.",
+      "acceptance": [
+        "pytest tests/test_cli_jobs.py passes"
+      ],
+      "files": [
+        "tests/test_cli_jobs.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-tests-parser",
+      "title": "parser tests",
+      "description": "tests/test_cli_parser.py: subcommand dispatch + exit codes.",
+      "acceptance": [
+        "pytest tests/test_cli_parser.py passes"
+      ],
+      "files": [
+        "tests/test_cli_parser.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-tests-users",
+      "title": "users CLI tests",
+      "description": "tests/test_cli_users.py: create/list via subprocess or main() against tmp db.",
+      "acceptance": [
+        "pytest tests/test_cli_users.py passes"
+      ],
+      "files": [
+        "tests/test_cli_users.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "cli-users",
+      "title": "users subcommand",
+      "description": "swarm/cli/parser.py: users list prints id/name/role table; users create <id> <name> <role> inserts.",
+      "acceptance": [
+        "users create then users list shows the new user"
+      ],
+      "files": [
+        "swarm/cli/parser.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: cli",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-codec",
+      "title": "canonical JSON codec",
+      "description": "swarm/contract/codec.py: to_json(msg) -> str (canonical key order, ensure_ascii=False, sort_keys=True) and from_json(text, cls) -> dataclass instance; unknown top-level keys ignored by default.",
+      "acceptance": [
+        "to_json/from_json roundtrip preserves all fields",
+        "output key order is sorted (canonical)",
+        "from_json ignores unknown top-level keys"
+      ],
+      "files": [
+        "swarm/contract/codec.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-docs",
+      "title": "contract README",
+      "description": "swarm/contract/README.md: message catalog (UserMsg/JobMsg/EventMsg), wire version, strict/lenient policy, size limit.",
+      "acceptance": [
+        "swarm/contract/README.md exists and documents the message catalog"
+      ],
+      "files": [
+        "swarm/contract/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-errors",
+      "title": "ContractError with field context",
+      "description": "swarm/contract/errors.py: ContractError(SwarmError) with msg, field, value attributes; str() renders 'field <field>: <msg>'.",
+      "acceptance": [
+        "ContractError('required', 'name', None).str() contains 'name' and 'required'",
+        "ContractError is a SwarmError subclass"
+      ],
+      "files": [
+        "swarm/contract/errors.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-iso-time",
+      "title": "ISO8601 UTC time helpers",
+      "description": "swarm/contract/timeutil.py: parse_iso(s) -> datetime (requires UTC or Z), format_iso(dt) -> 'YYYY-MM-DDTHH:MM:SS.mmmZ' (UTC).",
+      "acceptance": [
+        "parse_iso(format_iso(utcnow)) roundtrips to same instant",
+        "parse_iso rejects naive local time (no tzinfo)"
+      ],
+      "files": [
+        "swarm/contract/timeutil.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-nested",
+      "title": "nested payload validation",
+      "description": "swarm/contract/validate.py: validate_job_payload(payload, kind) — kind 'echo' requires payload {'text': str}; kind 'add' requires {'a': number, 'b': number}; unknown kind raises ContractError field='kind'.",
+      "acceptance": [
+        "echo with text passes; without raises ContractError",
+        "add with numbers passes; with strings raises",
+        "unknown kind raises ContractError field='kind'"
+      ],
+      "files": [
+        "swarm/contract/validate.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-schema",
+      "title": "wire message schema dataclasses",
+      "description": "swarm/contract/schema.py: frozen dataclasses UserMsg(id: str, name: str, role: str), JobMsg(id: str, user_id: str, kind: str, payload: dict, status: str), EventMsg(id: str, type: str, data: dict, ts: str). as_dict() returns dict with canonical key order; repr is deterministic.",
+      "acceptance": [
+        "UserMsg('u1','Ada','admin').as_dict() == {'id':'u1','name':'Ada','role':'admin'}",
+        "dataclasses are frozen (no mutation)",
+        "JobMsg accepts arbitrary payload dict"
+      ],
+      "files": [
+        "swarm/contract/schema.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-size-limit",
+      "title": "message size limit guard",
+      "description": "swarm/contract/limits.py: MAX_MESSAGE_BYTES = 65536; enforce_size(text) raises ContractError when len(text.encode()) exceeds the limit.",
+      "acceptance": [
+        "65536-byte payload raises ContractError",
+        "small payload passes"
+      ],
+      "files": [
+        "swarm/contract/limits.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-codec",
+      "title": "codec tests",
+      "description": "tests/test_contract_codec.py: roundtrips for all three messages, canonical ordering, unknown-key ignore.",
+      "acceptance": [
+        "pytest tests/test_contract_codec.py passes"
+      ],
+      "files": [
+        "tests/test_contract_codec.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-iso",
+      "title": "time helper tests",
+      "description": "tests/test_contract_timeutil.py: roundtrip, tz rejection.",
+      "acceptance": [
+        "pytest tests/test_contract_timeutil.py passes"
+      ],
+      "files": [
+        "tests/test_contract_timeutil.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-limit",
+      "title": "size limit tests",
+      "description": "tests/test_contract_limits.py: boundary at 65536 bytes.",
+      "acceptance": [
+        "pytest tests/test_contract_limits.py passes"
+      ],
+      "files": [
+        "tests/test_contract_limits.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-schema",
+      "title": "schema tests",
+      "description": "tests/test_contract_schema.py covering as_dict order, frozen dataclasses, JobMsg payload dict.",
+      "acceptance": [
+        "pytest tests/test_contract_schema.py passes"
+      ],
+      "files": [
+        "tests/test_contract_schema.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-unknown",
+      "title": "strict-mode tests",
+      "description": "tests/test_contract_unknown.py: lenient default vs strict rejection.",
+      "acceptance": [
+        "pytest tests/test_contract_unknown.py passes"
+      ],
+      "files": [
+        "tests/test_contract_unknown.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-validate",
+      "title": "validation tests",
+      "description": "tests/test_contract_validate.py: each rule failure asserts field context; valid messages pass.",
+      "acceptance": [
+        "pytest tests/test_contract_validate.py passes"
+      ],
+      "files": [
+        "tests/test_contract_validate.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-tests-version",
+      "title": "versioning tests",
+      "description": "tests/test_contract_version.py: roundtrip, v1 ok, v0/v2 rejected.",
+      "acceptance": [
+        "pytest tests/test_contract_version.py passes"
+      ],
+      "files": [
+        "tests/test_contract_version.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-unknown-fields",
+      "title": "unknown-field policy (ignore / strict)",
+      "description": "swarm/contract/codec.py: add strict mode — from_json(text, cls, strict=True) raises ContractError on unknown top-level keys; default stays lenient.",
+      "acceptance": [
+        "strict=True rejects unknown key",
+        "default ignores unknown key"
+      ],
+      "files": [
+        "swarm/contract/codec.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-validate",
+      "title": "message validation rules",
+      "description": "swarm/contract/validate.py: validate(msg) checks required fields non-empty, role in {admin, operator, read}, status in {todo, running, done, failed}, ts parses as ISO8601; raises ContractError with field context on first violation.",
+      "acceptance": [
+        "missing id raises ContractError field='id'",
+        "bad role raises ContractError field='role'",
+        "valid message passes without error"
+      ],
+      "files": [
+        "swarm/contract/validate.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "contract-versioning",
+      "title": "wire version header + check",
+      "description": "swarm/contract/version.py: WIRE_VERSION = 1; encode(text, version) prefixes 'v1:' ; check_version(header) returns int or raises ContractError for unsupported versions.",
+      "acceptance": [
+        "encode/decode roundtrip at version 1",
+        "check_version('v1') == 1",
+        "check_version('v0') raises ContractError"
+      ],
+      "files": [
+        "swarm/contract/version.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: contract",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "foundation-tests",
+      "title": "foundation unit tests",
+      "description": "tests/test_foundation.py: cover version-module, shared-errors (str rendering, detail), shared-utils (utcnow_iso roundtrip, slugify cases, ensure_dir).",
+      "acceptance": [
+        "pytest tests/test_foundation.py passes",
+        "each util/error/version behavior has >= 1 assertion"
+      ],
+      "files": [
+        "tests/test_foundation.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-app",
+      "title": "WSGI application factory",
+      "description": "swarm/gateway/app.py: create_app(storage_path) -> callable WSGI app wiring routers, auth guard, error handler, /healthz. Uses wsgiref-compatible plain WSGI (stdlib only).",
+      "acceptance": [
+        "create_app returns a callable(environ, start_response)",
+        "GET /healthz on the app returns 200 and JSON {\"ok\": true}"
+      ],
+      "files": [
+        "swarm/gateway/app.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-auth-guard",
+      "title": "Bearer token auth guard",
+      "description": "swarm/gateway/guard.py: wrap(app, keyring) middleware — requests with Authorization: Bearer <token> are verified; /healthz is public; missing/invalid token -> 401 JSON; claims exposed via environ['swarm.identity'].",
+      "acceptance": [
+        "no token -> 401 JSON",
+        "valid token passes and sets environ['swarm.identity']",
+        "/healthz bypasses auth"
+      ],
+      "files": [
+        "swarm/gateway/guard.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-docs",
+      "title": "gateway README",
+      "description": "swarm/gateway/README.md: route table, auth, rate limits, error shape.",
+      "acceptance": [
+        "swarm/gateway/README.md exists with the route table"
+      ],
+      "files": [
+        "swarm/gateway/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-errors",
+      "title": "JSON error responses",
+      "description": "swarm/gateway/errors.py: error_response(start_response, status, code, message) -> bytes {'error': code, 'message': message}; maps SwarmError subclasses to status codes.",
+      "acceptance": [
+        "error_response produces the right status + JSON shape",
+        "NotFound maps to 404, ContractError to 400, AuthError to 401"
+      ],
+      "files": [
+        "swarm/gateway/errors.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-logging",
+      "title": "request logging via observe",
+      "description": "swarm/gateway/log.py: middleware logging method, path, status, duration_ms through swarm.observe.logging.get_logger('gateway').",
+      "acceptance": [
+        "a request through the logging middleware emits one structured log line"
+      ],
+      "files": [
+        "swarm/gateway/log.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-rate-limit",
+      "title": "in-memory per-IP rate limit",
+      "description": "swarm/gateway/ratelimit.py: TokenBucket per client IP (10 req / 10s) in a dict with periodic cleanup; exceeded -> 429 JSON.",
+      "acceptance": [
+        "11th request within the window -> 429",
+        "window expiry resets the bucket"
+      ],
+      "files": [
+        "swarm/gateway/ratelimit.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-routes-events",
+      "title": "events router",
+      "description": "swarm/gateway/routes_events.py: GET /events?limit=N returns recent events.",
+      "acceptance": [
+        "GET /events returns events newest-first",
+        "limit parameter is honored"
+      ],
+      "files": [
+        "swarm/gateway/routes_events.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-routes-jobs",
+      "title": "jobs router",
+      "description": "swarm/gateway/routes_jobs.py: POST /jobs {user_id, kind, payload} creates job + 201; GET /jobs/<id> returns job or 404.",
+      "acceptance": [
+        "POST /jobs returns 201 with the job id",
+        "GET /jobs/<id> returns the job; unknown id -> 404"
+      ],
+      "files": [
+        "swarm/gateway/routes_jobs.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-routes-users",
+      "title": "users router",
+      "description": "swarm/gateway/routes_users.py: handle(environ, start_response, repo) — POST /users {id,name,role} creates + returns 201; GET /users returns list.",
+      "acceptance": [
+        "POST /users returns 201 and the created user",
+        "GET /users returns the stored users"
+      ],
+      "files": [
+        "swarm/gateway/routes_users.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-serialization",
+      "title": "request/response codec wiring",
+      "description": "swarm/gateway/serialize.py: json_body(environ) -> dict (decodes + validates via contract codec), respond(start_response, status, payload) -> bytes with application/json content-type.",
+      "acceptance": [
+        "json_body parses a JSON request body",
+        "respond emits correct status line and JSON bytes"
+      ],
+      "files": [
+        "swarm/gateway/serialize.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-tests-app",
+      "title": "app factory tests",
+      "description": "tests/test_gateway_app.py: /healthz 200 + JSON; app is callable.",
+      "acceptance": [
+        "pytest tests/test_gateway_app.py passes"
+      ],
+      "files": [
+        "tests/test_gateway_app.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-tests-auth",
+      "title": "auth guard tests",
+      "description": "tests/test_gateway_guard.py: 401 without token, pass with token, /healthz public.",
+      "acceptance": [
+        "pytest tests/test_gateway_guard.py passes"
+      ],
+      "files": [
+        "tests/test_gateway_guard.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-tests-ratelimit",
+      "title": "rate limit tests",
+      "description": "tests/test_gateway_ratelimit.py: 429 path + reset.",
+      "acceptance": [
+        "pytest tests/test_gateway_ratelimit.py passes"
+      ],
+      "files": [
+        "tests/test_gateway_ratelimit.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-tests-routes",
+      "title": "routes tests (WSGI client)",
+      "description": "tests/test_gateway_routes.py: users + jobs + events routes via a minimal WSGI test client against a tmp db.",
+      "acceptance": [
+        "pytest tests/test_gateway_routes.py passes"
+      ],
+      "files": [
+        "tests/test_gateway_routes.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-tests-validation",
+      "title": "validation tests",
+      "description": "tests/test_gateway_validate.py: 400 on invalid body with field context.",
+      "acceptance": [
+        "pytest tests/test_gateway_validate.py passes"
+      ],
+      "files": [
+        "tests/test_gateway_validate.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "gw-validation",
+      "title": "request validation wiring",
+      "description": "swarm/gateway/validate.py: validate_request(method, path, body) using contract validation; bad requests -> 400 with field context.",
+      "acceptance": [
+        "invalid body returns 400 with field in the error",
+        "valid body passes"
+      ],
+      "files": [
+        "swarm/gateway/validate.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: gateway",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-demo-script",
+      "title": "demo driver script",
+      "description": "demo/run_demo.py: drives the e2e scenario with visible console output (timestamps, per-step prints) against a fresh tmp db, exits 0.",
+      "acceptance": [
+        "python demo/run_demo.py exits 0 and prints the full lifecycle"
+      ],
+      "files": [
+        "demo/run_demo.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-e2e",
+      "title": "full lifecycle end-to-end",
+      "description": "tests/test_integration_e2e.py: create user -> auth token -> submit echo job via gateway -> worker completes -> GET /jobs/<id> shows done -> GET /events shows the event -> CLI status shows counts.",
+      "acceptance": [
+        "pytest tests/test_integration_e2e.py passes"
+      ],
+      "files": [
+        "tests/test_integration_e2e.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-gateway-worker",
+      "title": "gateway submit -> worker processes",
+      "description": "tests/test_integration_gateway_worker.py: create user, POST /jobs via WSGI client, run worker run_once, assert job done and an event recorded.",
+      "acceptance": [
+        "pytest tests/test_integration_gateway_worker.py passes"
+      ],
+      "files": [
+        "tests/test_integration_gateway_worker.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-readme",
+      "title": "README.md (8 proof sections)",
+      "description": "README.md for the proof with all 8 PROOF_SPEC sections: What was built, Why this proof exists, Final architecture, Commands, Reproduce, Artifact index, Behavior notes, Lessons learned.",
+      "acceptance": [
+        "README.md contains all 8 required sections",
+        "Commands section references run_agents.py and demo/run_demo.py"
+      ],
+      "files": [
+        "README.md"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-repro",
+      "title": "reproduction script",
+      "description": "scripts/reproduce.sh: init db, run the full pytest suite, run demo, print summary; set -e.",
+      "acceptance": [
+        "bash scripts/reproduce.sh exits 0 on a clean tree"
+      ],
+      "files": [
+        "scripts/reproduce.sh"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-storage-contract",
+      "title": "storage rows <-> contract messages",
+      "description": "swarm/integration/mapping.py: job_row_to_msg(row) -> JobMsg and msg_to_job_row(msg); integration tests assert the mapping survives a storage roundtrip.",
+      "acceptance": [
+        "a JobMsg stored as a row and read back maps to an equal JobMsg",
+        "mapping tests pass under pytest"
+      ],
+      "files": [
+        "swarm/integration/mapping.py",
+        "tests/test_integration_mapping.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "int-verify-matrix",
+      "title": "verification gate matrix",
+      "description": "scripts/verify.sh: runs compileall, full pytest, demo script, and the DAG invariants check; prints 'ALL GREEN'.",
+      "acceptance": [
+        "bash scripts/verify.sh exits 0 and prints 'ALL GREEN'"
+      ],
+      "files": [
+        "scripts/verify.sh"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: integration",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "makefile",
+      "title": "Makefile targets",
+      "description": "Makefile with targets: test (pytest), lint (python -m compileall -q swarm tests), clean (rm -rf __pycache__ build dist), help (lists targets).",
+      "acceptance": [
+        "make test runs pytest and exits 0",
+        "make lint exits 0 on the empty skeleton",
+        "make help prints target names"
+      ],
+      "files": [
+        "Makefile"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-context",
+      "title": "request-id propagation",
+      "description": "swarm/observe/context.py: contextvars-based request_id; set_request_id(), get_request_id(); logging middleware injects it into structured lines.",
+      "acceptance": [
+        "set/get roundtrip within one context",
+        "log lines carry the active request_id"
+      ],
+      "files": [
+        "swarm/observe/context.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-docs",
+      "title": "observe README",
+      "description": "swarm/observe/README.md: logging format, metric types, request-id flow.",
+      "acceptance": [
+        "swarm/observe/README.md exists and documents the log line format"
+      ],
+      "files": [
+        "swarm/observe/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-endpoint",
+      "title": "metrics text renderer",
+      "description": "swarm/observe/render.py: render_metrics(registry) -> str in Prometheus text format (name{labels} value).",
+      "acceptance": [
+        "render output lines are 'name{label=\"v\"} value' shaped",
+        "renders counters and gauges"
+      ],
+      "files": [
+        "swarm/observe/render.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-logging",
+      "title": "structured JSON logging",
+      "description": "swarm/observe/logging.py: get_logger(name) -> stdlib logging.Logger with a JSON formatter emitting one JSON object per line {ts, level, logger, msg, **extra}; configure(level).",
+      "acceptance": [
+        "a log line parses as JSON with ts/level/logger keys",
+        "extra kwargs appear as top-level JSON fields"
+      ],
+      "files": [
+        "swarm/observe/logging.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-metrics",
+      "title": "metrics registry",
+      "description": "swarm/observe/metrics.py: Registry with counter(name, labels=None) increment and gauge(name, value, labels); snapshot() -> list of (name, labels, value).",
+      "acceptance": [
+        "counter increments accumulate",
+        "snapshot reflects counters and gauges"
+      ],
+      "files": [
+        "swarm/observe/metrics.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-tests-context",
+      "title": "context tests",
+      "description": "tests/test_observe_context.py: propagation + isolation across contexts.",
+      "acceptance": [
+        "pytest tests/test_observe_context.py passes"
+      ],
+      "files": [
+        "tests/test_observe_context.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-tests-logging",
+      "title": "logging tests",
+      "description": "tests/test_observe_logging.py: JSON shape + extra fields.",
+      "acceptance": [
+        "pytest tests/test_observe_logging.py passes"
+      ],
+      "files": [
+        "tests/test_observe_logging.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-tests-metrics",
+      "title": "metrics tests",
+      "description": "tests/test_observe_metrics.py: counters, gauges, snapshot.",
+      "acceptance": [
+        "pytest tests/test_observe_metrics.py passes"
+      ],
+      "files": [
+        "tests/test_observe_metrics.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-tests-render",
+      "title": "renderer tests",
+      "description": "tests/test_observe_render.py: text format lines.",
+      "acceptance": [
+        "pytest tests/test_observe_render.py passes"
+      ],
+      "files": [
+        "tests/test_observe_render.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "obs-threshold",
+      "title": "alert threshold counters",
+      "description": "swarm/observe/threshold.py: ThresholdCounter(registry, name, limit) — inc() returns True when crossing the limit (once), exposing a boolean alert flag in the registry.",
+      "acceptance": [
+        "crossing the limit returns True exactly once",
+        "alert flag appears in snapshot"
+      ],
+      "files": [
+        "swarm/observe/threshold.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: observe",
+        "owner: agent-d (observe+integration)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "pytest-setup",
+      "title": "pytest configuration + conftest fixtures",
+      "description": "pyproject.toml [tool.pytest.ini_options] with testpaths=['tests'], addopts='-q'; tests/ dir with tests/conftest.py providing fixtures: tmp_swarm (tmp_path-based project dir), db_path (fresh sqlite file path).",
+      "acceptance": [
+        "pytest --collect-only exits 0 and finds tests/test_foundation.py",
+        "conftest.py defines fixtures tmp_swarm and db_path"
+      ],
+      "files": [
+        "pyproject.toml",
+        "tests/conftest.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "shared-errors",
+      "title": "shared SwarmError base",
+      "description": "swarm/errors.py: class SwarmError(Exception) with optional detail dict; str() renders message plus detail. Every module-specific error in the project derives from SwarmError.",
+      "acceptance": [
+        "SwarmError('boom', {'k': 1}) str() contains 'boom' and 'k'",
+        "tests import SwarmError from swarm.errors"
+      ],
+      "files": [
+        "swarm/errors.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "shared-utils",
+      "title": "shared utilities",
+      "description": "swarm/util.py: utcnow_iso() -> ISO8601 UTC string with Z suffix; slugify(text) -> ascii kebab; ensure_dir(path) mkdir -p.",
+      "acceptance": [
+        "utcnow_iso() parses back with datetime.fromisoformat and ends with Z",
+        "slugify('Hello, World!') == 'hello-world'",
+        "ensure_dir creates nested dirs idempotently"
+      ],
+      "files": [
+        "swarm/util.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-bench",
+      "title": "insert throughput sanity bench",
+      "description": "scripts/bench_storage.py: inserts 1000 jobs via JobRepo and asserts wall time < 5s, printing rows/sec.",
+      "acceptance": [
+        "python scripts/bench_storage.py exits 0 and prints rows/sec"
+      ],
+      "files": [
+        "scripts/bench_storage.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-conn",
+      "title": "connection context manager (WAL)",
+      "description": "swarm/storage/conn.py: connect(path) -> sqlite3.Connection with PRAGMA journal_mode=WAL, foreign_keys=ON; Database context manager class managing open/close and a thread-local connection.",
+      "acceptance": [
+        "journal_mode == 'wal' after connect",
+        "context manager closes the connection on exit"
+      ],
+      "files": [
+        "swarm/storage/conn.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-ddl",
+      "title": "SQLite schema DDL",
+      "description": "swarm/storage/ddl.py: SCHEMA_SQL string with CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY, name TEXT NOT NULL, role TEXT NOT NULL), jobs(id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL, status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL), events(id TEXT PRIMARY KEY, type TEXT NOT NULL, data TEXT NOT NULL, ts TEXT NOT NULL); plus indexes on jobs(status), events(ts).",
+      "acceptance": [
+        "executing SCHEMA_SQL twice on the same connection is idempotent",
+        "PRAGMA table_info reports the 8 jobs columns"
+      ],
+      "files": [
+        "swarm/storage/ddl.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-docs",
+      "title": "storage README",
+      "description": "swarm/storage/README.md: schema overview, repo API, claim semantics, migration policy.",
+      "acceptance": [
+        "swarm/storage/README.md exists and documents claim semantics"
+      ],
+      "files": [
+        "swarm/storage/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-errors",
+      "title": "storage error hierarchy",
+      "description": "swarm/storage/errors.py: StorageError(SwarmError), NotFound(StorageError, carries id), ConstraintViolation(StorageError).",
+      "acceptance": [
+        "NotFound('user','u1') str() contains 'user' and 'u1'",
+        "both subclasses derive from StorageError"
+      ],
+      "files": [
+        "swarm/storage/errors.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-init",
+      "title": "idempotent database init",
+      "description": "swarm/storage/init.py: init_db(conn) applies SCHEMA_SQL and sets PRAGMA user_version = 1; safe to call repeatedly.",
+      "acceptance": [
+        "init_db twice raises no error",
+        "PRAGMA user_version == 1 after init"
+      ],
+      "files": [
+        "swarm/storage/init.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-migrations",
+      "title": "versioned migration runner",
+      "description": "swarm/storage/migrations.py: MIGRATIONS = [(1, SCHEMA_SQL)]; migrate(conn) applies pending migrations in order and bumps user_version; upgrade path from version 0.",
+      "acceptance": [
+        "migrate on a fresh db ends at latest version",
+        "migrate on an already-current db is a no-op"
+      ],
+      "files": [
+        "swarm/storage/migrations.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-repo-events",
+      "title": "events repository",
+      "description": "swarm/storage/events.py: EventRepo(conn) with append(event_id, type, data, ts), recent(limit=50) newest-first, list_by_type(type, limit=50).",
+      "acceptance": [
+        "append then recent returns the event first",
+        "recent respects limit and ordering",
+        "list_by_type filters correctly"
+      ],
+      "files": [
+        "swarm/storage/events.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-repo-jobs",
+      "title": "jobs repository with atomic claim",
+      "description": "swarm/storage/jobs.py: JobRepo(conn) with create(job_id, user_id, kind, payload), get(job_id), claim() — atomically sets one todo job to running (UPDATE ... WHERE status='todo' RETURNING, or immediate transaction) and returns it or None; complete(job_id) sets status=done, updated_at; fail(job_id, reason) sets status=failed, attempts=attempts+1.",
+      "acceptance": [
+        "claim() returns exactly one todo job and flips it to running",
+        "two sequential claim() calls return different jobs (no double-claim)",
+        "fail() increments attempts"
+      ],
+      "files": [
+        "swarm/storage/jobs.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-repo-users",
+      "title": "users repository",
+      "description": "swarm/storage/users.py: UserRepo(conn) with create(user_id, name, role), get(user_id) (raises NotFound), list(limit=100), delete(user_id) (raises NotFound if absent).",
+      "acceptance": [
+        "create then get returns the row with matching fields",
+        "get on missing id raises NotFound",
+        "list returns rows newest-first"
+      ],
+      "files": [
+        "swarm/storage/users.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-conn",
+      "title": "connection tests",
+      "description": "tests/test_storage_conn.py: WAL mode, context close, foreign_keys on.",
+      "acceptance": [
+        "pytest tests/test_storage_conn.py passes"
+      ],
+      "files": [
+        "tests/test_storage_conn.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-ddl",
+      "title": "DDL tests",
+      "description": "tests/test_storage_ddl.py: idempotency + column inventory.",
+      "acceptance": [
+        "pytest tests/test_storage_ddl.py passes"
+      ],
+      "files": [
+        "tests/test_storage_ddl.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-events",
+      "title": "events repo tests",
+      "description": "tests/test_storage_events.py: append/recent/list_by_type.",
+      "acceptance": [
+        "pytest tests/test_storage_events.py passes"
+      ],
+      "files": [
+        "tests/test_storage_events.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-jobs",
+      "title": "jobs repo tests (atomicity)",
+      "description": "tests/test_storage_jobs.py: claim atomicity — open two connections, claim from both, assert disjoint results and no double-claim; complete/fail transitions; attempts increment.",
+      "acceptance": [
+        "pytest tests/test_storage_jobs.py passes",
+        "the two-connection claim test is included"
+      ],
+      "files": [
+        "tests/test_storage_jobs.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-migrations",
+      "title": "migration tests",
+      "description": "tests/test_storage_migrations.py: fresh + already-current cases.",
+      "acceptance": [
+        "pytest tests/test_storage_migrations.py passes"
+      ],
+      "files": [
+        "tests/test_storage_migrations.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-txn",
+      "title": "transaction tests",
+      "description": "tests/test_storage_txn.py: commit vs rollback.",
+      "acceptance": [
+        "pytest tests/test_storage_txn.py passes"
+      ],
+      "files": [
+        "tests/test_storage_txn.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-tests-users",
+      "title": "users repo tests",
+      "description": "tests/test_storage_users.py: CRUD + NotFound paths.",
+      "acceptance": [
+        "pytest tests/test_storage_users.py passes"
+      ],
+      "files": [
+        "tests/test_storage_users.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "storage-transactions",
+      "title": "transaction context manager",
+      "description": "swarm/storage/txn.py: transaction(conn) context manager committing on success, rolling back on exception.",
+      "acceptance": [
+        "committed writes persist after context exit",
+        "exception inside the block rolls back all writes"
+      ],
+      "files": [
+        "swarm/storage/txn.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: storage",
+        "owner: agent-b (storage+auth)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "swarm-pkg-layout",
+      "title": "subpackage layout",
+      "description": "Create swarm/contract, swarm/storage, swarm/auth, swarm/gateway, swarm/worker, swarm/cli, swarm/observe subpackages, each with an __init__.py (empty docstring for now).",
+      "acceptance": [
+        "python -c 'import swarm.contract, swarm.storage, swarm.auth, swarm.gateway, swarm.worker, swarm.cli, swarm.observe' succeeds",
+        "each subpackage __init__.py exists"
+      ],
+      "files": [
+        "swarm/contract/__init__.py",
+        "swarm/storage/__init__.py",
+        "swarm/auth/__init__.py",
+        "swarm/gateway/__init__.py",
+        "swarm/worker/__init__.py",
+        "swarm/cli/__init__.py",
+        "swarm/observe/__init__.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "swarm-skeleton",
+      "title": "swarm repository skeleton",
+      "description": "Create examples/swarm/ as a Python project: pyproject.toml declaring package swarm, .gitignore with root-anchored patterns (/events.log, /events.lock, /demo/.frames/, __pycache__/, *.pyc — bare patterns that could match source dirs are forbidden), and swarm/__init__.py placeholder.",
+      "acceptance": [
+        "pyproject.toml parses with tomllib and declares project name 'swarm'",
+        ".gitignore patterns are root-anchored (leading /) and never bare like 'target'",
+        "python -c 'import swarm' succeeds from the repo root"
+      ],
+      "files": [
+        "pyproject.toml",
+        ".gitignore",
+        "swarm/__init__.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "version-module",
+      "title": "swarm version module",
+      "description": "swarm/__init__.py exports __version__ = '0.1.0' and __version_info__ = (0, 1, 0).",
+      "acceptance": [
+        "swarm.__version__ == '0.1.0'",
+        "swarm.__version_info__ == (0, 1, 0)"
+      ],
+      "files": [
+        "swarm/__init__.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: foundation",
+        "owner: agent-a (foundation+contract+gateway)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-docs",
+      "title": "worker README",
+      "description": "swarm/worker/README.md: dispatch kinds, poll/execute loop, retry policy, pool lifecycle.",
+      "acceptance": [
+        "swarm/worker/README.md exists and documents the retry policy"
+      ],
+      "files": [
+        "swarm/worker/README.md"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-errors",
+      "title": "worker errors",
+      "description": "swarm/worker/errors.py: WorkerError(SwarmError), JobExecutionError(WorkerError, carries job_id and kind).",
+      "acceptance": [
+        "JobExecutionError('j1','echo') str() contains 'j1' and 'echo'"
+      ],
+      "files": [
+        "swarm/worker/errors.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-exec",
+      "title": "single-job executor",
+      "description": "swarm/worker/executor.py: run_once(conn, job_fn=JOB_KINDS) — poll, execute, complete(job_id) on success; on failure fail(job_id, reason) with attempt counter; writes an event row via EventRepo on completion.",
+      "acceptance": [
+        "successful run marks the job done and appends an event",
+        "failing kind marks the job failed and increments attempts",
+        "empty queue is a silent no-op"
+      ],
+      "files": [
+        "swarm/worker/executor.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-graceful",
+      "title": "graceful shutdown drain",
+      "description": "swarm/worker/pool.py: stop(wait=True) drains in-flight jobs; wait=False interrupts. Documented drain semantics in docstring.",
+      "acceptance": [
+        "stop(wait=True) blocks until in-flight job finishes",
+        "stop(wait=False) returns promptly"
+      ],
+      "files": [
+        "swarm/worker/pool.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-job-fn",
+      "title": "job dispatch table",
+      "description": "swarm/worker/jobs.py: JOB_KINDS = {'echo': fn_echo, 'add': fn_add}; fn_echo(payload) returns {'echo': payload['text']}; fn_add(payload) returns {'sum': a+b}; unknown kind raises ValueError.",
+      "acceptance": [
+        "fn_echo returns {'echo': ...}",
+        "fn_add returns {'sum': ...}",
+        "unknown kind raises ValueError"
+      ],
+      "files": [
+        "swarm/worker/jobs.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-poll",
+      "title": "job polling via atomic claim",
+      "description": "swarm/worker/poll.py: next_ready_job(conn) -> row | None using JobRepo.claim() (atomic todo->running).",
+      "acceptance": [
+        "next_ready_job returns a running-status job row",
+        "returns None when the queue is empty"
+      ],
+      "files": [
+        "swarm/worker/poll.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-pool",
+      "title": "N-thread worker pool",
+      "description": "swarm/worker/pool.py: WorkerPool(n=2, conn_factory) — n threads each looping run_once; start()/stop() lifecycle; stop drains the current job before joining.",
+      "acceptance": [
+        "pool processes >= 1 queued job to completion",
+        "stop() returns and all threads exit"
+      ],
+      "files": [
+        "swarm/worker/pool.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-queue",
+      "title": "bounded in-process queue",
+      "description": "swarm/worker/queue.py: class JobQueue with put(job_id) (blocking when full, maxsize=100), get(timeout) -> job_id | None.",
+      "acceptance": [
+        "put/get roundtrip in FIFO order",
+        "get with timeout returns None when empty"
+      ],
+      "files": [
+        "swarm/worker/queue.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-retry",
+      "title": "retry with backoff",
+      "description": "swarm/worker/retry.py: RETRY_LIMIT = 3; requeue_failed(conn, delay_fn) — failed jobs with attempts < RETRY_LIMIT are set back to todo; attempts >= limit stay failed.",
+      "acceptance": [
+        "failed job with attempts=1 is requeued to todo",
+        "failed job with attempts=3 stays failed"
+      ],
+      "files": [
+        "swarm/worker/retry.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-tests-exec",
+      "title": "executor tests",
+      "description": "tests/test_worker_executor.py: success path (done + event), failure path (failed + attempts), empty queue no-op.",
+      "acceptance": [
+        "pytest tests/test_worker_executor.py passes"
+      ],
+      "files": [
+        "tests/test_worker_executor.py"
+      ],
+      "priority": "high",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-tests-job-fn",
+      "title": "job fn tests",
+      "description": "tests/test_worker_jobs.py: echo/add/unknown-kind.",
+      "acceptance": [
+        "pytest tests/test_worker_jobs.py passes"
+      ],
+      "files": [
+        "tests/test_worker_jobs.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-tests-poll",
+      "title": "poll tests",
+      "description": "tests/test_worker_poll.py: claim semantics — two polls never return the same todo job.",
+      "acceptance": [
+        "pytest tests/test_worker_poll.py passes"
+      ],
+      "files": [
+        "tests/test_worker_poll.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-tests-pool",
+      "title": "pool tests",
+      "description": "tests/test_worker_pool.py: pool completes queued jobs; stop exits.",
+      "acceptance": [
+        "pytest tests/test_worker_pool.py passes"
+      ],
+      "files": [
+        "tests/test_worker_pool.py"
+      ],
+      "priority": "medium",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "task_created",
+      "id": "worker-tests-retry",
+      "title": "retry tests",
+      "description": "tests/test_worker_retry.py: requeue threshold.",
+      "acceptance": [
+        "pytest tests/test_worker_retry.py passes"
+      ],
+      "files": [
+        "tests/test_worker_retry.py"
+      ],
+      "priority": "low",
+      "notes": [
+        "subsystem: worker",
+        "owner: agent-c (worker+cli)"
+      ]
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-claims",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-constant-time",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-docs",
+      "depends_on": "auth-tests-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-hmac",
+      "depends_on": "auth-claims"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-hmac",
+      "depends_on": "auth-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-rotate",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-scopes",
+      "depends_on": "auth-claims"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-scopes",
+      "depends_on": "auth-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-tests-claims",
+      "depends_on": "auth-claims"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-tests-errors",
+      "depends_on": "auth-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-tests-hmac",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-tests-rotate",
+      "depends_on": "auth-rotate"
+    },
+    {
+      "op": "dependency_added",
+      "task": "auth-tests-scopes",
+      "depends_on": "auth-scopes"
+    },
+    {
+      "op": "dependency_added",
+      "task": "ci-script",
+      "depends_on": "pytest-setup"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-docs",
+      "depends_on": "cli-tests-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-errors",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-events",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-jobs",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-jobs",
+      "depends_on": "worker-retry"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-output",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-parser",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-tests-events",
+      "depends_on": "cli-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-tests-jobs",
+      "depends_on": "cli-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-tests-parser",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-tests-users",
+      "depends_on": "cli-users"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-users",
+      "depends_on": "cli-parser"
+    },
+    {
+      "op": "dependency_added",
+      "task": "cli-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-codec",
+      "depends_on": "contract-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-codec",
+      "depends_on": "contract-schema"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-docs",
+      "depends_on": "contract-tests-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-iso-time",
+      "depends_on": "contract-schema"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-nested",
+      "depends_on": "contract-validate"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-schema",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-size-limit",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-codec",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-iso",
+      "depends_on": "contract-iso-time"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-limit",
+      "depends_on": "contract-size-limit"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-schema",
+      "depends_on": "contract-schema"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-unknown",
+      "depends_on": "contract-unknown-fields"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-validate",
+      "depends_on": "contract-validate"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-tests-version",
+      "depends_on": "contract-versioning"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-unknown-fields",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-validate",
+      "depends_on": "contract-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-validate",
+      "depends_on": "contract-schema"
+    },
+    {
+      "op": "dependency_added",
+      "task": "contract-versioning",
+      "depends_on": "contract-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "foundation-tests",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "foundation-tests",
+      "depends_on": "shared-utils"
+    },
+    {
+      "op": "dependency_added",
+      "task": "foundation-tests",
+      "depends_on": "version-module"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-app",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-app",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-app",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-auth-guard",
+      "depends_on": "auth-constant-time"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-auth-guard",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-auth-guard",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-docs",
+      "depends_on": "gw-tests-auth"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-errors",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-logging",
+      "depends_on": "obs-logging"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-rate-limit",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-events",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-events",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-jobs",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-jobs",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-users",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-users",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-routes-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-serialization",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-serialization",
+      "depends_on": "contract-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-app",
+      "depends_on": "gw-app"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-auth",
+      "depends_on": "gw-auth-guard"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-ratelimit",
+      "depends_on": "gw-rate-limit"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-users"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-tests-validation",
+      "depends_on": "gw-validation"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-validation",
+      "depends_on": "contract-validate"
+    },
+    {
+      "op": "dependency_added",
+      "task": "gw-validation",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-demo-script",
+      "depends_on": "int-e2e"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-e2e",
+      "depends_on": "cli-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-e2e",
+      "depends_on": "gw-auth-guard"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-e2e",
+      "depends_on": "int-gateway-worker"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-e2e",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-gateway-worker",
+      "depends_on": "gw-routes-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-gateway-worker",
+      "depends_on": "worker-exec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-readme",
+      "depends_on": "int-e2e"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-repro",
+      "depends_on": "int-e2e"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-storage-contract",
+      "depends_on": "contract-codec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-storage-contract",
+      "depends_on": "contract-validate"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-storage-contract",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-verify-matrix",
+      "depends_on": "int-e2e"
+    },
+    {
+      "op": "dependency_added",
+      "task": "int-verify-matrix",
+      "depends_on": "int-readme"
+    },
+    {
+      "op": "dependency_added",
+      "task": "makefile",
+      "depends_on": "pytest-setup"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-context",
+      "depends_on": "obs-logging"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-docs",
+      "depends_on": "obs-tests-logging"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-endpoint",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-logging",
+      "depends_on": "shared-utils"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-metrics",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-tests-context",
+      "depends_on": "obs-context"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-tests-logging",
+      "depends_on": "obs-logging"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-tests-metrics",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-tests-render",
+      "depends_on": "obs-endpoint"
+    },
+    {
+      "op": "dependency_added",
+      "task": "obs-threshold",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "op": "dependency_added",
+      "task": "pytest-setup",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "op": "dependency_added",
+      "task": "shared-errors",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "op": "dependency_added",
+      "task": "shared-utils",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-bench",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-conn",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-ddl",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-docs",
+      "depends_on": "storage-tests-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-init",
+      "depends_on": "storage-conn"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-init",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-migrations",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-migrations",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-events",
+      "depends_on": "storage-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-events",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-jobs",
+      "depends_on": "storage-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-jobs",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-users",
+      "depends_on": "storage-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-repo-users",
+      "depends_on": "storage-init"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-conn",
+      "depends_on": "storage-conn"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-ddl",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-migrations",
+      "depends_on": "storage-migrations"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-txn",
+      "depends_on": "storage-transactions"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-tests-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "op": "dependency_added",
+      "task": "storage-transactions",
+      "depends_on": "storage-conn"
+    },
+    {
+      "op": "dependency_added",
+      "task": "swarm-pkg-layout",
+      "depends_on": "swarm-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "version-module",
+      "depends_on": "swarm-skeleton"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-docs",
+      "depends_on": "worker-tests-exec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-exec",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-exec",
+      "depends_on": "worker-job-fn"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-exec",
+      "depends_on": "worker-poll"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-graceful",
+      "depends_on": "worker-pool"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-job-fn",
+      "depends_on": "contract-schema"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-poll",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-pool",
+      "depends_on": "worker-exec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-pool",
+      "depends_on": "worker-queue"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-queue",
+      "depends_on": "shared-errors"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-retry",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-tests-exec",
+      "depends_on": "worker-exec"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-tests-job-fn",
+      "depends_on": "worker-job-fn"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-tests-poll",
+      "depends_on": "worker-poll"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-tests-pool",
+      "depends_on": "worker-pool"
+    },
+    {
+      "op": "dependency_added",
+      "task": "worker-tests-retry",
+      "depends_on": "worker-retry"
+    }
+  ]
+}
