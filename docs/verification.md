@@ -9,7 +9,7 @@ checks, run on every milestone.
 python -m unittest discover -s tests
 ```
 
-Zero dependencies, Python 3.10+. Full suite: 217 tests.
+Zero dependencies, Python 3.10+. Full suite: 218 tests.
 Breakdown:
 
 | Suite | Count | Proves |

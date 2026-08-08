@@ -162,8 +162,12 @@ class Checker:
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td) / "swarm"
             tmp.mkdir()
-            (tmp / "events.log").write_bytes(
-                (self.proof / "events.log").read_bytes())
+            # authoritative proof inputs (PROOF_SPEC §5): the raw log and the
+            # committed proposal. claims_claimed-less proofs fall back to
+            # proposal.json's claims field, so a log-only copy cannot
+            # reproduce the shipped metrics.
+            for fname in ("events.log", "proposal.json"):
+                (tmp / fname).write_bytes((self.proof / fname).read_bytes())
             py = sys.executable
             derive = os.path.join(REPO, "tools", "proof-derive.py")
             r1 = subprocess.run([py, derive, str(tmp), "--forge-version",
