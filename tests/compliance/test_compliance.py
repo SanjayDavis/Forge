@@ -550,9 +550,14 @@ class ComplianceRoadmap(unittest.TestCase):
             self.assertIsNotNone(m, f"ROAD_TO_1.0.md missing evidence line for {name}")
             checked = m.group(1) == "x"
 
-            # the index row: find the line in the comparison table containing the label
+            # the index row: find the line in the comparison table containing the
+            # label. Rows are scoped to `#proof-`-anchored lines so the
+            # "Milestones" table (which may reuse a label like "multi-agent") can
+            # never shadow the evidence row; every comparison-table row carries
+            # its proof anchor, milestone rows do not.
             row = next((ln for ln in index_text.splitlines()
-                        if row_label in ln and ln.strip().startswith("|")), None)
+                        if "#proof-" in ln and row_label in ln
+                        and ln.strip().startswith("|")), None)
             self.assertIsNotNone(row, f"proofs/INDEX.md missing table row for {name}")
             conforming = "**yes**" in row
 

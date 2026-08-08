@@ -28,7 +28,7 @@ Source of truth: [`proofs/INDEX.md`](proofs/INDEX.md). A box is checked only whe
 - [x] `chip8` — CHIP-8 emulator, headless CLI (Proof #2, claims C1, C2, C7)
 - [x] `expr-parser` — C++ expression parser (Proof #3, claims C1, C3)
 - [x] `rust-cli` — Rust CLI (Proof #4, claims C1, C3)
-- [ ] `multi-agent` — 100+ task multi-agent run (Proof #5, claims C4, C5)
+- [x] `multi-agent` — 100+ task multi-agent run (Proof #5, claims C4, C5)
 
 ## Validation — people, not clones
 
@@ -43,7 +43,7 @@ from Forge's planner/executor, not a fork + clone.
 ## Stability — the 1.0 referee
 
 - [ ] No public-SDK/API change for 90 days (surface-guard CI is the referee)
-- [ ] Compliance suite green (`python -m unittest tests.compliance`)
+- [x] Compliance suite green (`python -W error -m unittest tests.compliance.test_compliance`, 15 tests)
 - [ ] Proof suite green (`proof-check` passes on every conforming entry in the corpus)
 
 ## Release

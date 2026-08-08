@@ -47,7 +47,23 @@ from forge import ForgeClient, GraphError, ProposalError
 PROTOCOL_VERSION = "2025-11-25"
 KNOWN_VERSIONS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25")
 
-SERVER_INFO = {"name": "forge", "version": "0.1.0-alpha"}
+SERVER_NAME = "forge"
+
+
+def _distribution_version():
+    """Package version from installed dist metadata (never a stale literal).
+
+    The MCP client reads serverInfo.version; it must track the distribution
+    actually installed, not a string frozen in the source tree.
+    """
+    try:
+        from importlib.metadata import version as _dist_version
+        return _dist_version("forge-mcp-base")
+    except Exception:
+        return "unknown"
+
+
+SERVER_INFO = {"name": SERVER_NAME, "version": _distribution_version()}
 
 JSON_RPC = "2.0"
 # JSON-RPC error codes (the MCP spec reuses these verbatim).

@@ -148,14 +148,15 @@ Full command reference: [docs/CLI.md](docs/CLI.md).
 
 ## Status
 
-The kernel is frozen at v1. This release is `0.1.0-alpha`.
+The kernel is frozen at v1. This release is `0.1.0a4`.
 
 Done:
 
 - Kernel — event-sourced task graph, scheduler, verifier gates, query
   language, inspector
 - Specification — `docs/SPEC.md` v1.0
-- Compliance suite — 13 portable tests mapped to invariants I1–I7
+- Compliance suite — 15 portable tests mapped to invariants I1–I7
+  (plus adversarial fuzzing and the ROAD_TO_1.0↔INDEX cross-check)
 - SDK — `forge.ForgeClient`, the single public surface
 - Context API — the ~500-token contract package for coding agents
 - Planner, Executor, Reviewer plugins — reference clients, each an LLM
@@ -209,6 +210,8 @@ orchestrate, Claude Code to write, Forge to hold the truth.
 - [docs/EVENTS.md](docs/EVENTS.md) — the event schema
 - [docs/CLI.md](docs/CLI.md) — command reference
 - [docs/ROADMAP.md](docs/ROADMAP.md) — milestone history and plan
+- [ROAD_TO_1.0.md](ROAD_TO_1.0.md) — the release-confidence ladder: what
+  must be true, and on what evidence, before each version is published
 - [docs/verification.md](docs/verification.md) — test suite and stress
   results
 - [docs/RELEASE_READINESS.md](docs/RELEASE_READINESS.md) — SDK audit,

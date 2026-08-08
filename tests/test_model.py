@@ -208,6 +208,27 @@ class GraphTest(unittest.TestCase):
         self.assertTrue(any("ghost" in p for p in probs))
         self.assertTrue(any("self-dependency" in p for p in probs))
 
+    def test_claims_claimed_event_validates_and_folds(self):
+        # canonical corpus shape: project-level claim record with optional
+        # id + note; apply is a no-op, so the fold is stable.
+        ev = {"op": "claims_claimed", "id": "proj", "claims": ["C6", "C7"],
+              "note": "backfill: log predates the claims_claimed convention"}
+        g = Graph.from_events([ev])
+        self.assertEqual(set(g.tasks), set())  # no state mutated
+        # replay over a real workflow with the claim attached
+        evs = []
+        g2 = Graph()
+        evs.append(self.commit(g2, g2.create_task("A")))
+        evs.append(dict(ev, seq=g2.seq + 1, ts=T))
+        g2.seq += 1
+        g2.apply(evs[-1])
+        g3 = Graph.from_events(evs)
+        self.assertEqual(set(g3.tasks), {"a"})
+        # malformed claim records are rejected loudly
+        for bad in ({"claims": []}, {"claims": ["C6", 7]}, {"claims": ["X1"]}):
+            with self.assertRaises(GraphError):
+                Graph.from_events([dict(ev, **bad)])
+
 
 if __name__ == "__main__":
     unittest.main()

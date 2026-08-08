@@ -112,6 +112,17 @@ python tools/proof-render-graph.py examples/chip8
 python tools/proof-render-demo.py examples/chip8 examples/chip8/demo/transcript.txt demo.mp4
 ```
 
+Note: `0.2.0` was the unpublished in-development version of the package when this
+proof ran (it sits between the a1 and a2 release ladder in the repo; no `0.2.0` tag
+or distribution was ever published). The recorded value is the version the run
+actually used — the released ladder is 0.1.0a1 → 0.1.0a2 → 0.1.0a3 (see
+`CHANGELOG.md`). The log also predates the frozen event grammar
+(`docs/EVENTS.md`): it carries `proposal_committed` and its own evidence
+vocabulary, so the released kernel rejects it loudly by design (unknown-op /
+unknown-field errors on replay). The Proof **tooling** — `proof-check.py`,
+`proof-derive.py`, `proof-render-*.py` — replays and verifies it directly; that
+is the authoritative reader for this corpus.
+
 `proof-derive` regenerates `graph.json` and `metrics.json` byte-identically
 (deterministic; verified in-session by hashing two consecutive runs).
 `proof-check` recomputes the same invariants over the raw log

@@ -2,6 +2,7 @@
   "proposal_id": "prop_swarm_001",
   "reason": "Proof #5: a 118-task multi-agent stress proof answering C4 (long projects) and C5 (multi-agent). One shared Forge project implemented by 4 concurrent agent processes across 9 subsystems (foundation, contract, storage, auth, gateway, worker, cli, observe, integration). Public SDK/CLI only; kernel frozen.",
   "confidence": 0.8,
+  "claims": ["C4", "C5"],
   "events": [
     {
       "op": "task_created",

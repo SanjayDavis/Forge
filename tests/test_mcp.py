@@ -420,7 +420,7 @@ class TestMCPServerClient(unittest.TestCase):
                            capture_output=True, text=True, env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
         out = r.stdout
-        self.assertIn("server: forge 0.1.0-alpha", out)
+        self.assertRegex(out, r"server: forge \S+")
         self.assertIn("tools: 6", out)
         self.assertIn("next: build-a-snake-game-foundation", out)
         self.assertIn("Task:", out)

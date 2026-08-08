@@ -5,7 +5,66 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-alpha `0.1.0a3` is the current release.
+alpha `0.1.0a4` is the current release.
+
+## [0.1.0a4] - 2026-08-08
+
+### Added
+
+- **Proof #5 `swarm` — 100+ task multi-agent stress proof, conforming.**
+  114 tasks, 612 events, 4 concurrent agents, MaxQ 28, 62 s wall-clock,
+  three genuine `verification_failed` cycles documented verbatim. Answers
+  C4 ("can't handle long projects") and C5 ("only works with one agent").
+  `ROAD_TO_1.0.md`'s `multi-agent` evidence box is checked; the corpus is
+  complete through Proof #5 and the a4 gate is earned.
+- **`claims_claimed` event support.** The kernel's event validator now
+  understands `claims_claimed` — the op PROOF_SPEC §5 reads for
+  `metrics.json` `claims`; flask-todo's log carries it, so released tooling
+  could not previously replay that proof. `forge replay` and `forge-mcp`
+  now open the four v1-grammar proofs (flask-todo, expr-parser, rust-cli,
+  swarm). Proof #2's log predates the v1 grammar (see chip8 README) and is
+  intentionally rejected by the kernel's fail-loud schema; the proof
+  tooling (`proof-check.py`, `proof-derive.py`) is its authoritative
+  reader.
+
+### Changed
+
+- **Version bump to `0.1.0a4`** across `forge-foundation`,
+  `forge-planner`, and `forge-mcp-base`. Per the publish-only-after-evidence
+  policy this is **prepared and tagged, not uploaded to PyPI**; the
+  previous live release remains `0.1.0a2`. The kernel contract (SPEC v1)
+  is untouched.
+- **Evidence-system integrity (release-readiness audit).**
+  `tools/proof-derive.py` infers `language` from implementation-file
+  references inside `events.log` (it was hardcoded to `python`) and falls
+  back to the proposal's authored `claims` field for proofs whose runtime
+  predates `claims_claimed`. Proofs #3/#4 (`expr-parser`, `rust-cli`) now
+  regenerate byte-identically including `language` (C++, Rust) and
+  `claims` (C1, C3); Proof #5's `metrics.json` `claims` reads `["C4","C5"]`
+  matching `proofs/INDEX.md`. `PROOF_SPEC.md` §5 derivation rule amended.
+  The `claims` field was added to the `proposal.json` inputs of Proofs
+  #3/#4/#5 — authored evidence, not log edits.
+- **MCP server `serverInfo.version`** now reports the installed
+  distribution's version from package metadata instead of a hardcoded
+  `0.1.0-alpha` literal.
+- **Doc consistency sweep.** README/CHANGELOG/INDEX/verification numbers
+  aligned with the measured corpus (217 tests, 15 compliance tests,
+  Proof #1 events 47, `not recorded`); README links `ROAD_TO_1.0.md`.
+- **Compliance guard hardened.** `test_road_to_1_0_checklist_matches_index`
+  searches only `#proof-`-anchored comparison-table rows, so the
+  Milestones table can no longer shadow a proof label (it masked the
+  `multi-agent` drift this release fixes).
+
+### Fixed
+
+- The compliance command documented in `ROAD_TO_1.0.md`
+  (`python -m unittest tests.compliance`) silently ran zero tests; docs
+  now use the module invocation that actually executes the 15-test suite
+  (what CI runs).
+- Proof #2's `metrics.json` records `forge_version` `0.2.0` — an
+  unpublished in-development version the run actually used; the chip8
+  README now explains the label against the released ladder
+  (0.1.0a1 → 0.1.0a2 → 0.1.0a3).
 
 ## [0.1.0a3] - 2026-08-07
 
@@ -84,11 +143,11 @@ alpha `0.1.0a3` is the current release.
   plan` command now lives in that package — a real client of the SDK,
   installed separately, proving the boundary end to end.
 - **PyPI distribution naming.** The core distribution is published as
-  `forge-kernel` (import name and CLI command stay `forge`), because
-  the name `forge` is already taken on PyPI by an unrelated Django
-  project. `forge-planner` depends on `forge-kernel`, never on plain
-  `forge` — so `pip install forge-planner` resolves to this SDK, not a
-  foreign package.
+  `forge-foundation` (import name and CLI command stay `forge`), because
+  the names `forge`, `forge-sdk`, `forge-core`, and `forge-kernel` are
+  taken on PyPI by unrelated projects. `forge-planner` depends on
+  `forge-foundation` — so `pip install forge-planner` resolves to this
+  SDK, not a foreign package.
 - **SDK surface completed (M2D).** `PLANNER_OPS` is now exported from the
   top-level `forge` namespace, so every client (planner included) imports
   only `forge.*` — no submodule reaches, no kernel internals.

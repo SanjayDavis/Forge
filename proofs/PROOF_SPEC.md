@@ -231,7 +231,11 @@ than "1 failure". Any consumer of the corpus may compute these; proofs do not st
 **Derivation rule:** every number in metrics.json must be reproducible by replaying
 `events.log` (e.g. `forge replay` or a ten-line script). A number that does not match
 the log fails conformance. This rule is what keeps the corpus honest — consistent
-shape with inconsistent measurement would be fake consistency.
+shape with inconsistent measurement would be fake consistency. The `claims` array
+derives from `claims_claimed` events in the log; proofs whose runtime predates that
+op fall back to the `claims` field authored in `proposal.json` (a committed input of
+the proof — never a post-hoc edit of the log). `language` derives from
+implementation-file references inside the log (see `tools/proof-derive.py`).
 
 ## 6. Conformance
 

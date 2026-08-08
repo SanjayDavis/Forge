@@ -30,7 +30,7 @@ version note in the Proof #4 entry). `0.1.0a4` will carry the Phase 2 multi-agen
 | 2 | [CHIP-8 emulator](#proof-2--chip-8-emulator) | Python | completed | 42 | 259 | 23 | 42 | 2 | 0 | 0 | 44 | not recorded | C1, C2, C7 | **yes** |
 | 3 | [expression-parser](#proof-3--c-expression-parser) | C++ | completed | 17 | 96 | 3 | 17 | 0 | 0 | 0 | 19 | not recorded | C1, C3 | **yes** |
 | 4 | [rust-cli](#proof-4--rust-cli) | Rust | completed | 15 | 86 | 6 | 15 | 0 | 0 | 0 | 1 | not recorded | C1, C3 | **yes** |
-| 5 | [swarm](#proof-5--swarm-multi-agent-project) | Python | completed | 114 | 612 | 28 | 114 | 3 | 0 | 0 | 1 | not | C4, C5 | **yes** |
+| 5 | [swarm](#proof-5--swarm-multi-agent-project) | Python | completed | 114 | 612 | 28 | 114 | 3 | 0 | 0 | 1 | not recorded | C4, C5 | **yes** |
 
 ## Claim coverage
 
@@ -56,7 +56,7 @@ the moment the proof is marked conforming.
 | Metric | Value |
 |--------|-------|
 | tasks | 8 |
-| events | 46 |
+| events | 47 |
 | verification passes | 9 |
 | verification failures | 1 |
 | failure rate | 10% (1 of 10 attempts) |
@@ -174,7 +174,9 @@ arithmetic error; the code was correct). Final: 94 checks green
 -Wextra` with zero warnings, `make`-driven, no Python in the build path.
 
 **Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
-`graph.json`/`metrics.json`/`graph.png` derive from `events.log` alone.
+`graph.json`/`metrics.json`/`graph.png` derive from the committed evidence
+(`events.log`, plus `proposal.json` for the claims the runtime did not emit as
+`claims_claimed` events — that op predates Proofs #3/#4).
 Post-conformance verification caught a `.gitignore` defect that had silently
 excluded `include/expr/` (headers); root-anchored patterns, committed the
 headers, clean-clone `make test` → 94/94. See replay.md.
@@ -225,8 +227,10 @@ Final: **48 checks green** (24 unit + 6 CLI integration via the real binary
 committed, no Python in the build path (run.py is a thin shell-out wrapper).
 
 **Conformance:** **conforming** to `proof-spec-0.1`. `proof-check` passes;
-`graph.json`/`metrics.json`/`graph.png` derive from `events.log` alone
-(86 events, contiguous seq 1–86). Toolchain lesson preserved in replay.md:
+`graph.json`/`metrics.json`/`graph.png` derive from the committed evidence
+(`events.log`, plus `proposal.json` for the claims the runtime did not log as
+`claims_claimed` events — that op postdates Proofs #3/#4). 86 events,
+contiguous seq 1–86. Toolchain lesson preserved in replay.md:
 on Windows, cargo must be invoked directly — routing it through a
 `bash -lc` PATH export under native python silently drops the toolchain.
 This proof is the Rust half of the non-Python generalization release

@@ -78,6 +78,15 @@ Soft = asserted (LLM review, human approval, architecture review).
 ### task_reopened
 `id`. Only `done` tasks. Returns to `in_progress`.
 
+### claims_claimed
+`claims` (non-empty list of Claim IDs), optional `id` (project name) and
+`note` (str). Project-level assertion that this project's run has
+demonstrated the given claims from `proofs/PROOF_SPEC.md` §2 (e.g. `C3` =
+"not tied to Python"). **Without** touching task state — `apply` is a no-op;
+the graph remains a pure fold of workflow events. This is the op the Proof
+Standard's derivation rule reads for `metrics.json` `claims`; proofs whose
+runtime predates the op may record it with a `note` explaining the backfill.
+
 ## Invariants (enforced at validation)
 
 1. Every event references existing tasks (except `task_created` /

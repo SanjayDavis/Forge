@@ -54,6 +54,7 @@ OP_SHAPES: dict[str, dict[str, type]] = {
     "evidence_added":      {"id": str, "kind": str, "source": str, "detail": str},
     "note_added":          {"id": str, "text": str},
     "task_deleted":        {"id": str},
+    "claims_claimed":      {"id": str, "claims": list, "note": str},
 }
 
 OP_REQUIRED: dict[str, tuple[str, ...]] = {
@@ -70,6 +71,7 @@ OP_REQUIRED: dict[str, tuple[str, ...]] = {
     "evidence_added":      ("id", "kind", "source"),
     "note_added":          ("id", "text"),
     "task_deleted":        ("id",),
+    "claims_claimed":      ("claims",),
 }
 
 # Keys the store stamps after validation; validate() must tolerate them on
@@ -431,6 +433,22 @@ class Graph:
             raise GraphError(f"cannot delete {ev['id']}: depended on by {', '.join(sorted(dependents))}")
         if t.composite and t.depends_on:
             raise GraphError(f"cannot delete {ev['id']}: it has children (delete them first)")
+
+    def _validate_claims_claimed(self, ev):
+        """Project-level claim record (Proof Standard). No task state is
+        touched: the event asserts this project has been demonstrated against
+        Claim IDs from proofs/PROOF_SPEC.md §2. `claims` must be a non-empty
+        list of non-empty Claim IDs."""
+        claims = ev.get("claims")
+        if not claims or not all(isinstance(c, str) and c.strip() for c in claims):
+            raise GraphError("claims_claimed requires a non-empty list of claim IDs")
+        for c in claims:
+            if not re.fullmatch(r"C\d+", c):
+                raise GraphError(f"claim id {c!r} must look like a Claim ID (C1..C7)")
+
+    def _apply_claims_claimed(self, ev):
+        """No-op: the event records project-level claim assertions and never
+        mutates task state (the graph stays a pure function of workflow)."""
 
     # ------------------------------------------------------------------ apply (mutates; assumes event already validated)
     def apply(self, ev: dict) -> None:

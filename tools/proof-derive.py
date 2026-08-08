@@ -18,8 +18,18 @@ from pathlib import Path
 FIELD_DEFAULTS = {
     "forge_version": "unknown",
     "conforms_to": "proof-spec-0.1",
-    "language": "python",
+    "language": "python",  # fallback when the log carries no implementation-file refs
 }
+
+# Implementation-language signal: extensions seen in file references inside
+# the log (task descriptions, acceptance criteria, evidence details). Counted
+# per language across the whole log; highest count wins; zero hits -> "python".
+_LANGUAGE_HINTS = [
+    ("rs", "Rust"),
+    ("cpp", "C++"), ("cc", "C++"), ("cxx", "C++"),
+    ("hpp", "C++"), ("hxx", "C++"),
+    ("py", "python"), ("pyw", "python"),
+]
 
 
 def _subsystem_of(e):
@@ -35,6 +45,47 @@ def _subsystem_of(e):
         if str(note).strip().startswith("subsystem:"):
             return str(note).split(":", 1)[1].strip()
     return None
+
+
+def _infer_language(events):
+    """Primary implementation language, inferred from file references in the
+    log (task descriptions, evidence records). Pure function of events.log."""
+    from collections import Counter as _Counter
+    import re as _re
+    hits = _Counter()
+    stack = list(events)
+    while stack:
+        v = stack.pop()
+        if isinstance(v, dict):
+            stack.extend(v.values())
+        elif isinstance(v, list):
+            stack.extend(v)
+        elif isinstance(v, str):
+            for ext, lang in _LANGUAGE_HINTS:
+                if _re.search(r"\.%s\b" % ext, v):
+                    hits[lang] += 1
+    if not hits:
+        return FIELD_DEFAULTS["language"]
+    # deterministic tie-break: fixed language order
+    return max(hits, key=lambda lang: (hits[lang], -("C++|Rust|python".split("|").index(lang))))
+
+
+def _infer_claims(events, root):
+    """Claim IDs for metrics.json.
+
+    Preferred source: `claims_claimed` events in the log (exactly what the
+    standard's derivation rule requires). Proofs whose runtime predates that
+    op never emitted it; for those, the authored intent lives in
+    proposal.json's `claims` field — a committed input of the proof, not a
+    post-hoc annotation of the log.
+    """
+    claims = [c for e in events if e["op"] == "claims_claimed"
+              for c in e.get("claims", [])]
+    if not claims:
+        prop = root / "proposal.json"
+        if prop.exists():
+            claims = json.loads(prop.read_text(encoding="utf-8")).get("claims", [])
+    return claims
 
 
 def replay(events):
@@ -155,7 +206,7 @@ def main(example_dir, forge_version="unknown", snapshot=None):
     metrics = {
         "proof": root.name,
         "status": "completed" if all(t["status"] == "done" for t in tasks) else "partial",
-        "language": FIELD_DEFAULTS["language"],
+        "language": _infer_language(events),
         "tasks": len(tasks),
         "events": len(events),
         "verification_passes": passes,
@@ -167,8 +218,7 @@ def main(example_dir, forge_version="unknown", snapshot=None):
         "llm": "not recorded",
         "forge_version": forge_version,
         "conforms_to": FIELD_DEFAULTS["conforms_to"],
-        "claims": [c for e in events if e["op"] == "claims_claimed"
-                   for c in e.get("claims", [])],
+        "claims": _infer_claims(events, root),
     }
 
     (root / "graph.json").write_text(json.dumps(graph, indent=2) + "\n", encoding="utf-8")

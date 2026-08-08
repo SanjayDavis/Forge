@@ -11,7 +11,7 @@ in the kernel; it is pure, deterministic, and zero-dependency.
     Human ─┘
 """
 
-__version__ = "0.1.0a3"
+__version__ = "0.1.0a4"
 # 0.1.0-alpha: the KERNEL is stable and frozen at v1 (docs/SPEC.md,
 # Appendix A: Versioning & Freeze Policy); the ecosystem around it
 # (executor, reviewer, MCP, UIs) is under active development. The

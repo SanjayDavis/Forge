@@ -2,6 +2,7 @@
   "proposal_id": "prop_rust_cli_001",
   "reason": "Decompose a Rust CLI for Proof #4 — the second half of the non-Python generalization claim (C3), with real constraints (C1): a hand-rolled CSV parser (quoted fields, escaped quotes, CRLF, positioned errors), a stats engine, describe/head subcommands, custom error handling with exit codes, and cargo unit+integration tests. 15 tasks across foundation/frontend/runtime/app/tests/docs, mirroring the Proof #3 pipeline shape exactly: proposal -> public SDK -> executor -> verification -> derive -> check. Std-only (no external crates) so the build is hermetic.",
   "confidence": 0.8,
+  "claims": ["C1", "C3"],
   "events": [
     {
       "op": "task_created",

@@ -17,5 +17,8 @@
   "llm": "not recorded",
   "forge_version": "0.1.0a3",
   "conforms_to": "proof-spec-0.1",
-  "claims": []
+  "claims": [
+    "C4",
+    "C5"
+  ]
 }

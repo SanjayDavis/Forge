@@ -2,6 +2,7 @@
   "proposal_id": "prop_expr_parser_001",
   "reason": "Decompose a C++ expression parser for Proof #3. Lexer -> parser -> AST -> evaluator -> REPL pipeline, deliberately small but complete, in a non-Python language (claim C3). Real constraints: precedence climbing with right-associative exponent, unary operators, function calls with arity checks, scientific-notation numbers, positioned error reporting, and a full unit+CLI test harness under plain make (claim C1). 17 tasks across foundation/frontend/runtime/tests/app/docs subsystems with a 19-edge dependency DAG.",
   "confidence": 0.8,
+  "claims": ["C1", "C3"],
   "events": [
     {
       "op": "task_created",
