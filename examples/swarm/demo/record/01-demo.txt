@@ -1,0 +1,7 @@
+$ python scripts/demo_drain.py --db session.db
+jobs_enqueued: 8
+jobs_done: 8
+status: {'todo': 0, 'running': 0, 'done': 8, 'failed': 0}
+events: 8
+demo OK
+demo drain OK

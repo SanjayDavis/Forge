@@ -1,0 +1,32 @@
+Proof #5 — swarm: 4 agents, 114 tasks, one event log
+────────────────────────────────────────────────────
+python scripts/demo_drain.py --db session.db
+jobs_enqueued: 8
+jobs_done: 8
+status: {'todo': 0, 'running': 0, 'done': 8, 'failed': 0}
+events: 8
+demo OK
+demo drain OK
+
+cd swarm-project
+python -m pytest tests -q
+........................................................................ [ 36%]
+........................................................................ [ 73%]
+.....................................................                    [100%]
+197 passed in 10.34s
+
+python examples/swarm/check_invariants.py examples/swarm
+S1=1  # tasks=114 edges=153 covered=114/114 unknown=[]
+S2=1  # orphans=0 not_done=0
+S3=1  # seq_violations=0 ts_violations=0
+S4=1  # double_starts=[] multi_agent=[]
+S5=1  # n=612
+S6=1  # missing_evidence=0 fail_cycles=3 fails=['storage-repo-jobs','worker-exec','contract-tests-codec']
+S7=1  # double_derive=True shipped_matches=True
+S8=1  # categories=4 citations=30
+S9=1  # cuts=['~50', '~100', 'full'] ctx_ok=True
+S10=1  # lines=612 sdk_export=612 gaps=0
+VERDICT PASS
+
+tools/proof-check.py examples/swarm
+CONFORMING: swarm — all checks pass

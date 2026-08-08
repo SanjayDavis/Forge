@@ -24,6 +24,10 @@ STATUS_COLOR = {
 }
 SYSTEM_COLOR = {
     "core": "#1565c0", "web": "#6a1b9a", "qa": "#00695c", "docs": "#5d4037", "other": "#37474f",
+    # Proof #5 `swarm` subsystems (border colors, matched to graph.json)
+    "foundation": "#1e88e5", "contract": "#7b1fa2", "storage": "#00897b",
+    "auth": "#c62828", "gateway": "#ef6c00", "worker": "#2e7d32",
+    "cli": "#5d4037", "observe": "#546e7a", "integration": "#6d4c41",
 }
 
 

@@ -1,0 +1,21 @@
+{
+  "proof": "swarm",
+  "status": "completed",
+  "language": "python",
+  "tasks": 114,
+  "events": 612,
+  "verification_passes": 114,
+  "verification_failures": 3,
+  "retries": 0,
+  "max_ready_queue": 28,
+  "max_ready_queue_at": {
+    "seq": 408,
+    "event": "verification_passed",
+    "id": "contract-validate"
+  },
+  "duration_minutes": 1,
+  "llm": "not recorded",
+  "forge_version": "0.1.0a3",
+  "conforms_to": "proof-spec-0.1",
+  "claims": []
+}

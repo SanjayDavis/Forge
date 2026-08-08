@@ -1,0 +1,1420 @@
+{
+  "proof": "swarm",
+  "forge_version": "0.1.0a3",
+  "derived_from": "events.log",
+  "log_tail_ts": "2026-08-08T11:44:37+00:00",
+  "tasks": [
+    {
+      "id": "auth-claims",
+      "title": "token claims model",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-constant-time",
+      "title": "constant-time signature compare",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-docs",
+      "title": "auth README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-errors",
+      "title": "auth error hierarchy",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-hmac",
+      "title": "HMAC token sign/verify (stdlib)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-rotate",
+      "title": "key rotation support",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-scopes",
+      "title": "scope checks",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-tests-claims",
+      "title": "claims tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-tests-errors",
+      "title": "error tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-tests-hmac",
+      "title": "HMAC tests",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-tests-rotate",
+      "title": "rotation tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "auth"
+    },
+    {
+      "id": "auth-tests-scopes",
+      "title": "scope tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "auth"
+    },
+    {
+      "id": "ci-script",
+      "title": "scripts/ci.sh gate",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "cli-docs",
+      "title": "CLI README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-errors",
+      "title": "friendly CLI errors + exit codes",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-events",
+      "title": "events subcommand",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-jobs",
+      "title": "jobs subcommand",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-output",
+      "title": "table/JSON output formatting",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-parser",
+      "title": "admin CLI parser",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-tests-events",
+      "title": "events CLI tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-tests-jobs",
+      "title": "jobs CLI tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-tests-parser",
+      "title": "parser tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-tests-users",
+      "title": "users CLI tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "cli"
+    },
+    {
+      "id": "cli-users",
+      "title": "users subcommand",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "cli"
+    },
+    {
+      "id": "contract-codec",
+      "title": "canonical JSON codec",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-docs",
+      "title": "contract README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-errors",
+      "title": "ContractError with field context",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-iso-time",
+      "title": "ISO8601 UTC time helpers",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-nested",
+      "title": "nested payload validation",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-schema",
+      "title": "wire message schema dataclasses",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-size-limit",
+      "title": "message size limit guard",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-codec",
+      "title": "codec tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-iso",
+      "title": "time helper tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-limit",
+      "title": "size limit tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-schema",
+      "title": "schema tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-unknown",
+      "title": "strict-mode tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-validate",
+      "title": "validation tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-tests-version",
+      "title": "versioning tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-unknown-fields",
+      "title": "unknown-field policy (ignore / strict)",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-validate",
+      "title": "message validation rules",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "contract"
+    },
+    {
+      "id": "contract-versioning",
+      "title": "wire version header + check",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "contract"
+    },
+    {
+      "id": "foundation-tests",
+      "title": "foundation unit tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "gw-app",
+      "title": "WSGI application factory",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-auth-guard",
+      "title": "Bearer token auth guard",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-docs",
+      "title": "gateway README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-errors",
+      "title": "JSON error responses",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-logging",
+      "title": "request logging via observe",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-rate-limit",
+      "title": "in-memory per-IP rate limit",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-routes-events",
+      "title": "events router",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-routes-jobs",
+      "title": "jobs router",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-routes-users",
+      "title": "users router",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-serialization",
+      "title": "request/response codec wiring",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-tests-app",
+      "title": "app factory tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-tests-auth",
+      "title": "auth guard tests",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-tests-ratelimit",
+      "title": "rate limit tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-tests-routes",
+      "title": "routes tests (WSGI client)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-tests-validation",
+      "title": "validation tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "gw-validation",
+      "title": "request validation wiring",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "gateway"
+    },
+    {
+      "id": "int-demo-script",
+      "title": "demo driver script",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-e2e",
+      "title": "full lifecycle end-to-end",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-gateway-worker",
+      "title": "gateway submit -> worker processes",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-readme",
+      "title": "README.md (8 proof sections)",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-repro",
+      "title": "reproduction script",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-storage-contract",
+      "title": "storage rows <-> contract messages",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "integration"
+    },
+    {
+      "id": "int-verify-matrix",
+      "title": "verification gate matrix",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "integration"
+    },
+    {
+      "id": "makefile",
+      "title": "Makefile targets",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "obs-context",
+      "title": "request-id propagation",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-docs",
+      "title": "observe README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-endpoint",
+      "title": "metrics text renderer",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-logging",
+      "title": "structured JSON logging",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-metrics",
+      "title": "metrics registry",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-tests-context",
+      "title": "context tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-tests-logging",
+      "title": "logging tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-tests-metrics",
+      "title": "metrics tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-tests-render",
+      "title": "renderer tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "observe"
+    },
+    {
+      "id": "obs-threshold",
+      "title": "alert threshold counters",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "observe"
+    },
+    {
+      "id": "pytest-setup",
+      "title": "pytest configuration + conftest fixtures",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "shared-errors",
+      "title": "shared SwarmError base",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "shared-utils",
+      "title": "shared utilities",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "storage-bench",
+      "title": "insert throughput sanity bench",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-conn",
+      "title": "connection context manager (WAL)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-ddl",
+      "title": "SQLite schema DDL",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-docs",
+      "title": "storage README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-errors",
+      "title": "storage error hierarchy",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-init",
+      "title": "idempotent database init",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-migrations",
+      "title": "versioned migration runner",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-repo-events",
+      "title": "events repository",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-repo-jobs",
+      "title": "jobs repository with atomic claim",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-repo-users",
+      "title": "users repository",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-conn",
+      "title": "connection tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-ddl",
+      "title": "DDL tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-events",
+      "title": "events repo tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-jobs",
+      "title": "jobs repo tests (atomicity)",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-migrations",
+      "title": "migration tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-txn",
+      "title": "transaction tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-tests-users",
+      "title": "users repo tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "storage-transactions",
+      "title": "transaction context manager",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "storage"
+    },
+    {
+      "id": "swarm-pkg-layout",
+      "title": "subpackage layout",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "swarm-skeleton",
+      "title": "swarm repository skeleton",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "version-module",
+      "title": "swarm version module",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "foundation"
+    },
+    {
+      "id": "worker-docs",
+      "title": "worker README",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-errors",
+      "title": "worker errors",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-exec",
+      "title": "single-job executor",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-graceful",
+      "title": "graceful shutdown drain",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-job-fn",
+      "title": "job dispatch table",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-poll",
+      "title": "job polling via atomic claim",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-pool",
+      "title": "N-thread worker pool",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-queue",
+      "title": "bounded in-process queue",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-retry",
+      "title": "retry with backoff",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-tests-exec",
+      "title": "executor tests",
+      "status": "done",
+      "priority": "high",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-tests-job-fn",
+      "title": "job fn tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-tests-poll",
+      "title": "poll tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-tests-pool",
+      "title": "pool tests",
+      "status": "done",
+      "priority": "medium",
+      "subsystem": "worker"
+    },
+    {
+      "id": "worker-tests-retry",
+      "title": "retry tests",
+      "status": "done",
+      "priority": "low",
+      "subsystem": "worker"
+    }
+  ],
+  "dependencies": [
+    {
+      "task": "auth-claims",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "auth-constant-time",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "task": "auth-docs",
+      "depends_on": "auth-tests-hmac"
+    },
+    {
+      "task": "auth-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "auth-hmac",
+      "depends_on": "auth-claims"
+    },
+    {
+      "task": "auth-hmac",
+      "depends_on": "auth-errors"
+    },
+    {
+      "task": "auth-rotate",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "task": "auth-scopes",
+      "depends_on": "auth-claims"
+    },
+    {
+      "task": "auth-scopes",
+      "depends_on": "auth-errors"
+    },
+    {
+      "task": "auth-tests-claims",
+      "depends_on": "auth-claims"
+    },
+    {
+      "task": "auth-tests-errors",
+      "depends_on": "auth-errors"
+    },
+    {
+      "task": "auth-tests-hmac",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "task": "auth-tests-rotate",
+      "depends_on": "auth-rotate"
+    },
+    {
+      "task": "auth-tests-scopes",
+      "depends_on": "auth-scopes"
+    },
+    {
+      "task": "ci-script",
+      "depends_on": "pytest-setup"
+    },
+    {
+      "task": "cli-docs",
+      "depends_on": "cli-tests-jobs"
+    },
+    {
+      "task": "cli-errors",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-events",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "task": "cli-jobs",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "cli-jobs",
+      "depends_on": "worker-retry"
+    },
+    {
+      "task": "cli-output",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-parser",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "cli-tests-events",
+      "depends_on": "cli-events"
+    },
+    {
+      "task": "cli-tests-jobs",
+      "depends_on": "cli-jobs"
+    },
+    {
+      "task": "cli-tests-parser",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-tests-users",
+      "depends_on": "cli-users"
+    },
+    {
+      "task": "cli-users",
+      "depends_on": "cli-parser"
+    },
+    {
+      "task": "cli-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "task": "contract-codec",
+      "depends_on": "contract-errors"
+    },
+    {
+      "task": "contract-codec",
+      "depends_on": "contract-schema"
+    },
+    {
+      "task": "contract-docs",
+      "depends_on": "contract-tests-codec"
+    },
+    {
+      "task": "contract-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "contract-iso-time",
+      "depends_on": "contract-schema"
+    },
+    {
+      "task": "contract-nested",
+      "depends_on": "contract-validate"
+    },
+    {
+      "task": "contract-schema",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "contract-size-limit",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "contract-tests-codec",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "contract-tests-iso",
+      "depends_on": "contract-iso-time"
+    },
+    {
+      "task": "contract-tests-limit",
+      "depends_on": "contract-size-limit"
+    },
+    {
+      "task": "contract-tests-schema",
+      "depends_on": "contract-schema"
+    },
+    {
+      "task": "contract-tests-unknown",
+      "depends_on": "contract-unknown-fields"
+    },
+    {
+      "task": "contract-tests-validate",
+      "depends_on": "contract-validate"
+    },
+    {
+      "task": "contract-tests-version",
+      "depends_on": "contract-versioning"
+    },
+    {
+      "task": "contract-unknown-fields",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "contract-validate",
+      "depends_on": "contract-errors"
+    },
+    {
+      "task": "contract-validate",
+      "depends_on": "contract-schema"
+    },
+    {
+      "task": "contract-versioning",
+      "depends_on": "contract-errors"
+    },
+    {
+      "task": "foundation-tests",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "foundation-tests",
+      "depends_on": "shared-utils"
+    },
+    {
+      "task": "foundation-tests",
+      "depends_on": "version-module"
+    },
+    {
+      "task": "gw-app",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "task": "gw-app",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "gw-app",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "gw-auth-guard",
+      "depends_on": "auth-constant-time"
+    },
+    {
+      "task": "gw-auth-guard",
+      "depends_on": "auth-hmac"
+    },
+    {
+      "task": "gw-auth-guard",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-docs",
+      "depends_on": "gw-tests-auth"
+    },
+    {
+      "task": "gw-errors",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "gw-logging",
+      "depends_on": "obs-logging"
+    },
+    {
+      "task": "gw-rate-limit",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-routes-events",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-routes-events",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "task": "gw-routes-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "task": "gw-routes-jobs",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-routes-jobs",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "task": "gw-routes-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "gw-routes-users",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-routes-users",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "task": "gw-routes-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "task": "gw-serialization",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "gw-serialization",
+      "depends_on": "contract-errors"
+    },
+    {
+      "task": "gw-tests-app",
+      "depends_on": "gw-app"
+    },
+    {
+      "task": "gw-tests-auth",
+      "depends_on": "gw-auth-guard"
+    },
+    {
+      "task": "gw-tests-ratelimit",
+      "depends_on": "gw-rate-limit"
+    },
+    {
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-events"
+    },
+    {
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-jobs"
+    },
+    {
+      "task": "gw-tests-routes",
+      "depends_on": "gw-routes-users"
+    },
+    {
+      "task": "gw-tests-validation",
+      "depends_on": "gw-validation"
+    },
+    {
+      "task": "gw-validation",
+      "depends_on": "contract-validate"
+    },
+    {
+      "task": "gw-validation",
+      "depends_on": "gw-serialization"
+    },
+    {
+      "task": "int-demo-script",
+      "depends_on": "int-e2e"
+    },
+    {
+      "task": "int-e2e",
+      "depends_on": "cli-jobs"
+    },
+    {
+      "task": "int-e2e",
+      "depends_on": "gw-auth-guard"
+    },
+    {
+      "task": "int-e2e",
+      "depends_on": "int-gateway-worker"
+    },
+    {
+      "task": "int-e2e",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "task": "int-gateway-worker",
+      "depends_on": "gw-routes-jobs"
+    },
+    {
+      "task": "int-gateway-worker",
+      "depends_on": "worker-exec"
+    },
+    {
+      "task": "int-readme",
+      "depends_on": "int-e2e"
+    },
+    {
+      "task": "int-repro",
+      "depends_on": "int-e2e"
+    },
+    {
+      "task": "int-storage-contract",
+      "depends_on": "contract-codec"
+    },
+    {
+      "task": "int-storage-contract",
+      "depends_on": "contract-validate"
+    },
+    {
+      "task": "int-storage-contract",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "int-verify-matrix",
+      "depends_on": "int-e2e"
+    },
+    {
+      "task": "int-verify-matrix",
+      "depends_on": "int-readme"
+    },
+    {
+      "task": "makefile",
+      "depends_on": "pytest-setup"
+    },
+    {
+      "task": "obs-context",
+      "depends_on": "obs-logging"
+    },
+    {
+      "task": "obs-docs",
+      "depends_on": "obs-tests-logging"
+    },
+    {
+      "task": "obs-endpoint",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "task": "obs-logging",
+      "depends_on": "shared-utils"
+    },
+    {
+      "task": "obs-metrics",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "obs-tests-context",
+      "depends_on": "obs-context"
+    },
+    {
+      "task": "obs-tests-logging",
+      "depends_on": "obs-logging"
+    },
+    {
+      "task": "obs-tests-metrics",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "task": "obs-tests-render",
+      "depends_on": "obs-endpoint"
+    },
+    {
+      "task": "obs-threshold",
+      "depends_on": "obs-metrics"
+    },
+    {
+      "task": "pytest-setup",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "task": "shared-errors",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "task": "shared-utils",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "task": "storage-bench",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "storage-conn",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "task": "storage-ddl",
+      "depends_on": "swarm-pkg-layout"
+    },
+    {
+      "task": "storage-docs",
+      "depends_on": "storage-tests-jobs"
+    },
+    {
+      "task": "storage-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "storage-init",
+      "depends_on": "storage-conn"
+    },
+    {
+      "task": "storage-init",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "task": "storage-migrations",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "task": "storage-migrations",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "storage-repo-events",
+      "depends_on": "storage-errors"
+    },
+    {
+      "task": "storage-repo-events",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "storage-repo-jobs",
+      "depends_on": "storage-errors"
+    },
+    {
+      "task": "storage-repo-jobs",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "storage-repo-users",
+      "depends_on": "storage-errors"
+    },
+    {
+      "task": "storage-repo-users",
+      "depends_on": "storage-init"
+    },
+    {
+      "task": "storage-tests-conn",
+      "depends_on": "storage-conn"
+    },
+    {
+      "task": "storage-tests-ddl",
+      "depends_on": "storage-ddl"
+    },
+    {
+      "task": "storage-tests-events",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "task": "storage-tests-jobs",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "storage-tests-migrations",
+      "depends_on": "storage-migrations"
+    },
+    {
+      "task": "storage-tests-txn",
+      "depends_on": "storage-transactions"
+    },
+    {
+      "task": "storage-tests-users",
+      "depends_on": "storage-repo-users"
+    },
+    {
+      "task": "storage-transactions",
+      "depends_on": "storage-conn"
+    },
+    {
+      "task": "swarm-pkg-layout",
+      "depends_on": "swarm-skeleton"
+    },
+    {
+      "task": "version-module",
+      "depends_on": "swarm-skeleton"
+    },
+    {
+      "task": "worker-docs",
+      "depends_on": "worker-tests-exec"
+    },
+    {
+      "task": "worker-errors",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "worker-exec",
+      "depends_on": "storage-repo-events"
+    },
+    {
+      "task": "worker-exec",
+      "depends_on": "worker-job-fn"
+    },
+    {
+      "task": "worker-exec",
+      "depends_on": "worker-poll"
+    },
+    {
+      "task": "worker-graceful",
+      "depends_on": "worker-pool"
+    },
+    {
+      "task": "worker-job-fn",
+      "depends_on": "contract-schema"
+    },
+    {
+      "task": "worker-poll",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "worker-pool",
+      "depends_on": "worker-exec"
+    },
+    {
+      "task": "worker-pool",
+      "depends_on": "worker-queue"
+    },
+    {
+      "task": "worker-queue",
+      "depends_on": "shared-errors"
+    },
+    {
+      "task": "worker-retry",
+      "depends_on": "storage-repo-jobs"
+    },
+    {
+      "task": "worker-tests-exec",
+      "depends_on": "worker-exec"
+    },
+    {
+      "task": "worker-tests-job-fn",
+      "depends_on": "worker-job-fn"
+    },
+    {
+      "task": "worker-tests-poll",
+      "depends_on": "worker-poll"
+    },
+    {
+      "task": "worker-tests-pool",
+      "depends_on": "worker-pool"
+    },
+    {
+      "task": "worker-tests-retry",
+      "depends_on": "worker-retry"
+    }
+  ]
+}

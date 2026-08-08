@@ -1,0 +1,14 @@
+S1=1  # tasks=114 edges=153 covered=114/114 unknown=[]
+S2=1  # orphans=0 not_done=0
+S3=1  # seq_violations=0 ts_violations=0
+S4=1  # double_starts=[] multi_agent=[]
+S5=1  # n=612
+S6=1  # missing_evidence=0 fail_cycles=3 fails=['storage-repo-jobs', 'worker-exec', 'contract-tests-codec']
+S7=1  # double_derive=True shipped_matches=True
+S8=1  # categories=4 citations=30
+S9/~50=1  # tasks=50 ctx_ok=True
+S9/~100=1  # tasks=100 ctx_ok=True
+S9/full=1  # tasks=114 ctx_ok=True
+S9=1  # cuts=['~50', '~100', 'full']
+S10=1  # lines=612 sdk_export=612 gaps=0
+VERDICT PASS

@@ -1,0 +1,235 @@
+# Replay facts (derived from events.log)
+
+- tasks: 114 · events: 612 · passes: 114 · failures: 3 · retries: 0 · duration: 1 min
+
+- seq 1  task_created           auth-claims — planned
+- seq 2  task_created           auth-constant-time — planned
+- seq 3  task_created           auth-docs — planned
+- seq 4  task_created           auth-errors — planned
+- seq 5  task_created           auth-hmac — planned
+- seq 6  task_created           auth-rotate — planned
+- seq 7  task_created           auth-scopes — planned
+- seq 8  task_created           auth-tests-claims — planned
+- seq 9  task_created           auth-tests-errors — planned
+- seq 10  task_created           auth-tests-hmac — planned
+- seq 11  task_created           auth-tests-rotate — planned
+- seq 12  task_created           auth-tests-scopes — planned
+- seq 13  task_created           ci-script — planned
+- seq 14  task_created           cli-docs — planned
+- seq 15  task_created           cli-errors — planned
+- seq 16  task_created           cli-events — planned
+- seq 17  task_created           cli-jobs — planned
+- seq 18  task_created           cli-output — planned
+- seq 19  task_created           cli-parser — planned
+- seq 20  task_created           cli-tests-events — planned
+- seq 21  task_created           cli-tests-jobs — planned
+- seq 22  task_created           cli-tests-parser — planned
+- seq 23  task_created           cli-tests-users — planned
+- seq 24  task_created           cli-users — planned
+- seq 25  task_created           contract-codec — planned
+- seq 26  task_created           contract-docs — planned
+- seq 27  task_created           contract-errors — planned
+- seq 28  task_created           contract-iso-time — planned
+- seq 29  task_created           contract-nested — planned
+- seq 30  task_created           contract-schema — planned
+- seq 31  task_created           contract-size-limit — planned
+- seq 32  task_created           contract-tests-codec — planned
+- seq 33  task_created           contract-tests-iso — planned
+- seq 34  task_created           contract-tests-limit — planned
+- seq 35  task_created           contract-tests-schema — planned
+- seq 36  task_created           contract-tests-unknown — planned
+- seq 37  task_created           contract-tests-validate — planned
+- seq 38  task_created           contract-tests-version — planned
+- seq 39  task_created           contract-unknown-fields — planned
+- seq 40  task_created           contract-validate — planned
+- seq 41  task_created           contract-versioning — planned
+- seq 42  task_created           foundation-tests — planned
+- seq 43  task_created           gw-app — planned
+- seq 44  task_created           gw-auth-guard — planned
+- seq 45  task_created           gw-docs — planned
+- seq 46  task_created           gw-errors — planned
+- seq 47  task_created           gw-logging — planned
+- seq 48  task_created           gw-rate-limit — planned
+- seq 49  task_created           gw-routes-events — planned
+- seq 50  task_created           gw-routes-jobs — planned
+- seq 51  task_created           gw-routes-users — planned
+- seq 52  task_created           gw-serialization — planned
+- seq 53  task_created           gw-tests-app — planned
+- seq 54  task_created           gw-tests-auth — planned
+- seq 55  task_created           gw-tests-ratelimit — planned
+- seq 56  task_created           gw-tests-routes — planned
+- seq 57  task_created           gw-tests-validation — planned
+- seq 58  task_created           gw-validation — planned
+- seq 59  task_created           int-demo-script — planned
+- seq 60  task_created           int-e2e — planned
+- seq 61  task_created           int-gateway-worker — planned
+- seq 62  task_created           int-readme — planned
+- seq 63  task_created           int-repro — planned
+- seq 64  task_created           int-storage-contract — planned
+- seq 65  task_created           int-verify-matrix — planned
+- seq 66  task_created           makefile — planned
+- seq 67  task_created           obs-context — planned
+- seq 68  task_created           obs-docs — planned
+- seq 69  task_created           obs-endpoint — planned
+- seq 70  task_created           obs-logging — planned
+- seq 71  task_created           obs-metrics — planned
+- seq 72  task_created           obs-tests-context — planned
+- seq 73  task_created           obs-tests-logging — planned
+- seq 74  task_created           obs-tests-metrics — planned
+- seq 75  task_created           obs-tests-render — planned
+- seq 76  task_created           obs-threshold — planned
+- seq 77  task_created           pytest-setup — planned
+- seq 78  task_created           shared-errors — planned
+- seq 79  task_created           shared-utils — planned
+- seq 80  task_created           storage-bench — planned
+- seq 81  task_created           storage-conn — planned
+- seq 82  task_created           storage-ddl — planned
+- seq 83  task_created           storage-docs — planned
+- seq 84  task_created           storage-errors — planned
+- seq 85  task_created           storage-init — planned
+- seq 86  task_created           storage-migrations — planned
+- seq 87  task_created           storage-repo-events — planned
+- seq 88  task_created           storage-repo-jobs — planned
+- seq 89  task_created           storage-repo-users — planned
+- seq 90  task_created           storage-tests-conn — planned
+- seq 91  task_created           storage-tests-ddl — planned
+- seq 92  task_created           storage-tests-events — planned
+- seq 93  task_created           storage-tests-jobs — planned
+- seq 94  task_created           storage-tests-migrations — planned
+- seq 95  task_created           storage-tests-txn — planned
+- seq 96  task_created           storage-tests-users — planned
+- seq 97  task_created           storage-transactions — planned
+- seq 98  task_created           swarm-pkg-layout — planned
+- seq 99  task_created           swarm-skeleton — planned
+- seq 100  task_created           version-module — planned
+- seq 101  task_created           worker-docs — planned
+- seq 102  task_created           worker-errors — planned
+- seq 103  task_created           worker-exec — planned
+- seq 104  task_created           worker-graceful — planned
+- seq 105  task_created           worker-job-fn — planned
+- seq 106  task_created           worker-poll — planned
+- seq 107  task_created           worker-pool — planned
+- seq 108  task_created           worker-queue — planned
+- seq 109  task_created           worker-retry — planned
+- seq 110  task_created           worker-tests-exec — planned
+- seq 111  task_created           worker-tests-job-fn — planned
+- seq 112  task_created           worker-tests-poll — planned
+- seq 113  task_created           worker-tests-pool — planned
+- seq 114  task_created           worker-tests-retry — planned
+- seq 269  verification_passed    swarm-skeleton
+- seq 272  verification_passed    swarm-pkg-layout
+- seq 276  verification_passed    version-module
+- seq 279  verification_passed    pytest-setup
+- seq 282  verification_passed    storage-ddl
+- seq 285  verification_passed    storage-conn
+- seq 288  verification_passed    storage-tests-ddl
+- seq 291  verification_passed    storage-init
+- seq 295  verification_passed    storage-tests-conn
+- seq 298  verification_passed    storage-transactions
+- seq 301  verification_passed    shared-errors
+- seq 305  verification_passed    shared-utils
+- seq 308  verification_passed    contract-errors
+- seq 311  verification_passed    storage-migrations
+- seq 314  verification_passed    cli-parser
+- seq 317  verification_passed    contract-schema
+- seq 320  verification_passed    obs-metrics
+- seq 323  verification_passed    worker-queue
+- seq 326  verification_passed    cli-errors
+- seq 329  verification_passed    foundation-tests
+- seq 332  verification_passed    obs-logging
+- seq 335  verification_passed    cli-output
+- seq 338  verification_passed    cli-tests-parser
+- seq 341  verification_passed    storage-tests-txn
+- seq 344  verification_passed    ci-script
+- seq 347  verification_passed    auth-claims
+- seq 350  verification_passed    obs-endpoint
+- seq 353  verification_passed    obs-tests-metrics
+- seq 356  verification_passed    auth-errors
+- seq 359  verification_passed    storage-errors
+- seq 362  verification_passed    storage-tests-migrations
+- seq 365  verification_passed    auth-hmac
+- seq 368  verification_failed    storage-repo-jobs — [storage claim must be atomic (BEGIN IMMEDIATE / single txn)] probe expected FAIL on v1: tests/test_review_atomicity.py:         ) E       AssertionError: double-claim: both connections received the same job (j1) — claim() is not atomic E       assert 'j1' != 'j1' tests\test_review_atomicity.py:34: AssertionError =========================== short test summary info =========================== FAILED tests/test_review_atomicity.py::test_claim_is_atomic_across_two_connections
+- seq 369  verification_passed    storage-repo-jobs
+- seq 372  verification_passed    storage-repo-users
+- seq 375  verification_passed    obs-threshold
+- seq 378  verification_passed    obs-context
+- seq 381  verification_passed    auth-scopes
+- seq 384  verification_passed    makefile
+- seq 387  verification_passed    worker-errors
+- seq 390  verification_passed    worker-job-fn
+- seq 393  verification_passed    obs-tests-logging
+- seq 396  verification_passed    worker-poll
+- seq 399  verification_passed    contract-codec
+- seq 402  verification_passed    storage-repo-events
+- seq 405  verification_passed    cli-users
+- seq 408  verification_passed    contract-validate
+- seq 411  verification_passed    auth-tests-claims
+- seq 414  verification_passed    worker-retry
+- seq 417  verification_passed    contract-iso-time
+- seq 420  verification_passed    obs-tests-render
+- seq 423  verification_failed    worker-exec — [worker decodes JSON-string payload before dispatch] probe expected FAIL on v1: tests/test_review_execution.py: E          E         - done E         + failed tests\test_review_execution.py:29: AssertionError =========================== short test summary info =========================== FAILED tests/test_review_execution.py::test_executor_decodes_json_string_payload
+- seq 424  verification_passed    worker-exec
+- seq 427  verification_passed    auth-tests-errors
+- seq 430  verification_passed    contract-tests-schema
+- seq 433  verification_passed    auth-tests-hmac
+- seq 436  verification_passed    storage-tests-jobs
+- seq 439  verification_passed    int-storage-contract
+- seq 442  verification_passed    obs-docs
+- seq 445  verification_passed    contract-versioning
+- seq 448  verification_passed    gw-logging
+- seq 451  verification_passed    auth-constant-time
+- seq 454  verification_passed    auth-rotate
+- seq 457  verification_passed    gw-app
+- seq 460  verification_passed    contract-nested
+- seq 463  verification_passed    cli-jobs
+- seq 466  verification_passed    worker-tests-poll
+- seq 469  verification_passed    obs-tests-context
+- seq 471  verification_passed    storage-tests-users
+- seq 474  verification_passed    auth-tests-scopes
+- seq 477  verification_passed    storage-bench
+- seq 480  verification_passed    storage-tests-events
+- seq 483  verification_passed    cli-events
+- seq 486  verification_passed    cli-tests-users
+- seq 489  verification_passed    contract-size-limit
+- seq 492  verification_failed    contract-tests-codec — [codec test asserts the real (lenient) contract] probe expected FAIL on v1: tests/test_contract_codec.py: >       assert m is None, "lenient mode must reject unknown fields (WRONG ASSERTION)" E       AssertionError: lenient mode must reject unknown fields (WRONG ASSERTION) E       assert UserMsg(id='u1', name='Ada', role='admin') is None tests\test_contract_codec.py:34: AssertionError =========================== short test summary info =========================== FAILED tests/test_contract_codec.py::test_lenient_ignores_unknown - Assertion...
+- seq 493  verification_passed    contract-tests-codec
+- seq 496  verification_passed    contract-tests-validate
+- seq 499  verification_passed    contract-unknown-fields
+- seq 502  verification_passed    gw-serialization
+- seq 505  verification_passed    worker-tests-job-fn
+- seq 508  verification_passed    worker-tests-retry
+- seq 511  verification_passed    worker-pool
+- seq 514  verification_passed    worker-tests-exec
+- seq 517  verification_passed    contract-tests-iso
+- seq 520  verification_passed    auth-docs
+- seq 523  verification_passed    contract-tests-version
+- seq 526  verification_passed    gw-auth-guard
+- seq 529  verification_passed    auth-tests-rotate
+- seq 532  verification_passed    cli-tests-events
+- seq 535  verification_passed    cli-tests-jobs
+- seq 538  verification_passed    gw-routes-jobs
+- seq 541  verification_passed    storage-docs
+- seq 543  verification_passed    gw-routes-users
+- seq 546  verification_passed    gw-errors
+- seq 549  verification_passed    worker-graceful
+- seq 553  verification_passed    worker-tests-pool
+- seq 556  verification_passed    cli-docs
+- seq 559  verification_passed    worker-docs
+- seq 561  verification_passed    gw-rate-limit
+- seq 564  verification_passed    gw-routes-events
+- seq 567  verification_passed    gw-tests-app
+- seq 570  verification_passed    gw-validation
+- seq 573  verification_passed    contract-docs
+- seq 576  verification_passed    contract-tests-limit
+- seq 579  verification_passed    contract-tests-unknown
+- seq 582  verification_passed    int-gateway-worker
+- seq 585  verification_passed    int-e2e
+- seq 588  verification_passed    int-demo-script
+- seq 591  verification_passed    int-readme
+- seq 594  verification_passed    gw-tests-auth
+- seq 597  verification_passed    gw-tests-routes
+- seq 600  verification_passed    gw-tests-ratelimit
+- seq 603  verification_passed    gw-tests-validation
+- seq 606  verification_passed    int-repro
+- seq 609  verification_passed    int-verify-matrix
+- seq 611  verification_passed    gw-docs

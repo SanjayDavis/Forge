@@ -1,0 +1,1324 @@
+{
+ "schema": 1,
+ "name": "swarm",
+ "tasks": {
+  "auth-claims": {
+   "files": [
+    "swarm/auth/claims.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/claims.py"
+   ],
+   "fault": null
+  },
+  "auth-constant-time": {
+   "files": [
+    "swarm/auth/token.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/token.py"
+   ],
+   "fault": null
+  },
+  "auth-docs": {
+   "files": [
+    "swarm/auth/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/auth/README.md"
+   ],
+   "fault": null
+  },
+  "auth-errors": {
+   "files": [
+    "swarm/auth/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/errors.py"
+   ],
+   "fault": null
+  },
+  "auth-hmac": {
+   "files": [
+    "swarm/auth/token.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/token.py"
+   ],
+   "fault": null
+  },
+  "auth-rotate": {
+   "files": [
+    "swarm/auth/keys.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/keys.py"
+   ],
+   "fault": null
+  },
+  "auth-scopes": {
+   "files": [
+    "swarm/auth/scopes.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/auth/scopes.py"
+   ],
+   "fault": null
+  },
+  "auth-tests-claims": {
+   "files": [
+    "tests/test_auth_claims.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_auth_claims.py"
+   ],
+   "fault": null
+  },
+  "auth-tests-errors": {
+   "files": [
+    "tests/test_auth_errors.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_auth_errors.py"
+   ],
+   "fault": null
+  },
+  "auth-tests-hmac": {
+   "files": [
+    "tests/test_auth_token.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_auth_token.py"
+   ],
+   "fault": null
+  },
+  "auth-tests-rotate": {
+   "files": [
+    "tests/test_auth_keys.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_auth_keys.py"
+   ],
+   "fault": null
+  },
+  "auth-tests-scopes": {
+   "files": [
+    "tests/test_auth_scopes.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_auth_scopes.py"
+   ],
+   "fault": null
+  },
+  "ci-script": {
+   "files": [
+    "scripts/ci.sh"
+   ],
+   "verify": [
+    "compile",
+    "scripts/ci.sh"
+   ],
+   "fault": null
+  },
+  "cli-docs": {
+   "files": [
+    "swarm/cli/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/cli/README.md"
+   ],
+   "fault": null
+  },
+  "cli-errors": {
+   "files": [
+    "swarm/cli/parser.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/parser.py"
+   ],
+   "fault": null
+  },
+  "cli-events": {
+   "files": [
+    "swarm/cli/parser.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/parser.py"
+   ],
+   "fault": null
+  },
+  "cli-jobs": {
+   "files": [
+    "swarm/cli/parser.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/parser.py"
+   ],
+   "fault": null
+  },
+  "cli-output": {
+   "files": [
+    "swarm/cli/output.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/output.py"
+   ],
+   "fault": null
+  },
+  "cli-parser": {
+   "files": [
+    "swarm/cli/parser.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/parser.py"
+   ],
+   "fault": null
+  },
+  "cli-tests-events": {
+   "files": [
+    "tests/test_cli_events.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_cli_events.py"
+   ],
+   "fault": null
+  },
+  "cli-tests-jobs": {
+   "files": [
+    "tests/test_cli_jobs.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_cli_jobs.py"
+   ],
+   "fault": null
+  },
+  "cli-tests-parser": {
+   "files": [
+    "tests/test_cli_parser.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_cli_parser.py"
+   ],
+   "fault": null
+  },
+  "cli-tests-users": {
+   "files": [
+    "tests/test_cli_users.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_cli_users.py"
+   ],
+   "fault": null
+  },
+  "cli-users": {
+   "files": [
+    "swarm/cli/parser.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/cli/parser.py"
+   ],
+   "fault": null
+  },
+  "contract-codec": {
+   "files": [
+    "swarm/contract/codec.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/codec.py"
+   ],
+   "fault": null
+  },
+  "contract-docs": {
+   "files": [
+    "swarm/contract/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/contract/README.md"
+   ],
+   "fault": null
+  },
+  "contract-errors": {
+   "files": [
+    "swarm/contract/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/errors.py"
+   ],
+   "fault": null
+  },
+  "contract-iso-time": {
+   "files": [
+    "swarm/contract/timeutil.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/timeutil.py"
+   ],
+   "fault": null
+  },
+  "contract-nested": {
+   "files": [
+    "swarm/contract/validate.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/validate.py"
+   ],
+   "fault": null
+  },
+  "contract-schema": {
+   "files": [
+    "swarm/contract/schema.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/schema.py"
+   ],
+   "fault": null
+  },
+  "contract-size-limit": {
+   "files": [
+    "swarm/contract/limits.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/limits.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-codec": {
+   "files": [
+    "tests/test_contract_codec.py",
+    "tests/test_contract_codec.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_codec.py"
+   ],
+   "fault": {
+    "file": "tests/test_contract_codec.py",
+    "verify": [
+     "pytest",
+     "tests/test_contract_codec.py"
+    ],
+    "title": "codec test asserts the real (lenient) contract",
+    "accept": [
+     "lenient decoding ignores unknown fields",
+     "tests/test_contract_codec.py passes"
+    ]
+   }
+  },
+  "contract-tests-iso": {
+   "files": [
+    "tests/test_contract_timeutil.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_timeutil.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-limit": {
+   "files": [
+    "tests/test_contract_limits.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_limits.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-schema": {
+   "files": [
+    "tests/test_contract_schema.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_schema.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-unknown": {
+   "files": [
+    "tests/test_contract_unknown.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_unknown.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-validate": {
+   "files": [
+    "tests/test_contract_validate.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_validate.py"
+   ],
+   "fault": null
+  },
+  "contract-tests-version": {
+   "files": [
+    "tests/test_contract_version.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_contract_version.py"
+   ],
+   "fault": null
+  },
+  "contract-unknown-fields": {
+   "files": [
+    "swarm/contract/codec.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/codec.py"
+   ],
+   "fault": null
+  },
+  "contract-validate": {
+   "files": [
+    "swarm/contract/validate.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/validate.py"
+   ],
+   "fault": null
+  },
+  "contract-versioning": {
+   "files": [
+    "swarm/contract/version.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/version.py"
+   ],
+   "fault": null
+  },
+  "foundation-tests": {
+   "files": [
+    "tests/test_foundation.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_foundation.py"
+   ],
+   "fault": null
+  },
+  "gw-app": {
+   "files": [
+    "swarm/gateway/app.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/app.py"
+   ],
+   "fault": null
+  },
+  "gw-auth-guard": {
+   "files": [
+    "swarm/gateway/guard.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/guard.py"
+   ],
+   "fault": null
+  },
+  "gw-docs": {
+   "files": [
+    "swarm/gateway/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/gateway/README.md"
+   ],
+   "fault": null
+  },
+  "gw-errors": {
+   "files": [
+    "swarm/gateway/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/errors.py"
+   ],
+   "fault": null
+  },
+  "gw-logging": {
+   "files": [
+    "swarm/gateway/log.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/log.py"
+   ],
+   "fault": null
+  },
+  "gw-rate-limit": {
+   "files": [
+    "swarm/gateway/ratelimit.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/ratelimit.py"
+   ],
+   "fault": null
+  },
+  "gw-routes-events": {
+   "files": [
+    "swarm/gateway/routes_events.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/routes_events.py"
+   ],
+   "fault": null
+  },
+  "gw-routes-jobs": {
+   "files": [
+    "swarm/gateway/routes_jobs.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/routes_jobs.py"
+   ],
+   "fault": null
+  },
+  "gw-routes-users": {
+   "files": [
+    "swarm/gateway/routes_users.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/routes_users.py"
+   ],
+   "fault": null
+  },
+  "gw-serialization": {
+   "files": [
+    "swarm/gateway/serialize.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/serialize.py"
+   ],
+   "fault": null
+  },
+  "gw-tests-app": {
+   "files": [
+    "tests/test_gateway_app.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_gateway_app.py"
+   ],
+   "fault": null
+  },
+  "gw-tests-auth": {
+   "files": [
+    "tests/test_gateway_guard.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_gateway_guard.py"
+   ],
+   "fault": null
+  },
+  "gw-tests-ratelimit": {
+   "files": [
+    "tests/test_gateway_ratelimit.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_gateway_ratelimit.py"
+   ],
+   "fault": null
+  },
+  "gw-tests-routes": {
+   "files": [
+    "tests/test_gateway_routes.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_gateway_routes.py"
+   ],
+   "fault": null
+  },
+  "gw-tests-validation": {
+   "files": [
+    "tests/test_gateway_validate.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_gateway_validate.py"
+   ],
+   "fault": null
+  },
+  "gw-validation": {
+   "files": [
+    "swarm/gateway/validate.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/gateway/validate.py"
+   ],
+   "fault": null
+  },
+  "int-demo-script": {
+   "files": [
+    "demo/run_demo.py"
+   ],
+   "verify": [
+    "compile",
+    "demo/run_demo.py"
+   ],
+   "fault": null
+  },
+  "int-e2e": {
+   "files": [
+    "tests/test_integration_e2e.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_integration_e2e.py"
+   ],
+   "fault": null
+  },
+  "int-gateway-worker": {
+   "files": [
+    "tests/test_integration_gateway_worker.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_integration_gateway_worker.py"
+   ],
+   "fault": null
+  },
+  "int-readme": {
+   "files": [
+    "README.md"
+   ],
+   "verify": [
+    "exists",
+    "README.md"
+   ],
+   "fault": null
+  },
+  "int-repro": {
+   "files": [
+    "scripts/reproduce.sh"
+   ],
+   "verify": [
+    "compile",
+    "scripts/reproduce.sh"
+   ],
+   "fault": null
+  },
+  "int-storage-contract": {
+   "files": [
+    "swarm/integration/mapping.py",
+    "tests/test_integration_mapping.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_integration_mapping.py"
+   ],
+   "fault": null
+  },
+  "int-verify-matrix": {
+   "files": [
+    "scripts/verify.sh"
+   ],
+   "verify": [
+    "compile",
+    "scripts/verify.sh"
+   ],
+   "fault": null
+  },
+  "makefile": {
+   "files": [
+    "Makefile"
+   ],
+   "verify": [
+    "exists",
+    "Makefile"
+   ],
+   "fault": null
+  },
+  "obs-context": {
+   "files": [
+    "swarm/observe/context.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/observe/context.py"
+   ],
+   "fault": null
+  },
+  "obs-docs": {
+   "files": [
+    "swarm/observe/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/observe/README.md"
+   ],
+   "fault": null
+  },
+  "obs-endpoint": {
+   "files": [
+    "swarm/observe/render.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/observe/render.py"
+   ],
+   "fault": null
+  },
+  "obs-logging": {
+   "files": [
+    "swarm/observe/logging.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/observe/logging.py"
+   ],
+   "fault": null
+  },
+  "obs-metrics": {
+   "files": [
+    "swarm/observe/metrics.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/observe/metrics.py"
+   ],
+   "fault": null
+  },
+  "obs-tests-context": {
+   "files": [
+    "tests/test_observe_context.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_observe_context.py"
+   ],
+   "fault": null
+  },
+  "obs-tests-logging": {
+   "files": [
+    "tests/test_observe_logging.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_observe_logging.py"
+   ],
+   "fault": null
+  },
+  "obs-tests-metrics": {
+   "files": [
+    "tests/test_observe_metrics.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_observe_metrics.py"
+   ],
+   "fault": null
+  },
+  "obs-tests-render": {
+   "files": [
+    "tests/test_observe_render.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_observe_render.py"
+   ],
+   "fault": null
+  },
+  "obs-threshold": {
+   "files": [
+    "swarm/observe/threshold.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/observe/threshold.py"
+   ],
+   "fault": null
+  },
+  "pytest-setup": {
+   "files": [
+    "pyproject.toml",
+    "tests/conftest.py"
+   ],
+   "verify": [
+    "compile",
+    "tests/conftest.py"
+   ],
+   "fault": null
+  },
+  "shared-errors": {
+   "files": [
+    "swarm/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/errors.py"
+   ],
+   "fault": null
+  },
+  "shared-utils": {
+   "files": [
+    "swarm/util.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/util.py"
+   ],
+   "fault": null
+  },
+  "storage-bench": {
+   "files": [
+    "scripts/bench_storage.py"
+   ],
+   "verify": [
+    "compile",
+    "scripts/bench_storage.py"
+   ],
+   "fault": null
+  },
+  "storage-conn": {
+   "files": [
+    "swarm/storage/conn.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/conn.py"
+   ],
+   "fault": null
+  },
+  "storage-ddl": {
+   "files": [
+    "swarm/storage/ddl.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/ddl.py"
+   ],
+   "fault": null
+  },
+  "storage-docs": {
+   "files": [
+    "swarm/storage/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/storage/README.md"
+   ],
+   "fault": null
+  },
+  "storage-errors": {
+   "files": [
+    "swarm/storage/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/errors.py"
+   ],
+   "fault": null
+  },
+  "storage-init": {
+   "files": [
+    "swarm/storage/init.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/init.py"
+   ],
+   "fault": null
+  },
+  "storage-migrations": {
+   "files": [
+    "swarm/storage/migrations.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/migrations.py"
+   ],
+   "fault": null
+  },
+  "storage-repo-events": {
+   "files": [
+    "swarm/storage/events.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/events.py"
+   ],
+   "fault": null
+  },
+  "storage-repo-jobs": {
+   "files": [
+    "swarm/storage/jobs.py",
+    "swarm/storage/jobs.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_review_atomicity.py"
+   ],
+   "fault": {
+    "file": "swarm/storage/jobs.py",
+    "verify": [
+     "pytest",
+     "tests/test_review_atomicity.py"
+    ],
+    "title": "storage claim must be atomic (BEGIN IMMEDIATE / single txn)",
+    "acceptance": [
+     "a second connection must never claim the same job",
+     "tests/test_review_atomicity.py passes"
+    ]
+   }
+  },
+  "storage-repo-users": {
+   "files": [
+    "swarm/storage/users.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/users.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-conn": {
+   "files": [
+    "tests/test_storage_conn.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_conn.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-ddl": {
+   "files": [
+    "tests/test_storage_ddl.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_ddl.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-events": {
+   "files": [
+    "tests/test_storage_events.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_events.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-jobs": {
+   "files": [
+    "tests/test_storage_jobs.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_jobs.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-migrations": {
+   "files": [
+    "tests/test_storage_migrations.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_migrations.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-txn": {
+   "files": [
+    "tests/test_storage_txn.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_txn.py"
+   ],
+   "fault": null
+  },
+  "storage-tests-users": {
+   "files": [
+    "tests/test_storage_users.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_storage_users.py"
+   ],
+   "fault": null
+  },
+  "storage-transactions": {
+   "files": [
+    "swarm/storage/txn.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/storage/txn.py"
+   ],
+   "fault": null
+  },
+  "swarm-pkg-layout": {
+   "files": [
+    "swarm/contract/__init__.py",
+    "swarm/storage/__init__.py",
+    "swarm/auth/__init__.py",
+    "swarm/gateway/__init__.py",
+    "swarm/worker/__init__.py",
+    "swarm/cli/__init__.py",
+    "swarm/observe/__init__.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/contract/__init__.py",
+    "swarm/storage/__init__.py",
+    "swarm/auth/__init__.py",
+    "swarm/gateway/__init__.py",
+    "swarm/worker/__init__.py",
+    "swarm/cli/__init__.py",
+    "swarm/observe/__init__.py"
+   ],
+   "fault": null
+  },
+  "swarm-skeleton": {
+   "files": [
+    "pyproject.toml",
+    ".gitignore",
+    "swarm/__init__.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/__init__.py"
+   ],
+   "fault": null
+  },
+  "version-module": {
+   "files": [
+    "swarm/__init__.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/__init__.py"
+   ],
+   "fault": null
+  },
+  "worker-docs": {
+   "files": [
+    "swarm/worker/README.md"
+   ],
+   "verify": [
+    "exists",
+    "swarm/worker/README.md"
+   ],
+   "fault": null
+  },
+  "worker-errors": {
+   "files": [
+    "swarm/worker/errors.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/errors.py"
+   ],
+   "fault": null
+  },
+  "worker-exec": {
+   "files": [
+    "swarm/worker/executor.py",
+    "swarm/worker/executor.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_review_execution.py"
+   ],
+   "fault": {
+    "file": "swarm/worker/executor.py",
+    "verify": [
+     "pytest",
+     "tests/test_review_execution.py"
+    ],
+    "title": "worker decodes JSON-string payload before dispatch",
+    "acceptance": [
+     "payload is json.loads()ed before handler dispatch",
+     "tests/test_review_execution.py passes"
+    ]
+   }
+  },
+  "worker-graceful": {
+   "files": [
+    "swarm/worker/pool.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/pool.py"
+   ],
+   "fault": null
+  },
+  "worker-job-fn": {
+   "files": [
+    "swarm/worker/jobs.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/jobs.py"
+   ],
+   "fault": null
+  },
+  "worker-poll": {
+   "files": [
+    "swarm/worker/poll.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/poll.py"
+   ],
+   "fault": null
+  },
+  "worker-pool": {
+   "files": [
+    "swarm/worker/pool.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/pool.py"
+   ],
+   "fault": null
+  },
+  "worker-queue": {
+   "files": [
+    "swarm/worker/queue.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/queue.py"
+   ],
+   "fault": null
+  },
+  "worker-retry": {
+   "files": [
+    "swarm/worker/retry.py"
+   ],
+   "verify": [
+    "compile",
+    "swarm/worker/retry.py"
+   ],
+   "fault": null
+  },
+  "worker-tests-exec": {
+   "files": [
+    "tests/test_worker_executor.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_worker_executor.py"
+   ],
+   "fault": null
+  },
+  "worker-tests-job-fn": {
+   "files": [
+    "tests/test_worker_jobs.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_worker_jobs.py"
+   ],
+   "fault": null
+  },
+  "worker-tests-poll": {
+   "files": [
+    "tests/test_worker_poll.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_worker_poll.py"
+   ],
+   "fault": null
+  },
+  "worker-tests-pool": {
+   "files": [
+    "tests/test_worker_pool.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_worker_pool.py"
+   ],
+   "fault": null
+  },
+  "worker-tests-retry": {
+   "files": [
+    "tests/test_worker_retry.py"
+   ],
+   "verify": [
+    "pytest",
+    "tests/test_worker_retry.py"
+   ],
+   "fault": null
+  }
+ },
+ "fault_plans": {
+  "contract-tests-codec": {
+   "file": "tests/test_contract_codec.py",
+   "v1": "import json\n\nfrom swarm.contract.codec import to_json, from_json\nfrom swarm.contract.schema import UserMsg, JobMsg, EventMsg\n\n\ndef test_roundtrip_user():\n    m = UserMsg(\"u1\", \"Ada\", \"admin\")\n    assert from_json(to_json(m), UserMsg) == m\n\n\ndef test_roundtrip_job():\n    m = JobMsg(\"j1\", \"u1\", \"echo\", {\"text\": \"hi\"}, \"todo\")\n    assert from_json(to_json(m), JobMsg) == m\n\n\ndef test_roundtrip_event():\n    m = EventMsg(\"e1\", \"job.completed\", {\"job\": \"j1\"}, \"2026-01-01T00:00:00Z\")\n    assert from_json(to_json(m), EventMsg) == m\n\n\ndef test_canonical_sorted_keys():\n    m = UserMsg(\"u1\", \"Ada\", \"admin\")\n    obj = json.loads(to_json(m))\n    assert list(obj.keys()) == [\"id\", \"name\", \"role\"]\n\n\n# FAULT (v1, wrong-test lesson \u00a74.3): this asserts the WRONG contract. The\n# codec is lenient by default and IGNORES unknown fields; this test claims it\n# must REJECT them. The test (not the code) is wrong and must fail.\ndef test_lenient_ignores_unknown():\n    text = '{\"id\": \"u1\", \"name\": \"Ada\", \"role\": \"admin\", \"zzz\": 1}'\n    m = from_json(text, UserMsg)\n    assert m is None, \"lenient mode must reject unknown fields (WRONG ASSERTION)\"",
+   "verify": [
+    "pytest",
+    "tests/test_contract_codec.py"
+   ],
+   "needs": [
+    "tests/test_contract_codec.py"
+   ],
+   "title": "codec test asserts the real (lenient) contract",
+   "acceptance": [
+    "lenient decoding ignores unknown fields",
+    "tests/test_contract_codec.py passes"
+   ]
+  },
+  "storage-repo-jobs": {
+   "file": "swarm/storage/jobs.py",
+   "v1": "\"\"\"JobRepository \u2014 CRUD plus a claim() over the ``jobs`` table.\n\nNOTE (fault-injected v1, \u00a74.2 concurrency-race lesson): this variant SELECTs a\n``todo`` row but never flips it to ``running`` \u2014 so every worker that calls\nclaim() receives the SAME job. Only the canonical v2 transitions the row and\nmakes double-claim impossible. tests/review_atomicity.py must fail under this\nvariant (both connections claim ``j1`` -> double-claim).\n\"\"\"\nfrom __future__ import annotations\n\nimport sqlite3\nfrom typing import Any, Dict, Optional\n\nfrom ..util import utcnow_iso\n\n_COLS = (\n    \"id\", \"user_id\", \"kind\", \"payload\", \"status\",\n    \"attempts\", \"created_at\", \"updated_at\",\n)\n\n\nclass JobRepo:\n    \"\"\"Repo for the ``jobs`` table. Row dicts include ALL columns.\"\"\"\n\n    def __init__(self, conn: sqlite3.Connection):\n        self.conn = conn\n        self.conn.row_factory = sqlite3.Row\n\n    def create(self, job_id: str, user_id: str, kind: str, payload: str) -> Dict[str, Any]:\n        \"\"\"Insert a job. ``payload`` is the caller's JSON-encoded **string**.\"\"\"\n        now = utcnow_iso()\n        row = {\n            \"id\": job_id,\n            \"user_id\": user_id,\n            \"kind\": kind,\n            \"payload\": payload,\n            \"status\": \"todo\",\n            \"attempts\": 0,\n            \"created_at\": now,\n            \"updated_at\": now,\n        }\n        self.conn.execute(\n            \"INSERT INTO jobs (id, user_id, kind, payload, status, attempts,\"\n            \" created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)\",\n            tuple(row[k] for k in _COLS),\n        )\n        self.conn.commit()\n        return dict(row)\n\n    def get(self, job_id: str) -> Optional[Dict[str, Any]]:\n        \"\"\"Return the job row dict, or ``None`` when absent.\"\"\"\n        row = self.conn.execute(\n            \"SELECT * FROM jobs WHERE id = ?\", (job_id,)\n        ).fetchone()\n        return dict(row) if row is not None else None\n\n    def claim(self) -> Optional[Dict[str, Any]]:\n        \"\"\"Return the next ``todo`` job.\n\n        FAULT: the row is NOT transitioned to ``running``. Every caller gets\n        the same row again, so two connections both claim ``j1`` \u2014 a real\n        double-claim. The green v2 atomically UPDATEs to running instead.\n        \"\"\"\n        row = self.conn.execute(\n            \"SELECT * FROM jobs WHERE status = 'todo' ORDER BY rowid LIMIT 1\"\n        ).fetchone()\n        if row is None:\n            return None\n        return dict(row)  # status stays 'todo' \u2014 bug\n\n    def complete(self, job_id: str) -> None:\n        \"\"\"Mark the job done (status ``done``) and bump ``updated_at``.\"\"\"\n        now = utcnow_iso()\n        self.conn.execute(\n            \"UPDATE jobs SET status = 'done', updated_at = ? WHERE id = ?\",\n            (now, job_id),\n        )\n        self.conn.commit()\n\n    def fail(self, job_id: str, reason: str) -> None:\n        \"\"\"Mark the job failed: status ``failed``, attempts + 1, ``updated_at``.\"\"\"\n        now = utcnow_iso()\n        self.conn.execute(\n            \"UPDATE jobs SET status = 'failed', attempts = attempts + 1,\"\n            \" updated_at = ? WHERE id = ?\",\n            (now, job_id),\n        )\n        self.conn.commit()",
+   "verify": [
+    "pytest",
+    "tests/test_review_atomicity.py"
+   ],
+   "needs": [
+    "tests/test_review_atomicity.py"
+   ],
+   "title": "storage claim must be atomic (BEGIN IMMEDIATE / single txn)",
+   "acceptance": [
+    "a second connection must never claim the same job",
+    "tests/test_review_atomicity.py passes"
+   ]
+  },
+  "worker-exec": {
+   "file": "swarm/worker/executor.py",
+   "v1": "\"\"\"The job executor: poll -> dispatch -> complete/fail, with event logging.\n\nNOTE (fault-injected v1, PHASE2_DESIGN.md \u00a74.1 contract drift): the worker\nreads the payload column as if it were already a dict, but storage stores it\nas a JSON *string*. Calling handler(payload) with a str raises\nAttributeError, so jobs fail en masse. tests/review_execution.py must fail\nunder this variant.\n\"\"\"\nfrom __future__ import annotations\n\nimport json\nimport sqlite3\nimport uuid\nfrom typing import Any, Dict, Optional\n\nfrom ..storage.events import EventRepo\nfrom ..storage.jobs import JobRepo\nfrom ..util import utcnow_iso\nfrom .jobs import JOB_KINDS\nfrom .poll import next_ready_job\n\n\ndef _new_event_id() -> str:\n    return uuid.uuid4().hex\n\n\ndef _append_event(conn: sqlite3.Connection, type_: str, data: str) -> None:\n    EventRepo(conn).append(_new_event_id(), type_, data, utcnow_iso())\n\n\ndef run_once(conn: sqlite3.Connection,\n             job_fn: Optional[Dict[str, Any]] = None) -> Optional[str]:\n    \"\"\"Poll for one job and process it.\"\"\"\n    if job_fn is None:\n        job_fn = JOB_KINDS\n\n    row = next_ready_job(conn)\n    if row is None:\n        return None\n    job_id = row[\"id\"]\n    kind = row[\"kind\"]\n\n    # FAULT: payload comes from the column as a JSON string, but we pass it to\n    # the handler as-is (a str). handler[text] -> AttributeError.\n    payload: Any = row[\"payload\"]\n\n    handler = job_fn.get(kind)\n    if handler is None:\n        _fail(conn, row, f\"unknown job kind: {kind}\")\n        return job_id\n\n    try:\n        result = handler(payload)\n    except Exception as exc:\n        _fail(conn, row, f\"execution failed: {exc}\")\n        return job_id\n\n    JobRepo(conn).complete(job_id)\n    _append_event(conn, \"job.completed\",\n                  json.dumps({\"job_id\": job_id, \"kind\": kind,\n                              \"result\": result}, default=str))\n    return job_id\n\n\ndef _fail(conn: sqlite3.Connection, row: Dict[str, Any], reason: str) -> None:\n    job_id = row[\"id\"]\n    kind = row[\"kind\"]\n    JobRepo(conn).fail(job_id, reason)\n    _append_event(conn, \"job.failed\",\n                  json.dumps({\"job_id\": job_id, \"kind\": kind,\n                              \"reason\": reason}))",
+   "verify": [
+    "pytest",
+    "tests/test_review_execution.py"
+   ],
+   "needs": [
+    "tests/test_review_execution.py"
+   ],
+   "title": "worker decodes JSON-string payload before dispatch",
+   "acceptance": [
+    "payload is json.loads()ed before handler dispatch",
+    "tests/test_review_execution.py passes"
+   ]
+  }
+ },
+ "probe_bootstrap": [
+  "pyproject.toml",
+  "swarm/__init__.py",
+  "swarm/auth/README.md",
+  "swarm/auth/__init__.py",
+  "swarm/auth/claims.py",
+  "swarm/auth/errors.py",
+  "swarm/auth/keys.py",
+  "swarm/auth/scopes.py",
+  "swarm/auth/token.py",
+  "swarm/cli/README.md",
+  "swarm/cli/__init__.py",
+  "swarm/cli/handlers.py",
+  "swarm/cli/output.py",
+  "swarm/cli/parser.py",
+  "swarm/contract/README.md",
+  "swarm/contract/__init__.py",
+  "swarm/contract/codec.py",
+  "swarm/contract/errors.py",
+  "swarm/contract/limits.py",
+  "swarm/contract/schema.py",
+  "swarm/contract/timeutil.py",
+  "swarm/contract/validate.py",
+  "swarm/contract/version.py",
+  "swarm/errors.py",
+  "swarm/gateway/README.md",
+  "swarm/gateway/__init__.py",
+  "swarm/gateway/app.py",
+  "swarm/gateway/errors.py",
+  "swarm/gateway/guard.py",
+  "swarm/gateway/log.py",
+  "swarm/gateway/ratelimit.py",
+  "swarm/gateway/routes_events.py",
+  "swarm/gateway/routes_jobs.py",
+  "swarm/gateway/routes_users.py",
+  "swarm/gateway/serialize.py",
+  "swarm/gateway/validate.py",
+  "swarm/integration/README.md",
+  "swarm/integration/__init__.py",
+  "swarm/integration/mapping.py",
+  "swarm/observe/README.md",
+  "swarm/observe/__init__.py",
+  "swarm/observe/context.py",
+  "swarm/observe/logging.py",
+  "swarm/observe/metrics.py",
+  "swarm/observe/render.py",
+  "swarm/observe/threshold.py",
+  "swarm/storage/README.md",
+  "swarm/storage/__init__.py",
+  "swarm/storage/conn.py",
+  "swarm/storage/ddl.py",
+  "swarm/storage/errors.py",
+  "swarm/storage/events.py",
+  "swarm/storage/init.py",
+  "swarm/storage/jobs.py",
+  "swarm/storage/migrations.py",
+  "swarm/storage/txn.py",
+  "swarm/storage/users.py",
+  "swarm/util.py",
+  "swarm/worker/README.md",
+  "swarm/worker/__init__.py",
+  "swarm/worker/errors.py",
+  "swarm/worker/executor.py",
+  "swarm/worker/jobs.py",
+  "swarm/worker/poll.py",
+  "swarm/worker/pool.py",
+  "swarm/worker/queue.py",
+  "swarm/worker/retry.py",
+  "tests/conftest.py"
+ ],
+ "sources": 121,
+ "fault_names": {
+  "storage-repo-jobs": "swarm/storage/jobs.py",
+  "worker-exec": "swarm/worker/executor.py",
+  "contract-tests-codec": "tests/test_contract_codec.py"
+ }
+}

@@ -14,7 +14,7 @@ VF / (VPass + VF).
 |-------|----------|----------|--------|
 | 0 | Forge is real | core + SDK + planner + MCP + CLI milestones (tags `m2b`…`m5.1`); Proofs #1/#2 | **closed** |
 | 1 | "Forge is Python-specific" / "only web apps / toys" (C1–C3) | Proofs #3 (C++) + #4 (Rust) — non-Python generalization datapoints | **closed** — evidence for `0.1.0a3` |
-| 2 | "Can't handle long projects / one agent" (C4, C5) | Proof #5: 100+ task multi-agent stress proof (*designed*, see [PHASE2_DESIGN.md](PHASE2_DESIGN.md)) | **next** |
+| 2 | "Can't handle long projects / one agent" (C4, C5) | Proof #5: 100+ task multi-agent stress proof ([design](PHASE2_DESIGN.md), run: `examples/swarm`) | **closed** |
 | 3 | publish-per-evidence gate | dists already live for foundation/planner/mcp; each release ships behind its phase evidence | gate |
 
 `0.1.0a3` — **Generalization** — is the tagged release-point whose evidence corpus is the
@@ -30,7 +30,7 @@ version note in the Proof #4 entry). `0.1.0a4` will carry the Phase 2 multi-agen
 | 2 | [CHIP-8 emulator](#proof-2--chip-8-emulator) | Python | completed | 42 | 259 | 23 | 42 | 2 | 0 | 0 | 44 | not recorded | C1, C2, C7 | **yes** |
 | 3 | [expression-parser](#proof-3--c-expression-parser) | C++ | completed | 17 | 96 | 3 | 17 | 0 | 0 | 0 | 19 | not recorded | C1, C3 | **yes** |
 | 4 | [rust-cli](#proof-4--rust-cli) | Rust | completed | 15 | 86 | 6 | 15 | 0 | 0 | 0 | 1 | not recorded | C1, C3 | **yes** |
-| 5 | multi-agent *(planned)* | — | — | — | — | — | — | — | — | — | — | C4, C5 | — |
+| 5 | [swarm](#proof-5--swarm-multi-agent-project) | Python | completed | 114 | 612 | 28 | 114 | 3 | 0 | 0 | 1 | not | C4, C5 | **yes** |
 
 ## Claim coverage
 
@@ -237,13 +237,62 @@ pattern rather than an anecdote.
 
 ---
 
-## Proof #5 — Multi-Agent Project *(planned)*
+## Proof #5 — Swarm (multi-agent project)
 
-**Claims:** C4, C5
+**Language:** Python · **Status:** completed · **Claims:** C4, C5
+(the same log additionally evidences C1/C3 mechanics at scale without
+formally claiming them: cross-process log integrity and dependency
+partial-order across 4 processes).
 
-Why: planner/executor/verifier handoffs, reviewer loops, 100+ task scale. This is the
-proof that answers "long projects" and "one agent" together. May be split into two
-proofs if the 100+ task run and the multi-agent run are cleaner as separate evidence.
+|||| Metric | Value |
+|||---|--------|-------|
+|||| tasks | 114 |
+|||| events | 612 |
+|||| verification passes | 114 |
+|||| verification failures | 3 |
+|||| failure rate | 2.6% (3 of 117 attempts) |
+|||| retries | 0 (failures fixed + re-verified inside the same claim, no `task_retried` op) |
+|||| max_ready_queue | 28 (at seq 408, when contract-validate passed; pre-flight predicted 26) |
+|||| duration (min) | 1 |
+|||| llm | not recorded |
+
+**Planning (Aug 2026):** `examples/swarm/proposal.json` holds the 114-task,
+153-edge decomposition (proposal id `prop_swarm_001`, 9 subsystems, DAG depth
+11, ownership split 42/30/25/17 across 4 subsystems groups): contract,
+storage, auth, gateway, worker, cli, observe, integration. `preflight_dag.py`
+gated the DAG (PASSED) before the run launched.
+
+**Story (replay.md summary):** four independent OS processes raced on one
+shared Forge project through the public `Kernel` SDK — claims, verification,
+dependency ordering, event-log integrity under N=4 writers. The run went
+plan → 4-agent execution → verification in **1 minute** (612 contiguous
+events, `max_ready_queue = 28`). Three genuine failures are preserved in the
+journal, each a real red→green cycle: `storage-repo-jobs` (a non-atomic
+`claim()` really double-issued a job to two connections — caught by the
+atomicity review probe), `worker-exec` (the worker dispatched the raw
+payload instead of decoding the JSON-string column written by storage — a
+cross-subsystem seam), and `contract-tests-codec` (the *probe itself* was
+wrong: it asserted lenient mode rejects unknown fields; verification was
+corrected, not the code). Final: 197 tests green, S1..S10 invariants all
+pass, double-derive byte-identical, `proof-check` CONFORMING.
+
+**Conformance:** **conforming** to `proof-spec-0.1` (Aug 2026). `proof-check`
+passes; `graph.json`/`metrics.json`/`graph.png`/`replay.md` derive from
+`events.log` alone (612 events, contiguous seq 1–612) and the derivation is
+byte-stable (S7 double-derive hash match). Two genuine engineering findings
+are documented in the README: MSYS `/c/...` path opacity on Windows, and
+DAG-ordering vs. import-closure/probe bootstrap (package skeleton prefetch
+is probe-environment, not a DAG edge).
+
+**MaxQ interpretation:** `max_ready_queue = 28` is the widest
+simultaneously-executable frontier of a 100+-task graph under 4 processes —
+measured at the moment `contract-validate` passed (seq 408), when the
+gateway fan-out wave became ready at once. It is the first Property-#5
+quantitative datapoint on plan-driven versus discovery-driven production
+problems at C4/C5 scale, and matches the pre-flight prediction (26) closely
+enough to validate the planner's queue math.
+
+**Location:** `examples/swarm/` (fifth entry in the corpus).
 
 ---
 
@@ -253,6 +302,6 @@ proofs if the 100+ task run and the multi-agent run are cleaner as separate evid
 - [x] Proof #2 CHIP-8 — build per standard
 - [x] Proof #3 C++ expression parser — conforming Aug 2026
 - [x] Proof #4 Rust CLI — conforming Aug 2026
-- [ ] Proof #5 multi-agent / 100+ task run
+- [x] Proof #5 multi-agent / 100+ task run — conforming Aug 2026
 - [ ] Tooling (optional): a `proof-check` script that validates a proof's bundle against
       PROOF_SPEC.md — a convenience, not part of the standard

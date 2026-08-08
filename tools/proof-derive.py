@@ -22,11 +22,27 @@ FIELD_DEFAULTS = {
 }
 
 
+def _subsystem_of(e):
+    """Subsystem tag from a task_created event's notes list.
+
+    The proposal schema (docs/EVENTS.md) does not define a top-level
+    `subsystem` field; Proof #5's proposal embeds it as a structured note
+    ("subsystem: auth"). Parsing the note keeps graph.json a pure function
+    of events.log. Proofs whose notes do not carry the marker get None
+    (graph.png falls back to the 'other' border color).
+    """
+    for note in e.get("notes") or []:
+        if str(note).strip().startswith("subsystem:"):
+            return str(note).split(":", 1)[1].strip()
+    return None
+
+
 def replay(events):
     """Reconstruct final task state and edge list from the event log."""
     status = {}   # task id -> 'done' | 'in_progress' | 'needs_revision' | 'todo'
     priority = {}
     title = {}
+    subsystem = {}
     edges = []    # (dep, targ)
     milestones = []
     meta = {
@@ -41,6 +57,7 @@ def replay(events):
             status[e["id"]] = "todo"
             priority[e["id"]] = e.get("priority", "medium")
             title[e["id"]] = e.get("title", e["id"])
+            subsystem[e["id"]] = _subsystem_of(e)
             milestones.append((seq, "task_created", e["id"], "planned"))
         elif op == "task_started":
             status[e["id"]] = "in_progress"
@@ -98,7 +115,7 @@ def replay(events):
     meta["max_ready_queue_at"] = {"seq": peak_seq, "event": peak_ev[0], "id": peak_ev[1]}
     return {
         "tasks": {tid: {"id": tid, "title": title[tid], "status": status[tid],
-                        "priority": priority[tid]}
+                        "priority": priority[tid], "subsystem": subsystem.get(tid)}
                   for tid in status},
         "edges": edges, "status": status, "meta": meta,
         "milestones": milestones,

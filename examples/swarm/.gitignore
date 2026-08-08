@@ -3,6 +3,9 @@
 /swarm.db
 /.proof-work/
 /demo/.frames/
+/demo/_tree/
+/demo/_manifest.json
+/demo/record/session.db
 __pycache__/
 *.pyc
 *.pyo
