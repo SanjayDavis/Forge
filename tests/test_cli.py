@@ -138,5 +138,97 @@ class CliTest(unittest.TestCase):
         self.assertIn("not empty", r.stderr)
 
 
+class CliCrashClassTest(unittest.TestCase):
+    """Phase 1 regression tests: the 5 documented crash classes must be
+    clean errors (or a refused project), never raw tracebacks, and a typo'd
+    -d must never silently fork a new project."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = self.tmp.name
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def assert_clean_error(self, r, rc=1, want_in=None):
+        self.assertNotEqual(r.returncode, 0)
+        if rc is not None:
+            self.assertEqual(r.returncode, rc, f"stderr: {r.stderr}")
+        self.assertNotIn("Traceback", r.stderr, f"raw traceback leaked: {r.stderr}")
+        self.assertTrue(r.stderr.strip(), "expected an error message on stderr")
+        if want_in:
+            self.assertIn(want_in, r.stderr)
+
+    def test_d_flag_pointing_at_file(self):
+        f = os.path.join(self.root, "afile")
+        with open(f, "w") as fh:
+            fh.write("x")
+        r = run("next", cwd=f)
+        self.assert_clean_error(r)
+
+    def test_events_log_as_directory(self):
+        d = os.path.join(self.root, "logdir")
+        os.makedirs(os.path.join(d, "events.log"))
+        r = run("next", cwd=d)
+        self.assert_clean_error(r)
+
+    def test_propose_malformed_json(self):
+        d = os.path.join(self.root, "pj")
+        r = run("init", cwd=d)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        bad = os.path.join(self.root, "bad.json")
+        with open(bad, "w") as fh:
+            fh.write("{not json")
+        r = run("propose", bad, cwd=d)
+        self.assert_clean_error(r, want_in="not valid JSON")
+
+    def test_typo_d_does_not_silently_auto_init(self):
+        typo = os.path.join(self.root, "typo-dir")
+        r = run("next", cwd=typo)
+        self.assert_clean_error(r, want_in="is not a project")
+        self.assertFalse(os.path.exists(typo),
+                         "typo'd -d must not silently create a project")
+
+    def test_typo_d_create_does_not_fork_project(self):
+        typo = os.path.join(self.root, "typo-create")
+        r = run("create", "Task A", cwd=typo)
+        self.assert_clean_error(r, want_in="is not a project")
+        self.assertFalse(os.path.exists(typo))
+
+    def test_propose_distinguishes_missing_file_from_missing_dir(self):
+        # missing proposal FILE inside a valid project -> file message
+        d = os.path.join(self.root, "pj")
+        r = run("init", cwd=d)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        missing_file = os.path.join(self.root, "ghost.json")
+        r = run("propose", missing_file, cwd=d)
+        self.assert_clean_error(r, want_in="proposal file not found")
+        self.assertNotIn("is not a project", r.stderr)
+
+        # missing project DIR -> "is not a project", dir NOT auto-created
+        missing_dir = os.path.join(self.root, "no-such-project")
+        r = run("propose", missing_file, cwd=missing_dir)
+        self.assert_clean_error(r, want_in="is not a project")
+        self.assertFalse(os.path.exists(missing_dir))
+
+    def test_query_typo_is_clean_error_not_no_matches(self):
+        d = os.path.join(self.root, "pj")
+        r = run("init", cwd=d)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        r = run("create", "Task A", cwd=d)
+        self.assertEqual(r.returncode, 0, r.stderr)
+
+        for expr in ("sttus == todo", "status == nope", "status == high"):
+            r = run("query", expr, cwd=d)
+            self.assert_clean_error(r)
+            self.assertNotIn("(no matches)", r.stdout,
+                             f"typo'd query {expr!r} must not silently return (no matches)")
+
+        # the valid spelling still works
+        r = run("query", "status == todo", cwd=d)
+        self.assertEqual(r.returncode, 0)
+        self.assertEqual(r.stdout.strip(), "task-a")
+
+
 if __name__ == "__main__":
     unittest.main()

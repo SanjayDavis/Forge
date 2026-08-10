@@ -52,3 +52,8 @@ forge query ready()
 Safe expression subset: status, priority, evidence_count, files,
 depends_on, and/or/not, comparison operators, plus function calls
 (`children()`, `blockers()`, `evidence()`, `ready()`).
+
+Unknown field names or enum values are rejected with a clean error --
+a typo'd query never silently returns `(no matches)`. A status field
+takes `todo`/`in_progress`/`needs_revision`/`done`; a priority field
+takes `low`/`medium`/`high`.

@@ -566,6 +566,13 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.cmd == "init":
             return cmd_init(args)
+        # Phase 1: a typo'd -d must never silently fork a new project —
+        # only `init` creates one. Everything else requires an existing
+        # project (kernel auto-init stays for SDK/MCP ergonomics).
+        if not Store(args.dir).exists():
+            print(f"error: {args.dir} is not a project (run: forge init {args.dir})",
+                  file=sys.stderr)
+            return 1
         k = Kernel(args.dir)
         return commands[args.cmd](args, k)
     except GraphError as e:

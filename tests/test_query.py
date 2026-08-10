@@ -104,6 +104,44 @@ class QueryTest(unittest.TestCase):
         with self.assertRaises(QueryError):
             self.q(g, "blockers(ghost)")
 
+    # ---- Phase 1: field/enum validation (typos must error, not (no matches))
+    def test_unknown_field_rejected(self):
+        g = self.make()
+        for expr in ("sttus == todo", "priorty > medium", "not bloked"):
+            with self.assertRaises(QueryError, msg=expr):
+                self.q(g, expr)
+
+    def test_unknown_enum_value_rejected(self):
+        g = self.make()
+        for expr in ("status == nope", "priority == urgent", "status != nope"):
+            with self.assertRaises(QueryError, msg=expr):
+                self.q(g, expr)
+
+    def test_status_field_rejects_priority_values(self):
+        g = self.make()
+        for expr in ("status == high", "status == low"):
+            with self.assertRaises(QueryError, msg=expr):
+                self.q(g, expr)
+
+    def test_priority_field_rejects_status_values(self):
+        g = self.make()
+        for expr in ("priority == done", "priority == needs_revision"):
+            with self.assertRaises(QueryError, msg=expr):
+                self.q(g, expr)
+
+    def test_field_enum_validation_keeps_valid_queries(self):
+        g = self.make()
+        # every documented form still evaluates
+        self.assertEqual(self.q(g, "status == needs_revision"), ["ui"])
+        self.assertEqual(set(self.q(g, "priority > medium")), {"renderer", "camera"})
+        self.assertEqual(self.q(g, '"render" in title'), ["renderer"])
+        self.assertEqual(self.q(g, '"e" in id and not container'), ["camera"])
+        self.assertEqual(self.q(g, "blocked"), ["renderer"])
+        self.assertEqual(self.q(g, "container"), ["renderer"])
+        self.assertEqual(self.q(g, "id in children(renderer)"), ["camera", "ui", "lighting"])
+        self.assertEqual(self.q(g, "evidence_count >= 1"), ["ui"])
+        self.assertEqual(self.q(g, "blockers(renderer)"), ["ui", "lighting"])
+
 
 if __name__ == "__main__":
     unittest.main()

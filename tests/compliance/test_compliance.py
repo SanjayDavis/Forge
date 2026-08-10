@@ -538,8 +538,10 @@ class ComplianceRoadmap(unittest.TestCase):
         self.assertTrue(os.path.exists(road), "ROAD_TO_1.0.md missing at repo root")
         self.assertTrue(os.path.exists(index), "proofs/INDEX.md missing")
 
-        road_text = open(road, encoding="utf-8").read()
-        index_text = open(index, encoding="utf-8").read()
+        with open(road, encoding="utf-8") as rf:
+            road_text = rf.read()
+        with open(index, encoding="utf-8") as rf:
+            index_text = rf.read()
 
         # split the Evidence section so user/validation lines never match
         evidence = road_text.split("## Evidence")[1].split("## Validation")[0]
@@ -571,7 +573,8 @@ class ComplianceRoadmap(unittest.TestCase):
         in practice only 'compliance suite green' and 'proof suite green' may be
         checked before the corpus completes."""
         road = os.path.join(self.root, "ROAD_TO_1.0.md")
-        text = open(road, encoding="utf-8").read()
+        with open(road, encoding="utf-8") as rf:
+            text = rf.read()
         evidence = text.split("## Evidence")[1].split("## Validation")[0]
         for line in text.splitlines():
             if line.strip().startswith("- [x]") and line not in evidence.splitlines():

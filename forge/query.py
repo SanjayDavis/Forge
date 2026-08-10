@@ -25,14 +25,16 @@ Available per-task fields:
     evidence_count, files, notes, acceptance, depends_on, blocks, created_seq
 
 Bare words (needs_revision, high, ...) evaluate to strings; priority
-comparisons use low < medium < high.
+comparisons use low < medium < high. Unknown field names or enum values
+are rejected with QueryError — a typo'd query never silently returns
+(no matches).
 """
 
 from __future__ import annotations
 
 import ast
 
-from .model import PRIORITY_WEIGHT, STATUS_DONE, Graph, GraphError
+from .model import PRIORITY_WEIGHT, STATUS_DONE, VALID_STATUSES, Graph, GraphError
 from .scheduler import blockers, ready_tasks
 
 _ALLOWED_NODES = (
@@ -165,6 +167,65 @@ def _check_depth(tree: ast.AST) -> None:
             stack.append((child, depth + 1))
 
 
+# Phase 1: a typo'd field or enum value must fail loudly, not silently
+# return (no matches). Every bare word in a query is either a field name
+# or an enum value — anything else is a typo.
+_FIELDS = frozenset({
+    "id", "title", "status", "priority", "blocked", "container",
+    "evidence_count", "files", "notes", "acceptance", "depends_on",
+    "blocks", "created_seq",
+})
+_STATUS_WORDS = frozenset(VALID_STATUSES)
+_PRIORITY_WORDS = frozenset(PRIORITY_WEIGHT)
+_ALL_WORDS = _FIELDS | _STATUS_WORDS | _PRIORITY_WORDS
+_ENUM_FIELDS = {"status": _STATUS_WORDS, "priority": _PRIORITY_WORDS}
+
+
+def _validate_names(tree: ast.AST) -> None:
+    """Reject bare words that are neither a field nor an enum value.
+    Call function names and their arguments are exempt: arguments are
+    task ids, validated at runtime by the function itself."""
+    stack: list[tuple[ast.AST, bool]] = [(tree, False)]
+    while stack:
+        node, is_arg = stack.pop()
+        if isinstance(node, ast.Name):
+            if is_arg:
+                continue
+            if node.id in _ALL_WORDS:
+                continue
+            raise QueryError(
+                f"unknown field or value: {node.id!r} "
+                f"(fields: {', '.join(sorted(_FIELDS))}; "
+                f"values: {', '.join(sorted(_STATUS_WORDS | _PRIORITY_WORDS))})")
+        if isinstance(node, ast.Call):
+            stack.append((node.func, True))  # e.g. children( — not a field
+            for a in node.args:
+                stack.append((a, True))
+            continue
+        for child in ast.iter_child_nodes(node):
+            stack.append((child, False))
+
+
+def _validate_enums(tree: ast.AST) -> None:
+    """Position-aware enum check: a status field compared against a bare
+    word must use a status value; a priority field a priority value.
+    `status == high` and `priority == done` are wrong-position typos."""
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Compare):
+            continue
+        for comp in node.comparators:
+            for field_node, word_node in ((node.left, comp), (comp, node.left)):
+                if (isinstance(field_node, ast.Name)
+                        and field_node.id in _ENUM_FIELDS
+                        and isinstance(word_node, ast.Name)
+                        and word_node.id in _ALL_WORDS
+                        and word_node.id not in _ENUM_FIELDS[field_node.id]):
+                    field = field_node.id
+                    raise QueryError(
+                        f"{word_node.id!r} is not a valid {field} value "
+                        f"(valid: {', '.join(sorted(_ENUM_FIELDS[field]))})")
+
+
 FUNCTIONS: dict[str, callable] = {}
 
 
@@ -181,6 +242,8 @@ def run_query(g: Graph, expr: str):
         raise QueryError(f"bad query: {e}") from e
     _check_tree(tree)
     _check_depth(tree)
+    _validate_names(tree)
+    _validate_enums(tree)
     body = tree.body
 
     # call form: a top-level function call (blockers(x), evidence(x), ready()...)
