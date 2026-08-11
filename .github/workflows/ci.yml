@@ -23,6 +23,7 @@ jobs:
           python -m pip install -e .
           python -m pip install -e packages/forge-planner
           python -m pip install -e packages/forge-mcp
+          python -m pip install -e packages/forge-proof
 
       - name: Test suite (warnings are errors)
         run: python -W error -m unittest discover -s tests
@@ -56,11 +57,12 @@ jobs:
           python -m build
           python -m build packages/forge-planner
           python -m build packages/forge-mcp
+          python -m build packages/forge-proof
 
       - name: Install the wheels into a clean venv
         run: |
           python -m venv /tmp/forge-venv
-          /tmp/forge-venv/bin/pip install dist/*.whl packages/forge-planner/dist/*.whl packages/forge-mcp/dist/*.whl
+          /tmp/forge-venv/bin/pip install dist/*.whl packages/forge-planner/dist/*.whl packages/forge-mcp/dist/*.whl packages/forge-proof/dist/*.whl
 
       - name: forge --help works from the installed wheels
         run: |
@@ -71,6 +73,8 @@ jobs:
           /tmp/forge-venv/bin/python -c "from forge_planner import ReferencePlanner; print('planner package ok')"
           /tmp/forge-venv/bin/forge-mcp --help >/dev/null
           /tmp/forge-venv/bin/python -c "from forge_mcp import ForgeMCPServer, TOOLS; assert len(TOOLS) == 6; print('mcp package ok')"
+          /tmp/forge-venv/bin/forge proof --help >/dev/null
+          /tmp/forge-venv/bin/python -c "import forge_proof; print('proof package ok')"
 
       - name: SDK + CLI smoke against the installed packages
         run: |
