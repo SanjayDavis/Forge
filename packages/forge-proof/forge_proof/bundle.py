@@ -11,6 +11,10 @@ On an existing proof dir (examples/swarm): NEVER clobbers. The derived
 artifacts are re-derived in a temp copy and verified byte-identical (the
 §5 reproducibility rule); the curated README/replay.md/demo.mp4 are left
 untouched; the bundle ends with the conformance verdict.
+
+Deps: core derivation is stdlib-only; graph.png rendering additionally
+needs matplotlib+networkx (optional — bundle still succeeds without
+them, graph.png is reported as a gap).
 """
 from __future__ import annotations
 

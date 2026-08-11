@@ -20,10 +20,12 @@ jobs:
 
       - name: Install
         run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
           python -m pip install -e .
           python -m pip install -e packages/forge-planner
           python -m pip install -e packages/forge-mcp
           python -m pip install -e packages/forge-proof
+          python -m pip install matplotlib networkx
 
       - name: Test suite (warnings are errors)
         run: python -W error -m unittest discover -s tests

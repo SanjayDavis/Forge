@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "forge-proof"
 version = "0.1.0a4"
-description = "Forge reference proof tooling: forge proof check/derive/replay/bundle — a Proof-Standard evidence bundle from events.log alone. Stdlib-only, kernel-free."
+description = "Forge reference proof tooling: forge proof check/derive/replay/bundle — a Proof-Standard evidence bundle from events.log alone. Stdlib-only core; optional matplotlib+networkx for graph.png."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
