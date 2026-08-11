@@ -159,6 +159,16 @@ class Checker:
         derive from the shipped events.log must reproduce the SHIPPED
         graph.json/metrics.json — the temp project dir is named 'swarm' so
         the 'proof' field stays stable)."""
+        # Pin the derive stamp to the version the shipped artifacts claim
+        # (graph.json's forge_version field): deriving at today's repo
+        # version would break S7 on every version bump while the shipped
+        # artifacts are still stamped with their own derivation version.
+        if (self.proof / "graph.json").exists():
+            claimed = json.loads(
+                (self.proof / "graph.json").read_text(encoding="utf-8")
+            ).get("forge_version")
+            if claimed:
+                forge_version = claimed
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td) / "swarm"
             tmp.mkdir()

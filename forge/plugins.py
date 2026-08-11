@@ -33,6 +33,7 @@ PLUGIN_GROUP = "forge.commands"
 #: the registry that lets a future forge-mcp / forge-vscode join the CLI.
 ECOSYSTEM_COMMANDS: dict[str, str] = {
     "plan": "forge-planner",
+    "proof": "forge-proof",
 }
 
 

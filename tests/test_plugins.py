@@ -86,13 +86,15 @@ class TestDiscover(unittest.TestCase):
 class TestEcosystemStub(unittest.TestCase):
 
     def test_known_commands_map_is_curated(self):
-        # the only known ecosystem command today is plan -> forge-planner
-        self.assertEqual(ECOSYSTEM_COMMANDS, {"plan": "forge-planner"})
+        # the two known ecosystem commands and their packages
+        self.assertEqual(ECOSYSTEM_COMMANDS,
+                         {"plan": "forge-planner",
+                          "proof": "forge-proof"})
 
     def test_missing_plugin_gets_install_hint_stub(self):
         p, sub = _parser()
         stubs = stub_for_ecosystem(sub, present={})
-        self.assertEqual(set(stubs), {"plan"})
+        self.assertEqual(set(stubs), {"plan", "proof"})
 
         args = p.parse_args(["plan", "Build a calculator"])
         self.assertEqual(args.cmd, "plan")  # parses like the real command
@@ -107,8 +109,9 @@ class TestEcosystemStub(unittest.TestCase):
 
     def test_installed_plugin_suppresses_stub(self):
         p, sub = _parser()
-        stubs = stub_for_ecosystem(sub, present={"plan": object()})
-        self.assertEqual(stubs, {})  # real plugin wins, no stub
+        stubs = stub_for_ecosystem(
+            sub, present={"plan": object(), "proof": object()})
+        self.assertEqual(stubs, {})  # real plugins win, no stub
 
     def test_stub_parse_rejects_unknown_flags(self):
         # the stub only promises to parse; it must not swallow everything

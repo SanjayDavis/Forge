@@ -57,3 +57,24 @@ Unknown field names or enum values are rejected with a clean error --
 a typo'd query never silently returns `(no matches)`. A status field
 takes `todo`/`in_progress`/`needs_revision`/`done`; a priority field
 takes `low`/`medium`/`high`.
+
+## Plugin commands
+
+Additional commands arrive through the `forge.commands` entry-point
+group (see forge/plugins.py); a known-but-missing package gets an
+install-hint stub instead of a silent no-op.
+
+`forge proof` (provided by the `forge-proof` package) is the reference
+evidence pipeline — a stdlib-only, kernel-free tool that derives a
+Proof-Standard artifact bundle from a raw `events.log`:
+
+```
+forge proof check   <dir>   validate a bundle against the §6 conformance checklist
+forge proof derive  <dir>   derive graph.json/metrics.json/replay facts from events.log
+forge proof replay  <dir>   render replay.md (Goal/Outcome/Timeline/Turning points)
+forge proof bundle  <dir>   emit the full bundle + validate (derived artifacts are
+                            verified byte-identical; curated files are never clobbered)
+```
+
+`proof` operates on an artifacts directory, not a Forge project: it is
+exempt from the `-d` project gate and never constructs a Kernel.

@@ -566,6 +566,11 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.cmd == "init":
             return cmd_init(args)
+        # Proof tooling is dir-agnostic: `forge proof check/derive/replay/
+        # bundle <dir>` operates on an artifacts dir, not a project — it
+        # never needs a Kernel, so it must not hit the project gate.
+        if args.cmd == "proof":
+            return commands[args.cmd](args, None)
         # Phase 1: a typo'd -d must never silently fork a new project —
         # only `init` creates one. Everything else requires an existing
         # project (kernel auto-init stays for SDK/MCP ergonomics).

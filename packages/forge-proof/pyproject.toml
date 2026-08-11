@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-proof"
+version = "0.1.0a4"
+description = "Forge reference proof tooling: forge proof check/derive/replay/bundle — a Proof-Standard evidence bundle from events.log alone. Stdlib-only, kernel-free."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Sanjay Davis", email = "psanjuknl@gmail.com" }]
+keywords = ["forge", "proof", "evidence", "sdk", "autonomous-software"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+# Stdlib-only by design (Proof Standard §7: reference tooling stays
+# dependency-free). graph.png rendering needs matplotlib+networkx present
+# in the invoking python; demo.mp4 rendering shells out to the repo's
+# tools/proof-render-demo.py when a transcript exists.
+dependencies = []
+
+[project.entry-points."forge.commands"]
+proof = "forge_proof.cli:register"
+
+[tool.setuptools]
+packages = ["forge_proof"]
