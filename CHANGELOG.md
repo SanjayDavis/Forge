@@ -5,7 +5,53 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-alpha `0.1.0a4` is the current release.
+alpha `0.1.0a5` is the current release.
+
+## [0.1.0a5] - 2026-08-12
+
+### Added
+
+- **`forge-proof` distribution** (`packages/forge-proof/`, 2026-08-11):
+  reference proof evidence tooling — `forge proof
+  check|derive|replay|bundle <dir>` turns a raw `events.log` into a full
+  Proof Standard artifact bundle (§5 derive, §6 checklist). Stdlib-only,
+  kernel-free, registered via the `forge.commands` entry-point group;
+  derived artifacts are byte-identical to `tools/proof-derive.py`
+  (pinned by tests). `graph.png` rendering uses matplotlib+networkx when
+  present; otherwise bundle reports the gap instead of crashing.
+  ECOSYSTEM_COMMANDS gains `proof -> forge-proof` (install-hint stub).
+
+### Changed
+
+- **CI installs and builds `forge-proof` in both jobs**, plus ffmpeg,
+  matplotlib, and networkx in the test job — committed proof dirs stay
+  CONFORMING on runners (ffprobe for demo.mp4 conformance, renderers for
+  graph.png).
+- **Doc suite count corrected**: `docs/verification.md` now lists all 18
+  suites with measured counts — 255 tests total (240 + 15 compliance);
+  the phantom `tests/test_reference.py` row is gone (the human-loop test
+  lives in `tests/test_sdk.py`).
+
+### Version
+
+- **Bump to `0.1.0a5`** across `forge-foundation`, `forge-planner`,
+  `forge-mcp`, and `forge-proof`. Per the publish-only-after-evidence
+  policy this release is tagged; PyPI upload is approved separately from
+  the tag.
+
+### Fixed
+
+- **Windows: MCP server emitted non-UTF-8 stdio.** The server writes
+  JSON-RPC responses with `ensure_ascii=False`; on Windows the child
+  process encoded stdout as the locale codec (cp1252), so any non-ASCII
+  character (tool descriptions quote "SPEC §9") reached UTF-8 clients as
+  an undecodable byte (`UnicodeDecodeError … 0xa7`). The server now
+  forces UTF-8 on both stdio streams at startup — correct regardless of
+  how a client spawned it. The MCP stdio transport is UTF-8 by spec.
+- **Windows: CLI test harness decoded output with the locale codec**
+  while the CLI correctly emits UTF-8 (`forge graph` box-drawing), so
+  assertions on `"├──"` failed off-Linux. Test helpers now decode with
+  `encoding="utf-8"` explicitly.
 
 ## [0.1.0a4] - 2026-08-08
 

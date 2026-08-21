@@ -44,7 +44,7 @@ from Forge's planner/executor, not a fork + clone.
 
 - [ ] No public-SDK/API change for 90 days (surface-guard CI is the referee)
 - [x] Compliance suite green (`python -W error -m unittest tests.compliance.test_compliance`, 15 tests)
-- [ ] Proof suite green (`proof-check` passes on every conforming entry in the corpus)
+- [x] Proof suite green (`forge proof check` passes on every conforming entry in the corpus — all five, verified 2026-08-12)
 
 ## Release
 

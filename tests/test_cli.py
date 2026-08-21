@@ -10,7 +10,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def run(*args, cwd):
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONPATH=ROOT)
     return subprocess.run([sys.executable, "-m", "forge.cli", "-d", cwd, *args],
-                          capture_output=True, text=True, env=env, cwd=ROOT)
+                          capture_output=True, text=True, encoding="utf-8",
+                          env=env, cwd=ROOT)
 
 
 class CliTest(unittest.TestCase):

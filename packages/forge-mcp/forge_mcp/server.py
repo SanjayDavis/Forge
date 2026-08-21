@@ -259,7 +259,25 @@ class ForgeMCPServer:
         return 0
 
 
+def _setup_stdio() -> None:
+    """Force UTF-8 on both stdio streams.
+
+    The MCP stdio transport is UTF-8 by definition, but on Windows the
+    default pipe encoding is the locale codec (e.g. cp1252). Without this,
+    any non-ASCII character in a response (the tool descriptions quote
+    "SPEC §9") is written as a locale byte that UTF-8 clients cannot
+    decode. Reconfiguring here makes every client correct regardless of
+    how it spawned us; it is a no-op when stdout/stderr are already UTF-8.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _setup_stdio()
     ap = argparse.ArgumentParser(
         prog="forge-mcp",
         description="Forge MCP server: JSON-RPC 2.0 over stdio, six "

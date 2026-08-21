@@ -7,6 +7,6 @@ and validate the full §6 conformance checklist. Stdlib-only; the kernel
 stays out of scope — this package is a client of the artifacts, never
 of the event API.
 """
-__version__ = "0.1.0a4"
+__version__ = "0.1.0a5"
 
 __all__ = ["__version__", "check", "derive", "replay", "bundle"]

@@ -9,18 +9,30 @@ checks, run on every milestone.
 python -m unittest discover -s tests
 ```
 
-Zero dependencies, Python 3.10+. Full suite: 218 tests.
+Zero dependencies, Python 3.10+. Full suite: 255 tests (240 in
+`tests/`, 15 compliance).
 Breakdown:
 
 | Suite | Count | Proves |
 | --- | --- | --- |
-| `tests/test_planner.py` | — | planner protocol: valid + intentionally invalid proposals, kernel verdicts |
+| `tests/test_planner.py` | 26 | planner protocol: valid + intentionally invalid proposals, kernel verdicts |
+| `tests/test_mcp.py` | 26 | MCP wire protocol, tools, faults, official-SDK interop |
 | `tests/test_executor.py` | 23 | five-call flow, self-check, expansion, recovery, SDK-only boundary, end-to-end run |
+| `tests/test_proof_core.py` | 18 | proof derive/check/bundle core: determinism, byte-identity with tools/ |
+| `tests/test_model.py` | 18 | graph model: folding, statuses, priorities |
 | `tests/test_reviewer.py` | 17 | three-call flow, judge slot, blocked path, SDK-only boundary, end-to-end run |
-| `tests/test_sdk.py` | — | SDK surface |
-| `tests/test_reference.py` | — | human client loop |
 | `tests/test_security.py` | 16 | task-id charset, event typing, symlink-safe store, context injection, query recursion |
-| `tests/compliance/test_compliance.py` | 13 | SPEC invariants I1–I7, one-to-one |
+| `tests/test_sdk.py` | 16 | SDK surface + reference client loop end-to-end |
+| `tests/test_query.py` | 16 | query grammar and errors |
+| `tests/test_cli.py` | 13 | CLI commands incl. typo'd -d refusal |
+| `tests/test_kernel.py` | 12 | kernel ops, undo, merge/export/import |
+| `tests/test_store.py` | 8 | append, locks, torn-tail recovery |
+| `tests/test_plugins.py` | 8 | plugin command registration |
+| `tests/test_proof_cli.py` | 7 | `forge proof` CLI surface |
+| `tests/test_stress.py` | 6 | 100k-event fold/replay, concurrency |
+| `tests/test_scheduler.py` | 6 | ready ordering, dependency gating |
+| `tests/test_context.py` | 4 | context contract package |
+| `tests/compliance/test_compliance.py` | 15 | SPEC invariants I1–I7 one-to-one + ROAD_TO_1.0 guards |
 
 ## Specification Compliance Suite
 

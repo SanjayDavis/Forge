@@ -148,7 +148,7 @@ Full command reference: [docs/CLI.md](docs/CLI.md).
 
 ## Status
 
-The kernel is frozen at v1. This release is `0.1.0a4`.
+The kernel is frozen at v1. This release is `0.1.0a5`.
 
 Done:
 

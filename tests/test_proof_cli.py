@@ -29,8 +29,8 @@ SWARM = os.path.join(_REPO, "examples", "swarm")
 def run_cli(*args, cwd=None):
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONPATH=_REPO)
     return subprocess.run([sys.executable, "-m", "forge.cli", "-d", cwd, *args],
-                          capture_output=True, text=True, env=env, cwd=_REPO,
-                          timeout=120)
+                          capture_output=True, text=True, encoding="utf-8",
+                          env=env, cwd=_REPO, timeout=120)
 
 
 class ProofCliTest(unittest.TestCase):
