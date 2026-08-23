@@ -179,14 +179,15 @@ class TestReferenceClient(unittest.TestCase):
         env = dict(os.environ, PYTHONPATH=os.path.dirname(
             os.path.dirname(os.path.abspath(__file__))))
         subprocess.run(["forge", "-d", d, "init"], check=True,
-                       capture_output=True, text=True, env=env)
+                       capture_output=True, text=True, encoding="utf-8", env=env)
         p = _proposal("Build a Snake game")
         with open(os.path.join(d, "prop.json"), "w", encoding="utf-8") as f:
             json.dump(p, f)
         subprocess.run(["forge", "-d", d, "propose", os.path.join(d, "prop.json")],
-                       check=True, capture_output=True, text=True, env=env)
+                       check=True, capture_output=True, text=True,
+                       encoding="utf-8", env=env)
         r = subprocess.run(["python", REFERENCE_CLIENT, "-d", d, "--auto"],
-                           capture_output=True, text=True, env=env)
+                           capture_output=True, text=True, encoding="utf-8", env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("nothing ready", r.stdout)
         self.assertEqual(r.stdout.count("verified:"), 3)

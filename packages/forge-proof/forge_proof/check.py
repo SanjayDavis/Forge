@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 from collections import Counter
 from pathlib import Path
@@ -116,20 +117,27 @@ def problems(root: Path):
 
     demo = root / "demo.mp4"
     if demo.exists():
-        try:
-            r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0",
-                                "-show_entries", "stream=width,height",
-                                "-show_entries", "format=duration",
-                                "-of", "json", str(demo)], capture_output=True, text=True)
-            info = json.loads(r.stdout)
-            dur = float(info["format"]["duration"])
-            w, h = info["streams"][0]["width"], info["streams"][0]["height"]
-            if dur > 120:
-                out.append(f"demo.mp4 too long: {dur:.0f}s (> 120s)")
-            if w > 1280 or h > 720:
-                out.append(f"demo.mp4 too large: {w}x{h} (> 720p)")
-        except Exception as e:
-            out.append(f"demo.mp4 unreadable: {e}")
+        if shutil.which("ffprobe") is None:
+            # ffprobe absent: cannot verify duration/resolution. Report a
+            # distinct gap instead of a misleading "unreadable" error —
+            # the bundle itself is fine; the *checker* lacks a tool.
+            out.append("demo.mp4 present but ffprobe is not installed "
+                       "(install ffmpeg to fully check)")
+        else:
+            try:
+                r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0",
+                                    "-show_entries", "stream=width,height",
+                                    "-show_entries", "format=duration",
+                                    "-of", "json", str(demo)], capture_output=True, text=True)
+                info = json.loads(r.stdout)
+                dur = float(info["format"]["duration"])
+                w, h = info["streams"][0]["width"], info["streams"][0]["height"]
+                if dur > 120:
+                    out.append(f"demo.mp4 too long: {dur:.0f}s (> 120s)")
+                if w > 1280 or h > 720:
+                    out.append(f"demo.mp4 too large: {w}x{h} (> 720p)")
+            except Exception as e:
+                out.append(f"demo.mp4 unreadable: {e}")
 
     if not (root / "run.py").exists():
         out.append("no run.py entrypoint (README commands not checkable)")

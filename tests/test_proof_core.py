@@ -111,7 +111,8 @@ class ProofCoreTest(unittest.TestCase):
             subprocess.run([sys.executable,
                             os.path.join(_REPO, "tools", "proof-derive.py"),
                             str(p), "--forge-version", "0.1.0a4"],
-                           check=True, capture_output=True, text=True)
+                           check=True, capture_output=True,
+                           text=True, encoding="utf-8")
             theirs = [(f, hashlib.sha256((p / f).read_bytes()).hexdigest())
                       for f in ("graph.json", "metrics.json")]
             self.assertEqual(ours, theirs)
@@ -198,7 +199,7 @@ class S7DoubleDeriveParamTest(unittest.TestCase):
         r = subprocess.run(
             [sys.executable, os.path.join(_REPO, "tools", "proof-derive.py"),
              str(p), "--forge-version", version],
-            capture_output=True, text=True)
+            capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(r.returncode, 0, r.stderr)
 
     def _assert_double_derive(self, variant):

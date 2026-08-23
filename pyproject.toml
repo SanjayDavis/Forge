@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 # projects. The import name and the CLI command stay "forge". This is a
 # PEP 503 naming decision, not a rename of the product.
 name = "forge-foundation"
-version = "0.1.0a5"
+version = "0.1.0a6"
 description = "Forge — a deterministic project kernel for autonomous software development. Project state is deterministic; intelligence is replaceable."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development",
     "Topic :: Software Development :: Build Tools",
     "Topic :: Software Development :: Libraries :: Python Modules",

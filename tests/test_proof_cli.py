@@ -12,6 +12,7 @@ tests run the real CLI in subprocesses against real directories:
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -45,6 +46,11 @@ class ProofCliTest(unittest.TestCase):
     def test_check_swarm_conforming_outside_project(self):
         # -d points at a non-project dir: the proof command must NOT be
         # blocked by the Phase-1 gate (it is not a project command)
+        if shutil.which("ffprobe") is None:
+            self.skipTest(
+                "ffprobe not on PATH: swarm's demo.mp4 cannot be fully "
+                "checked, so the bundle would be NON-CONFORMING here even "
+                "though it is conforming (CI installs ffmpeg)")
         r = run_cli("proof", "check", SWARM, cwd=self.root)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("CONFORMING: swarm", r.stdout)
@@ -84,6 +90,11 @@ class ProofCliTest(unittest.TestCase):
 
     # ----------------------------------------------------------------- bundle
     def test_bundle_swarm_conforming(self):
+        if shutil.which("ffprobe") is None:
+            self.skipTest(
+                "ffprobe not on PATH: swarm's demo.mp4 cannot be fully "
+                "checked, so the bundle would be NON-CONFORMING here even "
+                "though it is conforming (CI installs ffmpeg)")
         r = run_cli("proof", "bundle", SWARM, "--forge-version", "0.1.0a4",
                     cwd=self.root)
         self.assertEqual(r.returncode, 0, r.stderr)

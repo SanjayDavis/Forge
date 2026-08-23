@@ -417,7 +417,7 @@ class TestMCPServerClient(unittest.TestCase):
                        check=True, capture_output=True, env=env)
 
         r = subprocess.run([sys.executable, MCP_CLIENT, "-d", d],
-                           capture_output=True, text=True, env=env)
+                           capture_output=True, text=True, encoding="utf-8", env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
         out = r.stdout
         self.assertRegex(out, r"server: forge \S+")

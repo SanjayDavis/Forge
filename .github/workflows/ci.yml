@@ -7,10 +7,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -20,12 +22,15 @@ jobs:
 
       - name: Install
         run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg
+          if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          if [ "$RUNNER_OS" = "macOS" ]; then brew install ffmpeg; fi
+          if [ "$RUNNER_OS" = "Windows" ]; then choco install ffmpeg -y --no-progress; fi
           python -m pip install -e .
           python -m pip install -e packages/forge-planner
           python -m pip install -e packages/forge-mcp
           python -m pip install -e packages/forge-proof
           python -m pip install matplotlib networkx
+        shell: bash
 
       - name: Test suite (warnings are errors)
         run: python -W error -m unittest discover -s tests
@@ -34,9 +39,10 @@ jobs:
         run: python -W error -m unittest tests.compliance.test_compliance
 
       - name: CLI smoke test
+        shell: bash
         run: |
-          forge -d /tmp/ci-demo init
-          cd /tmp/ci-demo
+          forge -d "$RUNNER_TEMP/ci-demo" init
+          cd "$RUNNER_TEMP/ci-demo"
           forge plan "CI Demo" --commit
           forge next
           forge progress
@@ -45,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
 

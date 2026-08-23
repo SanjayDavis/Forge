@@ -5,7 +5,45 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-alpha `0.1.0a5` is the current release.
+alpha `0.1.0a6` is the current release.
+
+## [0.1.0a6] - 2026-08-23
+
+### Added
+
+- **SDK surface guard** (`tests/test_surface.py`) — the rc1 freeze
+  referee: pins the exact public `forge` namespace (curated names +
+  submodule bindings) and every `ForgeClient` method signature. Any
+  accidental add/remove/rename/signature change now fails CI; intentional
+  changes update the pin in the same commit, making this file the
+  public-API changelog.
+- **Release workflow** (`.github/workflows/release.yml`, tag-triggered):
+  runs both suites on the tagged commit, builds all four distributions,
+  publishes a GitHub Release from `RELEASE_NOTES.md` with the artifacts,
+  and uploads to PyPI via Trusted Publishing (OIDC — no stored token).
+- `CONTRIBUTING.md`: external-user quickstart (install → 60-second
+  project → MCP wiring) for the `0.1.0b1` validation gate.
+
+### Changed
+
+- **CI is now 3 OS × 4 Python**: ubuntu/windows/macos × 3.10–3.13
+  (`fail-fast: false`), with per-OS ffmpeg installs and an
+  OS-independent CLI smoke test dir. The package-build job adds 3.13.
+- **Python 3.13 classifier** added to `forge-foundation`.
+
+### Fixed
+
+- **Windows locale-codec hardening (the a5 fix's siblings)**: all
+  remaining test-subprocess helpers decode child output as UTF-8
+  explicitly (`test_executor`, `test_sdk`, `test_reviewer`, `test_mcp`,
+  `test_proof_core`), and the three reference clients force UTF-8 stdout
+  like the CLI already did (`executor_client`, `reviewer_client`,
+  `reference_client`, plus `forge-mcp`'s reference MCP client).
+- **`forge proof check`: honest ffprobe gap** — when `demo.mp4` exists
+  but ffprobe is absent, the checker now reports "ffprobe is not
+  installed" instead of a misleading `[WinError 2] … unreadable`. The
+  two swarm conformance tests skip with that explanation when ffprobe is
+  missing locally (CI installs ffmpeg, so they run there).
 
 ## [0.1.0a5] - 2026-08-12
 

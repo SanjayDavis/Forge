@@ -18,6 +18,12 @@ from plugins.executor import ReferenceExecutor
 
 
 def main(argv: list[str] | None = None) -> int:
+    # The output uses non-ASCII (em dash, arrow); force UTF-8 so a
+    # Windows pipe (locale codec) cannot mangle it.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
     ap = argparse.ArgumentParser(
         prog="executor-client",
         description="reference executor: walk ready tasks, write stub "

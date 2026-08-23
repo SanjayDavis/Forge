@@ -44,6 +44,12 @@ def rpc(p: subprocess.Popen, msg_id: int, method: str,
 
 
 def main(argv: list[str] | None = None) -> int:
+    # The output uses non-ASCII (em dash); force UTF-8 so a Windows pipe
+    # (locale codec) cannot mangle it.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
     ap = argparse.ArgumentParser(
         prog="mcp-client",
         description="reference MCP client: walk the six forge tools "

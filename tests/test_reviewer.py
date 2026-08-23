@@ -328,15 +328,16 @@ class TestReviewerClient(unittest.TestCase):
         env = dict(os.environ, PYTHONPATH=os.path.dirname(
             os.path.dirname(os.path.abspath(__file__))))
         subprocess.run(["forge", "-d", d, "init"], check=True,
-                       capture_output=True, text=True, env=env)
+                       capture_output=True, text=True, encoding="utf-8", env=env)
         p = ReferencePlanner().plan("Build a Snake game")
         prop_path = os.path.join(d, "prop.json")
         with open(prop_path, "w", encoding="utf-8") as f:
             json.dump(p, f)
         subprocess.run(["forge", "-d", d, "propose", prop_path],
-                       check=True, capture_output=True, text=True, env=env)
+                       check=True, capture_output=True, text=True,
+                       encoding="utf-8", env=env)
         r = subprocess.run(["python", REVIEWER_CLIENT, "-d", d],
-                           capture_output=True, text=True, env=env)
+                           capture_output=True, text=True, encoding="utf-8", env=env)
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("nothing ready", r.stdout)
         self.assertEqual(r.stdout.count("done:"), 3)

@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          python -m pip install -e .
+          python -m pip install -e packages/forge-planner
+          python -m pip install -e packages/forge-mcp
+          python -m pip install -e packages/forge-proof
+          python -m pip install matplotlib networkx
+
+      - name: Test suite (warnings are errors)
+        run: python -W error -m unittest discover -s tests
+
+      - name: Compliance suite (warnings are errors)
+        run: python -W error -m unittest tests.compliance.test_compliance
+
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+          python -m build packages/forge-planner
+          python -m build packages/forge-mcp
+          python -m build packages/forge-proof
+
+      - name: GitHub Release with the CHANGELOG section and artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            packages/forge-planner/dist/*.whl
+            packages/forge-planner/dist/*.tar.gz
+            packages/forge-mcp/dist/*.whl
+            packages/forge-mcp/dist/*.tar.gz
+            packages/forge-proof/dist/*.whl
+            packages/forge-proof/dist/*.tar.gz
+
+  pypi:
+    runs-on: ubuntu-latest
+    needs: [release]
+    environment: pypi
+    permissions:
+      id-token: write  # Trusted Publishing (OIDC) — no token stored
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+          python -m build packages/forge-planner
+          python -m build packages/forge-mcp
+          python -m build packages/forge-proof
+
+      - name: Publish all four distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: |
+            dist/
+            packages/forge-planner/dist/
+            packages/forge-mcp/dist/
+            packages/forge-proof/dist/
