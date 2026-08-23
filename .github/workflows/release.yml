@@ -75,11 +75,21 @@ jobs:
           python -m build packages/forge-mcp
           python -m build packages/forge-proof
 
+      - name: Stage all four distributions into one directory
+        run: |
+          mkdir -p dist-staging
+          cp dist/*.whl dist/*.tar.gz dist-staging/
+          cp packages/forge-planner/dist/* dist-staging/
+          cp packages/forge-mcp/dist/* dist-staging/
+          cp packages/forge-proof/dist/* dist-staging/
+          ls dist-staging/
+
       - name: Publish all four distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: |
-            dist/
-            packages/forge-planner/dist/
-            packages/forge-mcp/dist/
-            packages/forge-proof/dist/
+          # A single flat directory: gh-action-pypi-publish versions differ
+          # on whether packages-dir accepts multiple lines (a6's run died
+          # on the multiline form with FileNotFoundError), and staging is
+          # version-independent. Filenames never collide across the four
+          # distributions.
+          packages-dir: dist-staging
