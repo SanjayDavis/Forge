@@ -5,7 +5,45 @@ All notable changes to the Forge kernel and its SDK. The kernel contract
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
-alpha `0.1.0a6` is the current release.
+beta `0.1.0b1` is the current release.
+
+## [0.1.0b1] - 2026-08-24
+
+The first beta: the release whose question is "does Forge work for
+people outside the project?" (`docs/B1_READINESS.md` is the gate).
+Kernel untouched — SPEC v1, no API changes; the public surface is now
+pinned by the guard landed after a6.
+
+### Added
+
+- **`docs/B1_READINESS.md`** — the objective b1 gate: ship prereqs
+  (release automation, Trusted-Publisher bindings, packaging evidence,
+  docs sufficiency, pre-tag checklist) plus the external-validation
+  evidence boxes (5 independent users AND 3 completed projects) that
+  actually earn `b1` per `ROAD_TO_1.0.md`.
+- **SDK surface guard committed** (`tests/test_surface.py`, fix-up to
+  a6): pins the exact public `forge` namespace and every `ForgeClient`
+  method signature — the rc1 freeze referee named by `ROAD_TO_1.0.md`.
+
+### Fixed
+
+- **Release workflow publish step** (`.github/workflows/release.yml`):
+  the `v0.1.0a6` run's `pypi` job died passing the multi-line
+  `packages-dir:` block to the action as one literal path
+  (FileNotFoundError). All eight artifacts are now staged into one flat
+  `dist-staging/` directory and published from it — version-independent
+  and rehearsed locally (8 artifacts staged, twine check 8/8 PASSED).
+
+### Verified
+
+- **Windows clean-venv battery** mirroring CI's package job against the
+  built wheels: all four distributions install; CLI/SDK/planner/MCP/
+  proof entry points work from installed packages; MCP wire smoke
+  (initialize/tools-list/tools-call) answers over stdio; sdist installs;
+  bare-install prints the forge-planner hint. CI proves Linux; this
+  closes the Windows gap by hand.
+- **Docs-vs-surface audit**: `docs/API.md`, README, and CONTRIBUTING
+  match the pinned surface exactly; no undocumented public API.
 
 ## [0.1.0a6] - 2026-08-23
 

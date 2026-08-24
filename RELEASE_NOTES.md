@@ -20,23 +20,25 @@ GitHub Release body.
    with the trusted-publisher binding for all four projects.
 
 <!---release-notes--->
-0.1.0a6 — cross-platform hardening release.
+0.1.0b1 — the external-validation release.
 
-- SDK surface guard (`tests/test_surface.py`): pins the public `forge`
-  namespace and every `ForgeClient` method signature; any accidental
-  API change now fails CI. This file is the public-API changelog going
-  forward — the referee ROAD_TO_1.0.md names for the rc1 90-day freeze.
-- CI expanded to 3 OS × 4 Python: ubuntu/windows/macos × 3.10–3.13,
-  with per-OS ffmpeg installs and an OS-independent smoke test.
-  Python 3.13 classifier added to forge-foundation.
-- Windows locale-codec fixes completed everywhere: all remaining test
-  subprocess helpers decode UTF-8 explicitly, and the reference clients
-  (executor, reviewer, human, forge-mcp's MCP client) force UTF-8
-  stdout like the CLI already did.
-- `forge proof check`: honest ffprobe gap — a present demo.mp4 without
-  ffprobe now reports the missing tool instead of a misleading
-  "unreadable" error; the swarm conformance tests skip with that
-  explanation on machines without ffmpeg (CI installs it).
-- New CONTRIBUTING.md quickstart for external users; tag-triggered
-  Release workflow publishes GitHub Releases from this file and uploads
-  all four distributions to PyPI via Trusted Publishing.
+The first beta: the question is no longer "can we reliably release
+this?" but "does Forge work for people outside the project?" The kernel
+is untouched (SPEC v1, zero API changes). `docs/B1_READINESS.md` is the
+objective b1 gate.
+
+- `docs/B1_READINESS.md`: ship prereqs (release automation, the four
+  PyPI Trusted-Publisher bindings, Windows packaging evidence, docs
+  sufficiency, pre-tag checklist) plus the validation evidence boxes —
+  5 independent users and 3 completed projects — that earn this release.
+- SDK surface guard committed (`tests/test_surface.py`): pins the public
+  `forge` namespace and every `ForgeClient` method signature; the rc1
+  freeze referee named by ROAD_TO_1.0.md.
+- Release workflow publish step fixed: a6's PyPI publish died on a
+  multi-line packages-dir reaching the action as one literal path;
+  artifacts now stage into one flat directory before upload.
+- Packaging verified beyond CI on Windows: all four distributions built,
+  installed into clean venvs, CLI/SDK/MCP-wire smoke green from the
+  installed packages.
+- Docs audited against the pinned surface: API.md, README, CONTRIBUTING
+  match exactly; no undocumented public API.

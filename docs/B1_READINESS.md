@@ -36,6 +36,12 @@ Two halves:
 
 ### 1b. Trusted Publishing bindings (PyPI side — user actions)
 
+> **State, 2026-08-24:** the `0.1.0b1` version bump itself is committed
+> on master (versions, CHANGELOG, RELEASE_NOTES) and its artifacts were
+> built + battery-tested locally. The only remaining ship action is the
+> four bindings below, then `git tag v0.1.0b1 && git push origin
+> v0.1.0b1`.
+
 The a6 run also failed the OIDC exchange itself with
 `invalid-publisher: valid token, but no corresponding publisher`, so the
 following four bindings must be created once on PyPI before any tag can
