@@ -16,5 +16,9 @@ dist/
 # local planning scratch — never commit (contains machine-local paths)
 .hermes/
 
+# agent session scratch — machine-local, may contain secrets
+.reasonix/
+reasonix.toml
+
 # transient proof driver (Proof #4 lifecycle)
 drive_proof4.py
