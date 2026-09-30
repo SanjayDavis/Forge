@@ -36,17 +36,31 @@ Two halves:
 
 ### 1b. Trusted Publishing bindings (PyPI side — user actions)
 
-> **State, 2026-08-24:** the `0.1.0b1` version bump itself is committed
-> on master (versions, CHANGELOG, RELEASE_NOTES) and its artifacts were
-> built + battery-tested locally. The only remaining ship action is the
-> four bindings below, then `git tag v0.1.0b1 && git push origin
-> v0.1.0b1`.
+> **State, 2026-09-30 — STILL OUTSTANDING, and now the only thing between
+> this repo and a green release.** `0.1.0b1` is tagged and its GitHub
+> Release is published (8 artifacts, from `RELEASE_NOTES.md`). The
+> `pypi` job still fails, with the same `invalid-publisher` error as the
+> a6 run:
+>
+> ```
+> ##[error]Trusted publishing exchange failure:
+> * `invalid-publisher`: valid token, but no corresponding publisher
+> * `sub`: `repo:SanjayDavis@152778940/Forge@1318378386:environment:pypi`
+> ```
+>
+> **These four bindings have never been created.** `0.1.0b1` reached PyPI
+> by hand (`twine`), not through the workflow — which is why the tag was
+> missing until 2026-09-30 and why the release was unreproducible from
+> the repo. Create the bindings below, and every future tag publishes
+> unattended. This is a PyPI web action; nothing in-repo can fix it.
 
-The a6 run also failed the OIDC exchange itself with
+The a6 run failed the OIDC exchange with
 `invalid-publisher: valid token, but no corresponding publisher`, so the
 following four bindings must be created once on PyPI before any tag can
 publish (each project → *Publishing* → *Add a new pending publisher*;
-use **exactly** these values):
+use **exactly** these values — the workflow filename and environment
+name must match character-for-character, or the exchange fails exactly
+as above):
 
 | PyPI project | Owner | Repository | Workflow | Environment |
 |---|---|---|---|---|
@@ -61,10 +75,15 @@ Notes:
   `permissions: id-token: write`; nothing to change in-repo for this.
 - The GitHub `pypi` environment should have **no reviewers** so tags can
   publish unattended.
+- The publish step is now **idempotent**: a version already on PyPI is
+  detected and skipped rather than re-uploaded, so re-running a release
+  for a published version is green instead of a 400 "file already
+  exists". That is separate from the bindings problem — the bindings
+  must still exist for any *new* version.
 - After adding all four bindings there is nothing left to configure:
-  pushing tag `v0.1.0b1` runs suites → builds → attaches artifacts to a
-  draft GitHub Release from `RELEASE_NOTES.md` → uploads all four
-  distributions to PyPI via OIDC.
+  pushing a tag runs suites → builds → attaches artifacts to a GitHub
+  Release from `RELEASE_NOTES.md` → uploads all four distributions to
+  PyPI via OIDC.
 
 ### 1c. Packaging verified beyond CI
 
