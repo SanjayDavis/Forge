@@ -26,11 +26,26 @@ forge progress
 Every mutation is a proposal; the kernel validates and commits it
 atomically or not at all. Nothing outside `events.log` is state.
 
-## Using an LLM agent with Forge
+## Already have a plan? Commit it as a proposal
+
+```
+forge -d my-project propose examples/proposal.example.json
+```
+
+That file is a complete, minimal, runnable proposal. The schema is
+documented in `forge propose --help`, and larger real ones live in
+`examples/<proof>/proposal.json`.
+
+If a proposal is rejected, the error names the field it expected and
+points at a working file — fix the named field and retry. A proposal is
+committed whole or rejected whole, so a rejection never leaves the
+project half-changed.
+
+## Point any agent at it
 
 Point any MCP client (Claude Desktop, Cursor, Hermes) at:
 
-```bash
+```
 forge-mcp -d path/to/project
 ```
 

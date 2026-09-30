@@ -22,6 +22,17 @@ from .store import EVENT_FILE, Store
 
 
 # --------------------------------------------------------------------------- helpers
+# F2/F3: a rejection is only useful if the client can act on it. Both the
+# protocol and kernel verdicts end with this pointer, so a rejected
+# proposal always has a next step: read the named field, copy the example.
+_PROPOSAL_HINT = (
+    "hint: fix the field named above, then re-propose. The proposal is "
+    "committed whole or rejected whole, so nothing was applied.\n"
+    "schema and a working example: forge propose --help, or\n"
+    "examples/proposal.example.json"
+)
+
+
 def _setup_stdout() -> None:
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -391,6 +402,14 @@ def cmd_propose(args, k: Kernel) -> int:
         result = client.propose(proposal)
     except ProposalError as e:
         print(f"proposal rejected (protocol): {e}", file=sys.stderr)
+        print(_PROPOSAL_HINT, file=sys.stderr)
+        return 1
+    except GraphError as e:
+        # the kernel's verdict: state/type validation the envelope can't see
+        # (unknown task id, duplicate id, bad field type). Same contract as
+        # above — name the fix, then point at a file that works.
+        print(f"proposal rejected (kernel): {e}", file=sys.stderr)
+        print(_PROPOSAL_HINT, file=sys.stderr)
         return 1
     print(f"committed {result['committed']} events from {result['proposal_id']} "
           f"(confidence {result['confidence']}) -> project now has "
@@ -406,10 +425,47 @@ def cmd_context(args, k: Kernel) -> int:
 
 
 # --------------------------------------------------------------------------- parser
+PROPOSAL_EPILOG = """\
+proposal file format (SPEC §9) — a JSON object:
+
+  {
+    "proposal_id": "prop_001",           # str, unique, non-empty
+    "reason": "why this decomposition",  # str, non-empty
+    "confidence": 0.8,                   # number, 0.0 - 1.0
+    "events": [                          # non-empty list, committed atomically
+      {"op": "task_created",
+       "id": "cpu",                      # str, kebab-case, unique in project
+       "title": "CPU core",              # str, non-empty
+       "description": "executes opcodes",
+       "acceptance": ["opcode 0x00NOP halts"],   # list of str
+       "files": ["chip8/cpu.py"],                # list of str
+       "priority": "high",               # low | medium | high
+       "notes": []},                     # list of str (never a bare string)
+      {"op": "dependency_added",
+       "task": "tests", "depends_on": "cpu"}     # both must already exist
+    ]
+  }
+
+allowed planner ops (§9.6): task_created, task_updated, task_expanded,
+dependency_added. Do NOT include "seq" — the kernel stamps sequence
+numbers on commit (§9.4). A proposal commits whole or is rejected whole.
+Every rejection names the shape it expected, so read the message and fix
+the field it names.
+
+Working example: examples/proposal.example.json — a complete, minimal,
+runnable proposal. Larger real ones live in examples/<proof>/proposal.json
+(e.g. examples/chip8/proposal.json, a real 42-task decomposition).
+
+  forge -d my-project init
+  forge propose examples/proposal.example.json
+"""
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="forge", description="Forge — a deterministic project kernel. "
                                 "execution engine for autonomous software development. "
-                                "Version " + __version__)
+                                "Version " + __version__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("-d", "--dir", default=".", help="project directory (default: .)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -508,7 +564,11 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("replay", help="reconstruct the graph from the log")
     sub.add_parser("demo", help="seed a demo project (Snake Game)")
 
-    c = sub.add_parser("propose", help="commit a proposal file: protocol check, then kernel commits or rejects whole")
+    c = sub.add_parser("propose", help="commit a proposal file: protocol check, then kernel commits or rejects whole",
+                       description="Commit a proposal file (SPEC §9). The envelope is validated, then the kernel "
+                                   "commits the whole proposal or rejects it whole.",
+                       epilog=PROPOSAL_EPILOG,
+                       formatter_class=argparse.RawDescriptionHelpFormatter)
     c.add_argument("file")
 
     # Ecosystem plugins contribute their own subparsers via the

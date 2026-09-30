@@ -38,6 +38,25 @@ class ProposalError(ValueError):
 PLANNER_OPS = ("task_created", "task_expanded", "task_updated",
                "dependency_added")
 
+# F3: a rejection an agent cannot act on is a stalled agent. Every
+# rejection therefore carries the expected shape, not just the rule that
+# was broken — "missing 'title' for task_created (expected: id, title)"
+# tells a planner what to emit; "missing field" alone does not, and the
+# observed failure mode was N identical rejections with zero progress.
+_OP_SHAPE_HELP: dict[str, str] = {
+    "task_created":     "expected: id (str, kebab-case), title (str), "
+                       "description (str), acceptance (list of str), "
+                       "files (list of str), priority (low|medium|high), "
+                       "notes (list of str)",
+    "task_updated":     "expected: id (str), plus any of title, description, "
+                       "acceptance (list), files (list), priority",
+    "task_expanded":    "expected: task (str, existing id), children (list of "
+                       "{id, title, ...}) — the kernel derives child ids and "
+                       "turns the parent into a container",
+    "dependency_added": "expected: task (str), depends_on (str) — both must "
+                       "already exist in the graph",
+}
+
 # fields that must be present on a proposal (SPEC §9.1-§9.3)
 _REQUIRED_FIELDS = ("proposal_id", "reason", "confidence", "events")
 
@@ -54,47 +73,67 @@ _OP_REQ = {
 
 def validate_proposal(proposal: Any) -> None:
     """Envelope checks only. Type and state validation is the kernel's
-    job (import_events); this just proves the client read the protocol."""
+    job (import_events); this just proves the client read the protocol.
+
+    Every rejection names the expected shape (F2/F3). A client that
+    cannot act on a rejection retries it verbatim and never converges,
+    so the message is part of the contract, not decoration."""
+    # The §9.1 envelope, quoted once so every envelope rejection can
+    # answer "what should it have looked like?" without a doc lookup.
+    envelope = ("expected envelope: {proposal_id: str, reason: str, "
+                "confidence: number 0.0-1.0, events: [event, ...]} "
+                "(SPEC §9.1-§9.3)")
     if not isinstance(proposal, dict):
-        raise ProposalError("proposal must be a JSON object")
+        raise ProposalError(f"proposal must be a JSON object — {envelope}")
     for field in _REQUIRED_FIELDS:
         if field not in proposal:
-            raise ProposalError(f"missing field '{field}' (SPEC §9.1)")
+            raise ProposalError(f"missing field '{field}' (SPEC §9.1) — {envelope}")
     if not isinstance(proposal["proposal_id"], str) or not proposal["proposal_id"]:
-        raise ProposalError("proposal_id must be a non-empty string")
+        raise ProposalError(
+            f"proposal_id must be a non-empty string — {envelope}")
     if not isinstance(proposal["reason"], str) or not proposal["reason"]:
-        raise ProposalError("reason must be a non-empty string")
+        raise ProposalError(f"reason must be a non-empty string — {envelope}")
     conf = proposal["confidence"]
     if isinstance(conf, bool) or not isinstance(conf, (int, float)):
-        raise ProposalError("confidence must be a number")
+        raise ProposalError(f"confidence must be a number — {envelope}")
     if not 0.0 <= conf <= 1.0:
-        raise ProposalError("confidence must be in [0, 1]")
+        raise ProposalError(f"confidence must be in [0, 1], got {conf} — {envelope}")
     events = proposal["events"]
     if not isinstance(events, list) or not events:
-        raise ProposalError("events must be a non-empty list (SPEC §9.3)")
+        raise ProposalError(
+            f"events must be a non-empty list (SPEC §9.3) — {envelope}")
     for i, ev in enumerate(events):
         if not isinstance(ev, dict) or "op" not in ev:
-            raise ProposalError(f"event {i}: must be an object with an 'op'")
+            raise ProposalError(
+                f"event {i}: must be an object with an 'op' — {_OP_SHAPE_HELP['task_created']}")
         if ev["op"] not in PLANNER_OPS:
             raise ProposalError(
-                f"op '{ev['op']}' not allowed for a planner (§9.6)")
+                f"op '{ev['op']}' not allowed for a planner (§9.6) — "
+                f"allowed ops: {', '.join(PLANNER_OPS)}; "
+                f"{_OP_SHAPE_HELP['task_created']}")
+        shape = _OP_SHAPE_HELP[ev["op"]]
         if "seq" in ev:
             raise ProposalError(
                 "proposal events must not carry 'seq' — the kernel "
-                "stamps sequence numbers on commit (§9.4)")
+                f"stamps sequence numbers on commit (§9.4). {shape}")
         for field in _OP_REQ[ev["op"]]:
             if field not in ev:
                 raise ProposalError(
-                    f"event {i}: missing '{field}' for {ev['op']} (§9.3)")
+                    f"event {i}: missing '{field}' for {ev['op']} (§9.3) — {shape}")
         if ev["op"] == "task_expanded":
-            for c in ev["children"]:
+            for j, c in enumerate(ev["children"]):
                 if not isinstance(c, dict):
-                    raise ProposalError(f"event {i}: children must be objects")
+                    raise ProposalError(
+                        f"event {i}: child {j} must be an object with 'id' and "
+                        f"'title', got {type(c).__name__} — {shape}")
                 if not (isinstance(c.get("title"), str) and c["title"]):
                     raise ProposalError(
-                        f"event {i}: child needs a non-empty title")
+                        f"event {i}: child {j} needs a non-empty title "
+                        f"(got {c.get('title')!r}) — {shape}")
                 if not (isinstance(c.get("id"), str) and c["id"]):
-                    raise ProposalError(f"event {i}: child needs a non-empty id")
+                    raise ProposalError(
+                        f"event {i}: child {j} needs a non-empty id "
+                        f"(got {c.get('id')!r}) — {shape}")
 
 
 # --------------------------------------------------------------------------- context contract

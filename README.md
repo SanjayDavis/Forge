@@ -1,5 +1,11 @@
 # Forge
 
+[![CI](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
+[![Python](https://img.shields.io/pypi/pyversions/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
+[![Tests](https://img.shields.io/badge/tests-267_compliance--18_included-blue.svg)](docs/verification.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 **Project state is deterministic. Intelligence is replaceable.**
 
 Forge is a deterministic project kernel for autonomous software
@@ -9,7 +15,15 @@ No client ever mutates project state directly.
 
 The planner proposes. The kernel decides.
 
-## Why does it exist?
+![A real Forge run: 42 tasks planned, worked, and verified through the kernel](assets/demo-chip8.gif)
+
+*That is not a mock-up.* It is Proof #2 — a real CHIP-8 emulator built by
+driving the kernel: 42 tasks, 259 events, 2 verification failures caught
+and retried, all replayed from an append-only log. The
+[raw event log](examples/chip8/events.log) is committed. Regenerate any
+proof yourself with `forge proof check`.
+
+## The one idea
 
 Conversations and markdown plans are a bad place to keep state. They
 are lossy, unreplayable, and unauditable. Forge replaces them with an
@@ -24,6 +38,34 @@ event-sourced task graph: append-only, deterministic, replayable.
 | Hard to audit | Fully auditable |
 
 See [WHY_FORGE.md](WHY_FORGE.md) for the full argument.
+
+## Proof corpus
+
+Claims are only worth what backs them. Every row below is a completed
+project with its event log committed, its graph rendered, and a claim it
+answers — check any of them yourself.
+
+| # | Proof | Language | Tasks | Events | Verif. failures | Conforms |
+|---|-------|----------|-------|--------|-----------------|----------|
+| 1 | [flask-todo](examples/flask-todo/) | Python | 8 | 47 | 1 | yes |
+| 2 | [chip8](examples/chip8/) | Python | 42 | 259 | 2 | yes |
+| 3 | [expr-parser](examples/expr-parser/) | C++ | 17 | 96 | 0 | yes |
+| 4 | [rust-cli](examples/rust-cli/) | Rust | 15 | 86 | 0 | yes |
+| 5 | [swarm](examples/swarm/) | Python (4 agents) | 114 | 612 | 3 | yes |
+
+The corpus answers specific criticisms, not "it works":
+
+| Claim | Criticism | Backed by |
+|-------|-----------|-----------|
+| C1 | "Only works on toy examples" | CHIP-8, expr-parser, rust-cli |
+| C2 | "Only works for web apps" | CHIP-8, rust-cli |
+| C3 | "Tied to Python" | expr-parser (C++), rust-cli (Rust) |
+| C4 | "Can't handle long projects" | swarm (114 tasks) |
+| C5 | "Only works with one agent" | swarm (4 concurrent agents) |
+| C6 | "Just a fancy todo list" | flask-todo, CHIP-8, rust-cli, swarm |
+| C7 | "Can't handle structured complexity" | flask-todo, CHIP-8, swarm |
+
+![A 114-task, 4-agent swarm run driven through one kernel](assets/demo-swarm.gif)
 
 ## Forge in 60 seconds
 
@@ -50,6 +92,12 @@ What happened: a goal became a graph. The kernel computed what is
 ready, handed the client a focused context package instead of the whole
 project, and recorded every step in an append-only log. The planner
 proposes; the kernel decides. Nothing was mutated directly.
+
+Already have a plan? Commit it as a proposal — atomically or not at all:
+
+```
+forge -d my-project propose examples/proposal.example.json
+```
 
 ## Architecture
 
@@ -155,7 +203,7 @@ Done:
 - Kernel — event-sourced task graph, scheduler, verifier gates, query
   language, inspector
 - Specification — `docs/SPEC.md` v1.0
-- Compliance suite — 15 portable tests mapped to invariants I1–I7
+- Compliance suite — 18 portable tests mapped to invariants I1–I7
   (plus adversarial fuzzing and the ROAD_TO_1.0↔INDEX cross-check)
 - SDK — `forge.ForgeClient`, the single public surface
 - Context API — the ~500-token contract package for coding agents

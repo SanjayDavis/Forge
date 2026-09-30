@@ -7,6 +7,56 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [PEP 440](https://peps.python.org/pep-0440/);
 beta `0.1.0b1` is the current release.
 
+## [Unreleased]
+
+Adoption work. The kernel is untouched — SPEC v1, no API changes, and
+the surface guard stays green. This release makes Forge *usable and
+visible* to someone arriving for the first time, which is the open
+`0.1.0b1` question.
+
+### Added
+
+- **A runnable example proposal** (`examples/proposal.example.json`):
+  a complete, minimal SPEC §9 proposal that `forge propose` accepts.
+  The proposal protocol was previously documented only in prose.
+- **`forge propose --help` documents the §9.3 event schema** — envelope,
+  all four planner ops, field types, and the "never a bare string" trap
+  for list fields — plus a pointer to the example file.
+- **Every proposal rejection now names the shape it expected** and ends
+  with the example path. Previously a rejection stated only the rule
+  broken; the observed failure mode was an agent retrying the same
+  malformed proposal N times with zero progress. A rejection an agent
+  cannot act on is a stalled agent, so the message is part of the
+  contract.
+- **Doc-integrity guards** (`tests/compliance/test_compliance.py`, +3):
+  the compliance suite's test counts, as stated in `README.md`,
+  `WHY_FORGE.md`, and `docs/verification.md`, are now re-derived by
+  test discovery and asserted equal. A stated count is a claim about the
+  repo, and this project holds claims to that standard. These tests
+  immediately caught three stale numbers on landing.
+- **README proof corpus**: all five proofs, their task/event/failure
+  counts and the claim each answers, surfaced from
+  `proofs/INDEX.md` into the README.
+- **README demo GIFs** (`assets/demo-chip8.gif`, `assets/demo-swarm.gif`,
+  built by `tools/make-readme-gif.py` from the committed proof frames):
+  the proof corpus was already recorded as video and rendered graphs,
+  but nothing on the landing page showed it.
+- **Issue templates** (bug / feature) and a link to Discussions, which
+  is now enabled.
+
+### Fixed
+
+- **PyPI publish is idempotent** (`.github/workflows/release.yml`): a
+  version already on PyPI is skipped rather than failing the job with a
+  400 "file already exists". PyPI versions are immutable, so
+  re-releasing an existing version is a no-op, not a re-upload.
+- **Kernel rejections are actionable at the CLI layer too**: `forge
+  propose` catches kernel verdicts (not just protocol verdicts) and
+  prints the same shape hint.
+- Stale counts: `docs/verification.md` said 255 tests (264), and
+  `WHY_FORGE.md` said "Twelve" compliance tests against fifteen.
+- `.gitignore` listed `dist/` twice and missed `.venv-b1-test/`.
+
 ## [0.1.0b1] - 2026-08-24
 
 The first beta: the release whose question is "does Forge work for

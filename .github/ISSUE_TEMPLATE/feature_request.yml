@@ -1,0 +1,52 @@
+name: Feature request
+description: Suggest a client, a plugin capability, or a spec amendment
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The kernel is frozen at SPEC v1: no new kernel features without a
+        spec amendment and a version bump (docs/SPEC.md Appendix A). New
+        features belong in **plugins** — separate distributions that consume
+        the SDK.
+
+        So please pick the layer:
+
+        - a **client/plugin** capability (planner, executor, reviewer, MCP, UI)
+        - a **missing SDK method** (the boundary is missing something)
+        - a **spec amendment** (the kernel contract itself)
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Which layer
+      options:
+        - client / plugin capability
+        - missing SDK method
+        - spec amendment (kernel contract)
+        - ecosystem / distribution
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't you do today? Describe the situation, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: |
+        If this touches the kernel, sketch the event or API shape and which
+        invariant (I1–I7) it affects.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

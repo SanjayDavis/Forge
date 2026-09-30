@@ -1,0 +1,42 @@
+{
+  "proposal_id": "prop_example_001",
+  "reason": "Minimal end-to-end example of the SPEC §9 proposal protocol: two tasks and one dependency. Copy this file, edit the values, run `forge propose <file>`. A proposal is committed whole or rejected whole - if any event is invalid, none are applied.",
+  "confidence": 0.9,
+  "events": [
+    {
+      "op": "task_created",
+      "id": "fetch-decode-execute",
+      "title": "Fetch-decode-execute loop",
+      "description": "The main interpreter cycle: fetch an opcode, decode it, execute it.",
+      "acceptance": [
+        "fetch reads PC and advances PC by 2",
+        "unknown opcode raises without mutating state"
+      ],
+      "files": [
+        "src/cpu.py"
+      ],
+      "priority": "high",
+      "notes": []
+    },
+    {
+      "op": "task_created",
+      "id": "test-suite",
+      "title": "CPU test suite",
+      "description": "Unit tests covering the fetch-decode-execute loop.",
+      "acceptance": [
+        "all tests pass",
+        "unknown-opcode case is covered"
+      ],
+      "files": [
+        "tests/test_cpu.py"
+      ],
+      "priority": "medium",
+      "notes": []
+    },
+    {
+      "op": "dependency_added",
+      "task": "test-suite",
+      "depends_on": "fetch-decode-execute"
+    }
+  ]
+}

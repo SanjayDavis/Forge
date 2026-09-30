@@ -1,0 +1,78 @@
+name: Bug report
+description: Something in the kernel, SDK, CLI, or a client behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Forge's kernel is frozen at SPEC v1. Please read
+        [WHY_FORGE.md](../blob/master/WHY_FORGE.md) first: the kernel decides,
+        and clients propose. Most surprising behavior is the design working
+        as intended.
+
+        If you are proposing a *change to the event schema or state machine*,
+        that is a spec amendment, not a bug — open a discussion instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+      placeholder: |
+        Expected: `forge next` returns the highest-priority ready task.
+        Actual:  returns a lower-priority task.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The smallest command sequence that shows it.
+      render: shell
+      placeholder: |
+        forge -d demo init
+        forge create "A" -a "done"
+        forge next
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "forge --version"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface
+      options:
+        - kernel / SDK
+        - CLI
+        - MCP server
+        - planner
+        - executor
+        - reviewer
+        - proof tooling
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Python version, and which distributions you installed.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Event log excerpt
+      description: If the graph state looks wrong, `forge log --tail 20` is usually the fastest way to show why.
+      render: shell

@@ -9,7 +9,7 @@ checks, run on every milestone.
 python -m unittest discover -s tests
 ```
 
-Zero dependencies, Python 3.10+. Full suite: 255 tests (240 in
+Zero dependencies, Python 3.10+. Full suite: 267 tests (249 in
 `tests/`, 15 compliance).
 Breakdown:
 
@@ -32,7 +32,7 @@ Breakdown:
 | `tests/test_stress.py` | 6 | 100k-event fold/replay, concurrency |
 | `tests/test_scheduler.py` | 6 | ready ordering, dependency gating |
 | `tests/test_context.py` | 4 | context contract package |
-| `tests/compliance/test_compliance.py` | 15 | SPEC invariants I1–I7 one-to-one + ROAD_TO_1.0 guards |
+| `tests/compliance/test_compliance.py` | 18 | SPEC invariants I1–I7 one-to-one + ROAD_TO_1.0 guards |
 
 ## Specification Compliance Suite
 

@@ -582,6 +582,111 @@ class ComplianceRoadmap(unittest.TestCase):
                 self.assertTrue(any(a in line for a in allowed),
                                 f"checked box with no verifiable source: {line}")
 
+    # ---------------------------------------------------------------- doc claims
+    # A stated count is a claim about the repo, and the whole point of this
+    # project is that claims should be checked, not trusted. These tests
+    # discover the real numbers and compare them to what the docs say, so
+    # "255 tests" cannot survive the suite the way it did.
+    def _count_tests(self, package: str = "") -> int:
+        """Count tests by discovery, scoped to one package directory
+        ('' = tests/ itself, 'compliance' = tests/compliance/)."""
+        base = os.path.join(self.root, "tests") if not package else None
+        if base is not None:
+            path, prefix = base, "tests."
+        else:
+            path, prefix = os.path.join(self.root, "tests", package), f"tests.{package}."
+        if not os.path.isdir(path):
+            return 0
+        total = 0
+        for fn in sorted(os.listdir(path)):
+            if not (fn.startswith("test_") and fn.endswith(".py")):
+                continue
+            total += unittest.defaultTestLoader.loadTestsFromName(
+                prefix + fn[:-3]).countTestCases()
+        return total
+
+    def _read(self, *parts: str) -> str:
+        with open(os.path.join(self.root, *parts), encoding="utf-8") as rf:
+            return rf.read()
+
+    def test_verification_md_test_counts_are_true(self):
+        """docs/verification.md states the full suite size; it must be true.
+
+        Discovery is the authority: the counts are recomputed, never
+        hardcoded here, so adding a test and forgetting the doc fails CI."""
+        unit = self._count_tests("")
+        compliance = self._count_tests("compliance")
+        total = unit + compliance
+        text = self._read("docs", "verification.md")
+        m = re.search(r"Full suite:\s*(\d+)\s*tests\s*\((\d+)\s*in", text)
+        self.assertIsNotNone(m, "docs/verification.md missing 'Full suite: N tests (M in ...)'")
+        self.assertEqual(int(m.group(1)), total,
+                         f"docs/verification.md says {m.group(1)} tests; "
+                         f"discovery finds {total} ({unit} in tests/, "
+                         f"{compliance} compliance)")
+        self.assertEqual(int(m.group(2)), unit,
+                         f"docs/verification.md says {m.group(2)} in tests/; "
+                         f"discovery finds {unit}")
+
+    def test_compliance_suite_count_is_true_everywhere(self):
+        """Every doc that states the compliance suite size must state it
+        correctly. The count is quoted in three places in two forms —
+
+          README.md           "15 portable tests"     (numeric)
+          WHY_FORGE.md        "Fifteen portable tests" (spelled)
+          docs/verification.md  the table row "| 15 |" (numeric)
+
+        — and they had drifted apart ('Twelve' vs 'fifteen'). This reads
+        whichever form each doc uses and holds all of them to the number
+        discovery reports."""
+        n = self._count_tests("compliance")
+        self.assertGreater(n, 0, "compliance suite not discovered")
+        # spelled-out numbers, so a word-form doc is checked as strictly
+        # as a digit-form one
+        words = {"twelve": 12, "Twelve": 12, "fifteen": 15, "Fifteen": 15,
+                 "eighteen": 18, "Eighteen": 18}
+        for doc in (("README.md",), ("WHY_FORGE.md",), ("docs", "verification.md")):
+            text = self._read(*doc)
+            name = "/".join(doc)
+            found = set()
+            # word form: "<Word> portable tests"
+            m = re.search(r"\b(" + "|".join(words) + r")\s+portable tests", text)
+            if m:
+                found.add(words[m.group(1)])
+            # digit form: "<N> portable tests"
+            m = re.search(r"\b(\d+)\s+portable tests", text)
+            if m:
+                found.add(int(m.group(1)))
+            # table form: "| <N> |" on the compliance row
+            m = re.search(r"test_compliance\.py`\s*\|\s*(\d+)", text)
+            if m:
+                found.add(int(m.group(1)))
+            if not found:
+                self.fail(f"{name} no longer states a compliance-suite count")
+            for got in found:
+                self.assertEqual(got, n,
+                                 f"{name} states {got} compliance tests; "
+                                 f"the suite has {n}")
+
+    def test_full_suite_count_matches_discovery(self):
+        """The headline number — total tests — must equal what discovery
+        reports, in both docs that state it (verification.md prose, and
+        the README's own compliance figure)."""
+        unit = self._count_tests("")
+        compliance = self._count_tests("compliance")
+        total = unit + compliance
+        text = self._read("docs", "verification.md")
+        m = re.search(r"Full suite:\s*(\d+)\s*tests\s*\((\d+)\s*in", text)
+        self.assertIsNotNone(
+            m, "docs/verification.md missing 'Full suite: N tests (M in ...)'")
+        self.assertEqual(int(m.group(1)), total,
+                         f"docs/verification.md says {m.group(1)} tests; "
+                         f"discovery finds {total} ({unit} in tests/, "
+                         f"{compliance} compliance)")
+        self.assertEqual(int(m.group(2)), unit,
+                         f"docs/verification.md says {m.group(2)} in tests/; "
+                         f"discovery finds {unit}")
+
 
 if __name__ == "__main__":
     unittest.main()

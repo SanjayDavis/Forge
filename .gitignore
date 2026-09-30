@@ -10,8 +10,10 @@ events.log
 # proofs ship their raw event log as evidence
 !examples/**/events.log
 demo/.frames/
-dist/
+
+# local test venvs
 .venv-test/
+.venv-b1-test/
 
 # local planning scratch — never commit (contains machine-local paths)
 .hermes/

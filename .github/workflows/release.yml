@@ -84,7 +84,26 @@ jobs:
           cp packages/forge-proof/dist/* dist-staging/
           ls dist-staging/
 
+      # Publish is idempotent. 0.1.0b1 reached PyPI by hand before its tag
+      # existed, so re-tagging it would otherwise fail this job with a 400
+      # "file already exists" and mark the release red. PyPI versions are
+      # immutable: a version that is already published is a no-op, never a
+      # re-upload. Detect that here and skip, so re-running a release for an
+      # already-published version is green and honest.
+      - name: Skip upload if this version is already on PyPI
+        id: already
+        run: |
+          version=$(python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if curl -fsS "https://pypi.org/pypi/forge-foundation/$version/json" > /dev/null; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "forge-foundation $version is already on PyPI - skipping upload (versions are immutable)"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish all four distributions to PyPI
+        if: steps.already.outputs.published != 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           # A single flat directory: gh-action-pypi-publish versions differ

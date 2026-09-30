@@ -68,7 +68,7 @@ deterministic operating system that AI agents can safely use."
   forever, so new features land in plugins instead.
 - **A proposal protocol.** Agents emit structured proposals; the kernel
   validates them atomically — whole commit or whole rejection.
-- **A compliance suite.** Twelve portable tests map one-to-one to the
+- **A compliance suite.** Eighteen portable tests map one-to-one to the
   invariants in the spec (I1–I7). They pass against the reference
   implementation *without reading its source*. Any implementation
   claiming to be Forge v1.0 must pass them.

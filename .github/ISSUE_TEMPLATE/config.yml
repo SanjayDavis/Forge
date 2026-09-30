@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea (no bug)
+    url: https://github.com/SanjayDavis/Forge/discussions
+    about: Ask how to use Forge, propose a client, or discuss a spec amendment. Discussions are enabled — this is the best place for anything that is not a reproducible bug.
+  - name: The specification (normative)
+    url: https://github.com/SanjayDavis/Forge/blob/master/docs/SPEC.md
+    about: Read this before claiming a kernel behavior is wrong — the kernel is frozen at SPEC v1 and this is the contract it implements.
+  - name: Kernel source (small, read it)
+    url: https://github.com/SanjayDavis/Forge/tree/master/forge
+    about: The whole kernel is ~2,200 lines of stdlib-only Python. If something seems wrong, the fastest check is usually to read it.
