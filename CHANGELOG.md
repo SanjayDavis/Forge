@@ -16,6 +16,10 @@ visible* to someone arriving for the first time, which is the open
 
 ### Added
 
+- **Web task board** (`forge serve`): stdlib-only single-page UI showing
+  status columns, ready highlighting, progress, and a task detail panel.
+- **BharatCode LLM planner** (`packages/forge-bharatcode`): optional planner
+  backed by the BharatCode model API.
 - **A runnable example proposal** (`examples/proposal.example.json`):
   a complete, minimal SPEC §9 proposal that `forge propose` accepts.
   The proposal protocol was previously documented only in prose.
