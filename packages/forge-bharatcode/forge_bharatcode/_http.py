@@ -10,9 +10,29 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Optional
+
+
+def _ssl_context() -> ssl.SSLContext:
+    # Prefer an explicit CA bundle when available (certifi is the common
+    # one on Windows, where Python's default verify paths are often empty).
+    try:
+        import certifi  # type: ignore
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        pass
+    ctx = ssl.create_default_context()
+    if not ctx.get_ca_certs():
+        # No CA bundle found anywhere: fall back to unverified so the
+        # tool still works, but warn on stderr.
+        import sys
+        print("warning: no CA bundle found; TLS verification disabled",
+              file=sys.stderr)
+        return ssl._create_unverified_context()
+    return ctx
 
 
 DEFAULT_BASE_URL = "https://bharatcode.ai/api/model/v1"
@@ -78,7 +98,8 @@ def chat_completion(
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout,
+                                    context=_ssl_context()) as resp:
             raw = resp.read().decode("utf-8")
     except urllib.error.HTTPError as e:
         body = ""
