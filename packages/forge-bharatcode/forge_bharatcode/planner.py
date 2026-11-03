@@ -46,6 +46,8 @@ Rules:
 - First event: task_created for the root, id = slugified goal (lowercase,
   a-z0-9 and hyphens). Include title, description, acceptance (list),
   files (list), notes (list), priority.
+- IMPORTANT: the operation field is named "op" (not "type"). The task
+  reference field is named "task" (not "source" or "task_id").
 - Second event: task_expanded on the root with 3-6 children. Each child
   has id, title, description, acceptance (list), files (list), priority.
   Child ids must be unique slugs derived from their titles.
@@ -82,6 +84,58 @@ def _extract_json(text: str) -> Dict[str, Any]:
         except json.JSONDecodeError:
             pass
     raise ProposalError(f"model did not return valid JSON: {text[:300]}")
+
+
+def _normalize_proposal(proposal: Dict[str, Any]) -> None:
+    """Tolerate common field-name aliases produced by weaker models."""
+    if not isinstance(proposal, dict):
+        return
+    events = proposal.get("events")
+    if not isinstance(events, list):
+        return
+    for ev in events:
+        if not isinstance(ev, dict):
+            continue
+        if "op" not in ev and "type" in ev:
+            ev["op"] = ev.pop("type")
+        op = ev.get("op")
+        # task_created sometimes nests fields under a "task" object
+        if op == "task_created" and isinstance(ev.get("task"), dict):
+            nested = ev.pop("task")
+            for k, v in nested.items():
+                if k not in ev:
+                    ev[k] = v
+        # task_created sometimes uses "task" as the id string
+        if op == "task_created" and "id" not in ev and isinstance(ev.get("task"), str):
+            ev["id"] = ev.pop("task")
+        # id aliases for task_created
+        if op == "task_created" and "id" not in ev:
+            for alt in ("task_id", "slug", "key", "name"):
+                if alt in ev:
+                    ev["id"] = ev.pop(alt)
+                    break
+        # task reference aliases
+        if op in ("task_expanded", "task_updated", "dependency_added",
+                  "dependency_removed"):
+            if "task" not in ev:
+                for alt in ("source", "parent", "task_id", "target", "from"):
+                    if alt in ev:
+                        ev["task"] = ev.pop(alt)
+                        break
+        if op in ("dependency_added", "dependency_removed"):
+            if "depends_on" not in ev:
+                for alt in ("depends", "depends_on_id", "to", "target"):
+                    if alt in ev:
+                        ev["depends_on"] = ev.pop(alt)
+                        break
+        # children id/title aliases
+        if op == "task_expanded":
+            for c in ev.get("children", []) or []:
+                if isinstance(c, dict):
+                    if "id" not in c and "task_id" in c:
+                        c["id"] = c.pop("task_id")
+                    if "title" not in c and "name" in c:
+                        c["title"] = c.pop("name")
 
 
 class BharatCodePlanner:
@@ -143,6 +197,7 @@ class BharatCodePlanner:
         )
 
         proposal = _extract_json(raw)
+        _normalize_proposal(proposal)
 
         # Normalize: ensure proposal_id exists.
         if not proposal.get("proposal_id"):

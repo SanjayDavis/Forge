@@ -67,6 +67,28 @@ class TestBharatCodePlanner(unittest.TestCase):
         with self.assertRaises(BharatCodeError):
             planner.plan("Build a demo")
 
+    def test_normalizes_aliases(self):
+        alias_proposal = {
+            "proposal_id": "prop_alias",
+            "reason": "r",
+            "confidence": 0.9,
+            "events": [
+                {"type": "task_created", "task": {"id": "root", "title": "Root",
+                 "description": "", "acceptance": [], "files": [], "notes": [],
+                 "priority": "medium"}},
+                {"type": "task_expanded", "task": "root",
+                 "children": [{"id": "c1", "title": "C1", "description": "",
+                               "acceptance": [], "files": [], "priority": "medium"}]},
+            ],
+        }
+        with patch("forge_bharatcode.planner.chat_completion",
+                   return_value=__import__("json").dumps(alias_proposal)):
+            planner = BharatCodePlanner(api_key="test-key")
+            proposal = planner.plan("Root")
+        self.assertEqual(proposal["events"][0]["op"], "task_created")
+        self.assertEqual(proposal["events"][0]["id"], "root")
+        self.assertEqual(proposal["events"][1]["task"], "root")
+
     def test_commit_without_client_raises(self):
         planner = BharatCodePlanner(api_key="test-key")
         with self.assertRaises(Exception):
