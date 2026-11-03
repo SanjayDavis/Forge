@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-bharatcode"
+version = "0.1.0b1"
+description = "Forge planner backed by the BharatCode model API (OpenAI-compatible)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Sanjay Davis", email = "psanjuknl@gmail.com" }]
+keywords = ["forge", "planner", "bharatcode", "llm", "agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = ["forge-foundation"]
+
+[project.urls]
+Homepage = "https://github.com/SanjayDavis/Forge"
+Repository = "https://github.com/SanjayDavis/Forge"
+
+[project.entry-points."forge.commands"]
+plan-bharatcode = "forge_bharatcode.cli:register"
+
+[tool.setuptools]
+packages = ["forge_bharatcode"]

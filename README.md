@@ -3,7 +3,7 @@
 [![CI](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
 [![Python](https://img.shields.io/pypi/pyversions/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
-[![Tests](https://img.shields.io/badge/tests-267_compliance--18_included-blue.svg)](docs/verification.md)
+[![Tests](https://img.shields.io/badge/tests-272_compliance--18_included-blue.svg)](docs/verification.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Project state is deterministic. Intelligence is replaceable.**
@@ -248,6 +248,25 @@ Forge does not compete with coding agents; it sits underneath them.
 
 Nothing stops you from using all of them together: LangGraph to
 orchestrate, Claude Code to write, Forge to hold the truth.
+
+## BharatCode integration
+
+Forge ships an optional LLM planner backed by the
+[BharatCode](https://bharatcode.ai) model API (OpenAI-compatible,
+`qwen-3.8-27b` / `deepseek-v4.1-flash`). The kernel stays
+zero-dependency; only this package touches the network, and only when you
+ask it to plan:
+
+```sh
+pip install -e packages/forge-bharatcode
+export BHARATCODE_API_KEY=bc_live_...
+forge -d myproject init
+forge -d myproject plan-bharatcode "Build a CHIP-8 emulator" --commit
+```
+
+The planner speaks the same proposal protocol as the reference planner,
+so a BharatCode model produces a graph the kernel validates and commits
+whole or rejects whole. See `packages/forge-bharatcode/`.
 
 ## Documentation
 

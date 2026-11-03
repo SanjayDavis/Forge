@@ -1,0 +1,21 @@
+BharatCode Build League submission
+
+Project: Forge — a deterministic project kernel for autonomous software engineering
+Repository: https://github.com/SanjayDavis/Forge
+Author: Sanjay Davis (psanjuknl@gmail.com)
+Category: Coding & developer tools
+Hackathon: https://bharatcode.ai/hackathon
+
+Forge is a zero-dependency Python kernel that turns a goal into an
+event-sourced task graph. Every change by an LLM, agent, or human is
+proposed, validated, and committed through the kernel — nothing mutates
+project state directly. Ships with a CLI, an SDK, an MCP server, and a
+reference planner.
+
+BharatCode integration: the optional forge-bharatcode package uses the
+BharatCode model API (qwen-3.8-27b / deepseek-v4.1-flash) as an LLM
+planner behind the same proposal protocol:
+    forge -d <project> plan-bharatcode "Build a CHIP-8 emulator" --commit
+
+Install: pip install -e . && pip install -e packages/forge-bharatcode
+Tests:   python -m unittest discover -s tests   (272 tests, all green)
