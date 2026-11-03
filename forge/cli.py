@@ -424,6 +424,11 @@ def cmd_context(args, k: Kernel) -> int:
     return 0
 
 
+def cmd_serve(args, k: Kernel) -> int:
+    from .webui import serve
+    return serve(k, host=args.host, port=args.port, open_browser=not args.no_open)
+
+
 # --------------------------------------------------------------------------- parser
 PROPOSAL_EPILOG = """\
 proposal file format (SPEC §9) — a JSON object:
@@ -564,6 +569,11 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("replay", help="reconstruct the graph from the log")
     sub.add_parser("demo", help="seed a demo project (Snake Game)")
 
+    c = sub.add_parser("serve", help="serve a web UI for the task board (stdlib only)")
+    c.add_argument("--host", default="127.0.0.1")
+    c.add_argument("--port", type=int, default=8000)
+    c.add_argument("--no-open", action="store_true", help="do not open a browser")
+
     c = sub.add_parser("propose", help="commit a proposal file: protocol check, then kernel commits or rejects whole",
                        description="Commit a proposal file (SPEC §9). The envelope is validated, then the kernel "
                                    "commits the whole proposal or rejects it whole.",
@@ -614,6 +624,7 @@ COMMANDS = {
     "replay": cmd_replay,
     "demo": cmd_demo,
     "propose": cmd_propose,
+    "serve": cmd_serve,
 }
 
 

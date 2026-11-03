@@ -3,7 +3,7 @@
 [![CI](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SanjayDavis/Forge/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
 [![Python](https://img.shields.io/pypi/pyversions/forge-foundation.svg)](https://pypi.org/project/forge-foundation/)
-[![Tests](https://img.shields.io/badge/tests-272_compliance--18_included-blue.svg)](docs/verification.md)
+[![Tests](https://img.shields.io/badge/tests-273_compliance--18_included-blue.svg)](docs/verification.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Project state is deterministic. Intelligence is replaceable.**
