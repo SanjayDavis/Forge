@@ -6,8 +6,8 @@ import unittest
 from unittest.mock import patch
 
 try:
-    from forge_bharatcode import BharatCodePlanner, BharatCodeError
-    from forge_bharatcode._http import chat_completion
+    from forge.bharatcode import BharatCodePlanner, BharatCodeError
+    from forge.bharatcode._http import chat_completion
     _AVAILABLE = True
 except Exception:  # pragma: no cover
     _AVAILABLE = False
@@ -35,7 +35,7 @@ class TestBharatCodePlanner(unittest.TestCase):
             ],
         }
 
-    @patch("forge_bharatcode.planner.chat_completion")
+    @patch("forge.bharatcode.planner.chat_completion")
     def test_plan_parses_and_validates(self, mock_chat):
         mock_chat.return_value = json.dumps(self._valid_proposal())
         planner = BharatCodePlanner(api_key="test-key")
@@ -46,14 +46,14 @@ class TestBharatCodePlanner(unittest.TestCase):
         from forge import validate_proposal
         validate_proposal(proposal)  # must not raise
 
-    @patch("forge_bharatcode.planner.chat_completion")
+    @patch("forge.bharatcode.planner.chat_completion")
     def test_plan_handles_code_fences(self, mock_chat):
         mock_chat.return_value = "```json\n" + json.dumps(self._valid_proposal()) + "\n```"
         planner = BharatCodePlanner(api_key="test-key")
         proposal = planner.plan("Build a demo")
         self.assertIn("events", proposal)
 
-    @patch("forge_bharatcode.planner.chat_completion")
+    @patch("forge.bharatcode.planner.chat_completion")
     def test_plan_raises_on_bad_json(self, mock_chat):
         mock_chat.return_value = "not json at all"
         planner = BharatCodePlanner(api_key="test-key")
@@ -81,7 +81,7 @@ class TestBharatCodePlanner(unittest.TestCase):
                                "acceptance": [], "files": [], "priority": "medium"}]},
             ],
         }
-        with patch("forge_bharatcode.planner.chat_completion",
+        with patch("forge.bharatcode.planner.chat_completion",
                    return_value=__import__("json").dumps(alias_proposal)):
             planner = BharatCodePlanner(api_key="test-key")
             proposal = planner.plan("Root")

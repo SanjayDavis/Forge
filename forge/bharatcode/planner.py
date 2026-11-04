@@ -16,7 +16,8 @@ import uuid
 from typing import Any, Dict, List, Optional
 
 from forge import ForgeClient, PLANNER_OPS, ProposalError, slugify, validate_proposal
-from forge_bharatcode._http import (
+from . import _http as _http_mod  # noqa: F401
+from ._http import (
     BharatCodeHTTPError,
     chat_completion,
     resolve_api_key,
@@ -130,12 +131,33 @@ def _normalize_proposal(proposal: Dict[str, Any]) -> None:
                         break
         # children id/title aliases
         if op == "task_expanded":
+            seen = set()
             for c in ev.get("children", []) or []:
                 if isinstance(c, dict):
                     if "id" not in c and "task_id" in c:
                         c["id"] = c.pop("task_id")
+                    if "id" not in c:
+                        title = c.get("title") or c.get("name") or "task"
+                        c["id"] = slugify(str(title))
                     if "title" not in c and "name" in c:
                         c["title"] = c.pop("name")
+                    if "title" not in c or not c.get("title"):
+                        c["title"] = str(c.get("id"))
+                    # dedupe ids
+                    base = c["id"]
+                    n = 2
+                    while c["id"] in seen:
+                        c["id"] = f"{base}-{n}"
+                        n += 1
+                    seen.add(c["id"])
+                    if "description" not in c:
+                        c["description"] = ""
+                    if "acceptance" not in c:
+                        c["acceptance"] = []
+                    if "files" not in c:
+                        c["files"] = []
+                    if "priority" not in c:
+                        c["priority"] = "medium"
 
 
 class BharatCodePlanner:
@@ -148,7 +170,7 @@ class BharatCodePlanner:
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
         model: Optional[str] = None,
-        max_tokens: int = 4096,
+        max_tokens: int = 8192,
         temperature: float = 0.2,
     ) -> None:
         self.client = client
@@ -186,18 +208,27 @@ class BharatCodePlanner:
             {"role": "user", "content": "\n".join(user_parts)},
         ]
 
-        raw = chat_completion(
-            messages,
-            api_key=self.api_key,
-            base_url=self.base_url,
-            model=self.model,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            response_format={"type": "json_object"},
-        )
-
-        proposal = _extract_json(raw)
-        _normalize_proposal(proposal)
+        last_err = None
+        for attempt in range(2):
+            try:
+                raw = chat_completion(
+                    messages,
+                    api_key=self.api_key,
+                    base_url=self.base_url,
+                    model=self.model,
+                    max_tokens=self.max_tokens * (attempt + 1),
+                    temperature=self.temperature,
+                    response_format={"type": "json_object"},
+                )
+                proposal = _extract_json(raw)
+                _normalize_proposal(proposal)
+                break
+            except (ProposalError, BharatCodeHTTPError) as e:
+                last_err = e
+                if attempt == 1:
+                    raise
+        else:
+            raise last_err  # type: ignore[misc]
 
         # Normalize: ensure proposal_id exists.
         if not proposal.get("proposal_id"):

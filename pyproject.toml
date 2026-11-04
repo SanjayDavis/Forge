@@ -48,8 +48,13 @@ Documentation = "https://github.com/SanjayDavis/Forge/tree/master/docs"
 [project.scripts]
 forge = "forge.cli:main"
 
+[project.entry-points."forge.commands"]
+plan-bharatcode = "forge.bharatcode.cli:register"
+
 [tool.setuptools]
-# Only the kernel package ships on PyPI. Plugins (plugins/) are separate
-# products that consume the SDK; they are not part of the installed
-# package (docs/ROADMAP.md: Repository separation).
-packages = ["forge"]
+# The kernel package plus its in-tree optional subpackages. Plugins that
+# live under plugins/ remain separate products.
+packages = ["forge", "forge.bharatcode"]
+
+[project.optional-dependencies]
+bharatcode = ["certifi"]

@@ -46,10 +46,10 @@ FORGE_NAMESPACE = frozenset("""
     # happen to be bound — but every entry must be an existing forge
     # submodule or a curated name, never anything else.
     "model", "store", "scheduler", "context", "query", "kernel", "sdk",
-    "plugins", "webui",
+    "plugins", "webui", "bharatcode",
 }
 FORGE_SUBMODULES = {"model", "store", "scheduler", "context", "query",
-                    "kernel", "sdk", "plugins", "webui"}
+                    "kernel", "sdk", "plugins", "webui", "bharatcode"}
 
 
 # name -> parameter signature (names only; order matters, defaults do not)
