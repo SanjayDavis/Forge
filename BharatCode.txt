@@ -17,5 +17,5 @@ BharatCode model API (qwen-3.8-27b / deepseek-v4.1-flash) as an LLM
 planner behind the same proposal protocol:
     forge -d <project> plan-bharatcode "Build a CHIP-8 emulator" --commit
 
-Install: pip install -e . && pip install -e packages/forge-bharatcode
+Install: git clone https://github.com/SanjayDavis/Forge && cd Forge && pip install -e . && pip install -e packages/forge-bharatcode
 Tests:   python -m unittest discover -s tests   (274 tests, all green)

@@ -161,11 +161,17 @@ same shape: an installable package that consumes only the SDK.
 For development, install from the repository root:
 
 ```bash
-python -m pip install -e .
+python -m pip install -e .                  # forge-foundation (kernel + CLI + SDK)
 python -m pip install -e packages/forge-planner
-python -m pip install -e packages/forge-mcp
+python -m pip install -e packages/forge-proof   # optional: `forge proof ...`
+python -m pip install -e packages/forge-mcp      # optional: MCP server transport
+python -m pip install -e packages/forge-bharatcode  # optional: BharatCode LLM planner
 forge --help
 ```
+
+Note: only `forge-foundation`, `forge-planner`, `forge-mcp-base` and
+`forge-proof` are published on PyPI. `forge-bharatcode` ships inside this
+repository and is installed from a clone (see the BharatCode section below).
 
 (Works without install too: `python -m forge.cli ...`)
 
@@ -258,11 +264,16 @@ zero-dependency; only this package touches the network, and only when you
 ask it to plan:
 
 ```sh
-pip install -e packages/forge-bharatcode
-export BHARATCODE_API_KEY=bc_live_...
+# (after cloning this repo)
+python -m pip install -e packages/forge-bharatcode
+export BHARATCODE_API_KEY=bc_live_...   # or an OpenRouter key
 forge -d myproject init
 forge -d myproject plan-bharatcode "Build a CHIP-8 emulator" --commit
 ```
+
+This package is **not** on PyPI — it ships inside this repository, so
+clone first, then install it editable. The kernel itself stays
+zero-dependency; only this optional package touches the network.
 
 The planner speaks the same proposal protocol as the reference planner,
 so a BharatCode model produces a graph the kernel validates and commits
